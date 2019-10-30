@@ -1,0 +1,3 @@
+node_modules/
+src/inc/Config.php
+src/nodejs/config.json
