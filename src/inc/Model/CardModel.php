@@ -288,8 +288,8 @@ class CardModel extends Model
 	 */
 	public function checkCard(array $called): bool
 	{
-		$marked = \array_keys($this->marked);
-		$marked = \array_intersect($called, $marked);
+		$called = \array_intersect($this->grid, $called);
+		$marked = \array_intersect(\array_keys($this->marked), \array_keys($called));
 		foreach (self::WINPATTERNS as $pattern)
 		{
 			$intersect = \array_intersect($pattern, $marked);
