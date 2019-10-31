@@ -35,26 +35,6 @@ class Config
 	const DBNAME = 'bingo';
 
 	/**
-	 * The hostname of the Node server
-	 */
-	const SERVER_HOST = 'localhost';
-
-	/**
-	 * The port of the Node server
-	 */
-	const SERVER_PORT = 3000;
-
-	/**
-	 * Secret for authentication with the Node server
-	 */
-	const SERVER_SECRET = '';
-
-	/**
-	 * True to use HTTPS to communicate with the Node server, false to use HTTP
-	 */
-	const SERVER_HTTPS = false;
-
-	/**
 	 * The Twitch application ID
 	 */
 	const TWITCH_APP_ID = '';

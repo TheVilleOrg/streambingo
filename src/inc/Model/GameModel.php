@@ -162,28 +162,18 @@ class GameModel extends Model
 		return $result;
 	}
 
-	/**
-	 * Gets a list of active games.
-	 *
-	 * @return string[] An array of unique names identifying the games
-	 */
-	public static function getGameList(): array
+	public static function getGameFromToken(string $token): ?string
 	{
-		$names = [];
-
 		$gameName = null;
 
-		$stmt = self::db()->prepare('SELECT gameName FROM games WHERE ended = 0;');
+		$stmt = self::db()->prepare('SELECT gameName FROM games WHERE userId = (SELECT id FROM users WHERE accessToken = ?);');
+		$stmt->bind_param('s', $token);
 		$stmt->execute();
 		$stmt->bind_result($gameName);
-		while ($stmt->fetch())
-		{
-			$names[] = $gameName;
-		}
-
+		$stmt->fetch();
 		$stmt->close();
 
-		return $names;
+		return $gameName;
 	}
 
 	/**

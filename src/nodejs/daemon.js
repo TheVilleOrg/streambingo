@@ -1,6 +1,6 @@
 const config = require('./config.json');
 
-const { exec, execSync } = require('child_process');
+const { exec } = require('child_process');
 
 const tmi = require('tmi.js');
 
@@ -18,15 +18,13 @@ const http = function() {
       options.ca = fs.readFileSync(config.ssl.cafile);
     }
 
-    return require('https').createServer(options, httpHandler);
+    return require('https').createServer(options);
   } else {
-    return require('http').Server(httpHandler);
+    return require('http').Server();
   }
 }();
 
 const io = require('socket.io')(http);
-
-const gameList = new Set(JSON.parse(execSync(`php ${config.phpcli} listgames`))['games']);
 
 const client = new tmi.Client({
 	connection: {
@@ -36,8 +34,7 @@ const client = new tmi.Client({
 	identity: {
 		username: config.twitch.username,
 		password: config.twitch.password
-  },
-  channels: Array.from(gameList)
+  }
 });
 
 client.connect()
@@ -65,39 +62,36 @@ http.listen(config.port, config.host, () => {
   console.log(`listening on ${config.host}:${config.port}`);
 });
 
-function httpHandler(req, res) {
-  if (req.headers['authorization'] !== config.secret) {
-    res.writeHead(401).end();
-
-    return;
-  }
-
-  let path = req.url.split('/');
-  if (path.length === 3 && path[1] === 'game') {
-    if (req.method === 'PUT') {
-      client.join(path[2])
-      .then((data) => {
-        gameList.add(path[2]);
-        console.log(`joined #${path[2]}`);
-      }).catch((err) => {
-        console.warn(err);
-      });
-    } else if (req.method === 'DELETE') {
-      client.part(path[2])
-      .then((data) => {
-        gameList.delete(path[2]);
-        console.log(`parted #${path[2]}`);
-      }).catch((err) => {
-        console.warn(err);
-      });
-    }
-  }
-
-  res.writeHead(200).end();
-}
+io.on('connect', (socket) => {
+  socket.on('creategame', (token, cb) => {
+    exec(`php ${config.phpcli} getgame ${token}`, (err, stdout, stderr) => {
+      let data = JSON.parse(stdout);
+      if (data.name) {
+        client.join(data.name)
+        .then(() => {
+          console.log(`joined #${data.name}`);
+          cb(data.name);
+          socket.join(data.name);
+          socket.on('disconnect', () => {
+            client.part(data.name)
+            .then(() => {
+              console.log(`parted #${data.name}`);
+            })
+            .catch((err) => {
+              console.warn(err);
+            });
+          })
+        })
+        .catch((err) => {
+          console.warn(err);
+        });
+      }
+    });
+  });
+});
 
 function joinGame(channel, user) {
-	exec(`php ${config.phpcli} getgame ${channel.substr(1)}`, (err, stdout, stderr) => {
+	exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout, stderr) => {
 		let data = JSON.parse(stdout);
 		if (data.url) {
 			client.say(channel, data.url);
@@ -106,11 +100,12 @@ function joinGame(channel, user) {
 }
 
 function callBingo(channel, user) {
-	exec(`php ${config.phpcli} submitcard ${user['user-id']} ${channel.substr(1)}`, (error, stdout, stderr) => {
-		let data = JSON.parse(stdout);
+  const gameName = channel.substr(1);
+	exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (error, stdout, stderr) => {
+    let data = JSON.parse(stdout);
 		if (data.result) {
       client.say(channel, `Congratulations @${user['display-name']}!`);
-      io.to(channel).emit('winner', user['display-name']);
+      io.to(gameName).emit('winner', user['display-name']);
 		} else {
 			client.say(channel, `@${user['display-name']}, your card does not meet the win conditions.`);
 		}

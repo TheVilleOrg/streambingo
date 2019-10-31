@@ -43,22 +43,29 @@ class GameController
 		$game = GameModel::createGame($userId, $gameName);
 		$game->save();
 
-		$ch = \curl_init(self::getGameServerUrl($gameName));
-		\curl_setopt($ch, CURLOPT_PUT, true);
-		\curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: ' . Config::SERVER_SECRET]);
-		\curl_exec($ch);
-
 		return $game;
 	}
 
 	/**
-	 * Gets a list of active games.
+	 * Ends the specified game.
 	 *
-	 * @return string[] An array of unique names identifying the games
+	 * @param string $gameName The unique name identifying the game
+	 * @param int|null $cardId The unique identifier associated with the winning card, or null if there is no winner
 	 */
-	public static function getGameList(): array
+	public static function endGame(string $gameName, int $cardId = null): void
 	{
-		return GameModel::getGameList();
+		$game = GameModel::loadGame($gameName);
+		if (!$game)
+		{
+			throw new NotFoundException('Attempted to end a non-existent game');
+		}
+
+		$game->setEnded(true)->setWinner($cardId)->save();
+	}
+
+	public static function getGameFromToken(string $token): ?string
+	{
+		return GameModel::getGameFromToken($token);
 	}
 
 	/**
@@ -77,28 +84,6 @@ class GameController
 		}
 
 		return Config::BASE_URL . 'play/' . $game->getGameName();
-	}
-
-	/**
-	 * Ends the specified game.
-	 *
-	 * @param string $gameName The unique name identifying the game
-	 * @param int|null $cardId The unique identifier associated with the winning card, or null if there is no winner
-	 */
-	public static function endGame(string $gameName, int $cardId = null): void
-	{
-		$game = GameModel::loadGame($gameName);
-		if (!$game)
-		{
-			throw new NotFoundException('Attempted to end a non-existent game');
-		}
-
-		$game->setEnded(true)->setWinner($cardId)->save();
-
-		$ch = \curl_init(self::getGameServerUrl($gameName));
-		\curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-		\curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: ' . Config::SERVER_SECRET]);
-		\curl_exec($ch);
 	}
 
 	/**
@@ -223,17 +208,5 @@ class GameController
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Gets the URL to the `game` endpoint of the Node server.
-	 *
-	 * @param string $gameName The unique name identifying the game
-	 *
-	 * @return string The URL
-	 */
-	protected static function getGameServerUrl(string $gameName): string
-	{
-		return \sprintf('http%s://%s:%d/game/%s', Config::SERVER_HTTPS ? 's' : '', Config::SERVER_HOST, Config::SERVER_PORT, $gameName);
 	}
 }
