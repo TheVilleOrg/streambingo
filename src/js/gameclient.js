@@ -1,10 +1,15 @@
 $(function () {
-  $('#card td').click(function () {
+  $('#card .marker').click(function () {
     const cell = $(this);
+    const index = cell.data('cell');
+    if (index === 12) {
+      return;
+    }
+
     let postData = {
       json: true,
       action: 'toggleCell',
-      cell: cell.data('cell')
+      cell: index
     };
     $.post(window.location, postData, function (data) {
       if (data.marked) {

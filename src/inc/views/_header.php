@@ -11,8 +11,16 @@
 	<script src="/bingo/js/<?php echo $name; ?>.js"></script>
 <?php endforeach; ?>
 <?php endif; ?>
-    <title>BINGO</title>
+    <title>Stream BINGO</title>
 </head>
 <body>
-    <noscript>JavaScript must be enabled</noscript>
-    <h1>BINGO</h1>
+	<div id="main">
+		<h1>Stream BINGO</h1>
+		<div id="nav">
+			<a href="#" id="logo">B</a>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Host</a></li>
+			</ul>
+			<span id="user"><a href="#">Login with Twitch</a></span>
+		</div>
