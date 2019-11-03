@@ -209,4 +209,40 @@ class GameController
 
 		return $result;
 	}
+	/**
+	 * Gets the letter associated with a grid number.
+	 *
+	 * @param int $number The number
+	 *
+	 * @return string The letter associated with the number
+	 */
+	public static function getLetter(int $number): string
+	{
+		if ($number <= 15)
+		{
+			return 'B';
+		}
+
+		if ($number <= 30)
+		{
+			return 'I';
+		}
+
+		if ($number <= 45)
+		{
+			return 'N';
+		}
+
+		if ($number <= 60)
+		{
+			return 'G';
+		}
+
+		if ($number <= 75)
+		{
+			return 'O';
+		}
+
+		return '';
+	}
 }

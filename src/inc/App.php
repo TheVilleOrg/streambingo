@@ -62,6 +62,10 @@ class App
 			case 'submitcard':
 				$return['result'] = GameController::submitCard((int) $argv[2], $argv[3]);
 				break;
+			case 'callnumber':
+				$return['number'] = GameController::callNumber($argv[2]);
+				$return['letter'] = GameController::getLetter($return['number']);
+				break;
 		}
 
 		echo \json_encode($return);

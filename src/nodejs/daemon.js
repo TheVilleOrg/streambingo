@@ -70,8 +70,13 @@ io.on('connect', (socket) => {
         client.join(data.name)
         .then(() => {
           console.log(`joined #${data.name}`);
-          cb(data.name);
+
           socket.join(data.name);
+
+          socket.on('callnumber', () => {
+            callNumber(data.name);
+          });
+
           socket.on('disconnect', () => {
             client.part(data.name)
             .then(() => {
@@ -80,7 +85,8 @@ io.on('connect', (socket) => {
             .catch((err) => {
               console.warn(err);
             });
-          })
+          });
+          cb(data.name);
         })
         .catch((err) => {
           console.warn(err);
@@ -90,13 +96,20 @@ io.on('connect', (socket) => {
   });
 });
 
+function callNumber(gameName) {
+  exec(`php ${config.phpcli} callnumber ${gameName}`, (err, stdout, stderr) => {
+    const data = JSON.parse(stdout);
+    io.to(gameName).emit('newnumber', data.letter, data.number);
+  });
+}
+
 function joinGame(channel, user) {
 	exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout, stderr) => {
 		let data = JSON.parse(stdout);
 		if (data.url) {
 			client.say(channel, data.url);
 		}
-	})
+	});
 }
 
 function callBingo(channel, user) {
@@ -109,5 +122,5 @@ function callBingo(channel, user) {
 		} else {
 			client.say(channel, `@${user['display-name']}, your card does not meet the win conditions.`);
 		}
-	})
+	});
 }
