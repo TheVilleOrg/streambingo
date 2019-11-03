@@ -1,4 +1,15 @@
 $(function () {
+  const socket = io('//' + window.location.hostname + ':3000');
+
+  socket.on('connect', function () {
+    $('#status').text('Connected');
+  });
+
+  socket.on('disconnect', function () {
+    console.log('socket connection lost');
+    $('#status').text('Disconnected');
+  });
+
   $('#card .marker').click(function () {
     const cell = $(this);
     const index = cell.data('cell');

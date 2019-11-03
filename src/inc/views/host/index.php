@@ -1,4 +1,5 @@
 <?php require __DIR__ . '/../_header.php'; ?>
+		<p>Status: <span id="status">Connecting...</p>
 		<p>Last Number: <span id="number"><?php echo $last; ?></span></p>
 		<table id="board" class="grid">
 			<tr>

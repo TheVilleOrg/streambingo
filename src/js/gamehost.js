@@ -6,8 +6,14 @@ $(function () {
     if (match.length === 2) {
       socket.emit('creategame', match[1], function (gameName) {
         console.log('joined game ' + gameName);
+        $('#status').text('Connected');
       });
     }
+  });
+
+  socket.on('disconnect', function () {
+    console.log('socket connection lost');
+    $('#status').text('Disconnected');
   });
 
   socket.on('newnumber', function (letter, number) {
