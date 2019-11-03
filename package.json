@@ -1,0 +1,23 @@
+{
+  "name": "streambingo",
+  "version": "1.0.0",
+  "description": "BINGO for live streaming",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevotvr/streambingo.git"
+  },
+  "author": "Steve 'StevoTVR' Guidetti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stevotvr/streambingo/issues"
+  },
+  "homepage": "https://github.com/stevotvr/streambingo#readme",
+  "devDependencies": {
+    "del": "^5.1.0",
+    "gulp": "^4.0.2"
+  }
+}
