@@ -114,7 +114,8 @@ class App
 	{
 		$protocol = ($_SERVER['HTTPS'] ?? null) === 'on' ? 'https' : 'http';
 		$hostname = $_SERVER['HTTP_HOST'];
-		$path = empty(self::$route) ? $_SERVER['REQUEST_URI'] : \substr($_SERVER['REQUEST_URI'], 0, -(\strlen(self::$route)));
+		$path = \explode('?', $_SERVER['REQUEST_URI'], 2)[0];
+		$path = empty(self::$route) ? $path : \substr($path, 0, -(\strlen(self::$route)));
 
 		return \sprintf('%s://%s%s', $protocol, $hostname, $path);
 	}
