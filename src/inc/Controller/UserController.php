@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Bingo\Controller;
 
+use Bingo\App;
 use Bingo\Config;
 use Bingo\Exception\InternalErrorException;
 use Bingo\Model\UserModel;
@@ -58,12 +59,12 @@ class UserController
 			\session_start();
 		}
 
-		$_SESSION['return_url'] = Config::BASE_URL . $returnPath;
+		$_SESSION['return_url'] = App::getBaseUrl() . $returnPath;
 		$_SESSION['state'] = \md5((string) \mt_rand());
 
 		$query = \http_build_query([
 			'client_id'		=> Config::TWITCH_APP_ID,
-			'redirect_uri'	=> Config::BASE_URL . 'auth',
+			'redirect_uri'	=> App::getBaseUrl() . 'auth',
 			'response_type'	=> 'code',
 			'scope'			=> 'chat:read',
 			'state'			=> $_SESSION['state'],
@@ -95,7 +96,7 @@ class UserController
 			'client_secret'	=> Config::TWITCH_APP_SECRET,
 			'code'			=> $code,
 			'grant_type'	=> 'authorization_code',
-			'redirect_uri'	=> Config::BASE_URL . 'auth',
+			'redirect_uri'	=> App::getBaseUrl() . 'auth',
 		]);
 		\curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

@@ -14,6 +14,13 @@ use Bingo\Page\Page;
 class App
 {
 	/**
+	 * The requested route.
+	 *
+	 * @var string
+	 */
+	private static $route = '';
+
+	/**
 	 * Runs the main application.
 	 */
     public static function run(): void
@@ -23,8 +30,10 @@ class App
 		$options = [
 			'regexp' => '/^[\w\-\/]*$/',
 		];
-		$page = \filter_input(INPUT_GET, 'page', FILTER_VALIDATE_REGEXP, [ 'options' => $options ]) ?? 'index';
+		self::$route = \filter_input(INPUT_GET, 'page', FILTER_VALIDATE_REGEXP, [ 'options' => $options ]) ?? '';
+		$page = empty(self::$route) ? 'index' : self::$route;
 		$page = \explode('/', \rtrim($page, '/'));
+
 		Page::route(\array_shift($page), $page);
 	}
 
@@ -96,5 +105,17 @@ class App
 		{
 			require __DIR__ . '/views/error.php';
 		}
+	}
+
+	/**
+	 * @return string The base URL to the application
+	 */
+	public static function getBaseUrl(): string
+	{
+		$protocol = ($_SERVER['HTTPS'] ?? null) === 'on' ? 'https' : 'http';
+		$hostname = $_SERVER['HTTP_HOST'];
+		$path = empty(self::$route) ? $_SERVER['REQUEST_URI'] : \substr($_SERVER['REQUEST_URI'], 0, -(\strlen(self::$route)));
+
+		return \sprintf('%s://%s%s', $protocol, $hostname, $path);
 	}
 }
