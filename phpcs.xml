@@ -4,6 +4,7 @@
 
     <rule ref="PSR2">
         <exclude name="Squiz.ControlStructures.ControlSignature" />
+        <exclude name="Generic.Files.LineLength"/>
     </rule>
     <rule ref="Squiz.ControlStructures.ControlSignature" />
 
