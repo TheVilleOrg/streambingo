@@ -18,8 +18,6 @@
   "homepage": "https://github.com/stevotvr/streambingo#readme",
   "devDependencies": {
     "del": "^5.1.0",
-    "gulp": "^4.0.2",
-    "jscs": "^3.0.7",
-    "jshint": "^2.10.2"
+    "gulp": "^4.0.2"
   }
 }
