@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Bingo\Page;
 
+use Bingo\App;
 use Bingo\Controller\UserController;
 use Bingo\Controller\GameController;
 use Bingo\Exception\UnauthorizedException;
@@ -83,6 +84,8 @@ class HostPage extends Page
 			'scripts'	=> [
 				'gamehost',
 			],
+			'gameName'	=> \htmlspecialchars($this->gameName),
+			'gameUrl'	=> \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
 			'called'	=> $called,
 			'last'		=> $last,
 		];
