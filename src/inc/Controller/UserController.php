@@ -63,11 +63,11 @@ class UserController
         $_SESSION['state'] = \md5((string) \mt_rand());
 
         $query = \http_build_query([
-            'client_id'		=> Config::TWITCH_APP_ID,
-            'redirect_uri'	=> App::getBaseUrl() . 'auth',
-            'response_type'	=> 'code',
-            'scope'			=> 'chat:read',
-            'state'			=> $_SESSION['state'],
+            'client_id'     => Config::TWITCH_APP_ID,
+            'redirect_uri'  => App::getBaseUrl() . 'auth',
+            'response_type' => 'code',
+            'scope'         => 'chat:read',
+            'state'         => $_SESSION['state'],
         ]);
 
         return 'https://id.twitch.tv/oauth2/authorize?' . $query;
@@ -92,11 +92,11 @@ class UserController
 
         \curl_setopt($ch, CURLOPT_POST, true);
         \curl_setopt($ch, CURLOPT_POSTFIELDS, [
-            'client_id'		=> Config::TWITCH_APP_ID,
-            'client_secret'	=> Config::TWITCH_APP_SECRET,
-            'code'			=> $code,
-            'grant_type'	=> 'authorization_code',
-            'redirect_uri'	=> App::getBaseUrl() . 'auth',
+            'client_id'     => Config::TWITCH_APP_ID,
+            'client_secret' => Config::TWITCH_APP_SECRET,
+            'code'          => $code,
+            'grant_type'    => 'authorization_code',
+            'redirect_uri'  => App::getBaseUrl() . 'auth',
         ]);
         \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

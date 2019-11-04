@@ -70,12 +70,12 @@ class PlayPage extends Page
         $grid[12] = 'Free';
 
         $data = [
-            'scripts'	=> [
+            'scripts'  => [
                 'gameclient',
             ],
-            'gameName'	=> \htmlspecialchars($this->gameName),
-            'grid'		=> $grid,
-            'marked'	=> $card->getMarked(),
+            'gameName' => \htmlspecialchars($this->gameName),
+            'grid'     => $grid,
+            'marked'   => $card->getMarked(),
         ];
 
         $this->showTemplate('play', $data);

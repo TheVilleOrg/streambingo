@@ -39,7 +39,7 @@ abstract class Page
      *
      * @param string[] $params The list of parameters
      */
-    protected abstract function run(array $params): void;
+    abstract protected function run(array $params): void;
 
     /**
      * Shows a template.
@@ -47,7 +47,7 @@ abstract class Page
      * @param string $template The name of the template
      * @param array $data The data to provide to the template
      */
-    protected final function showTemplate(string $template, array $data = []): void
+    final protected function showTemplate(string $template, array $data = []): void
     {
         \extract($data);
         $basePath = \explode('/', App::getBaseUrl(), 4);

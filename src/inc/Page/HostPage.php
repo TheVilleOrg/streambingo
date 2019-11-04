@@ -78,13 +78,13 @@ class HostPage extends Page
         }
 
         $data = [
-            'scripts'	=> [
+            'scripts'  => [
                 'gamehost',
             ],
-            'gameName'	=> \htmlspecialchars($this->gameName),
-            'gameUrl'	=> \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
-            'called'	=> $called,
-            'last'		=> $last,
+            'gameName' => \htmlspecialchars($this->gameName),
+            'gameUrl'  => \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
+            'called'   => $called,
+            'last'     => $last,
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);

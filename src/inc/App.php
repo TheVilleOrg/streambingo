@@ -98,10 +98,10 @@ class App
         {
             \header('Content-Type: application/json');
             echo \json_encode([
-                'error'	=> [
-                    'code'		=> $code,
-                    'message'	=> $message,
-                    'details'	=> $details,
+                'error' => [
+                    'code'    => $code,
+                    'message' => $message,
+                    'details' => $details,
                 ],
             ]);
         }

@@ -17,15 +17,15 @@ class IndexPage extends Page
     public function run(array $params): void
     {
         $data = [
-            'games'	=> [],
+            'games' => [],
         ];
 
         $games = GameController::getGameList();
         foreach ($games as $game)
         {
             $data['games'][] = [
-                'name'		=> $game->getGameName(),
-                'numCards'	=> $game->getNumCards(),
+                'name'     => $game->getGameName(),
+                'numCards' => $game->getNumCards(),
             ];
         }
 

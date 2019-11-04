@@ -30,12 +30,12 @@ abstract class Model
      *
      * @return bool True if the save was successful, false otherwise
      */
-    public abstract function save(): bool;
+    abstract public function save(): bool;
 
     /**
      * @return int The unique identifier associated with this item
      */
-    public final function getId(): int
+    final public function getId(): int
     {
         return $this->id;
     }
