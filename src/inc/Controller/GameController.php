@@ -9,6 +9,7 @@ use Bingo\Exception\BadRequestException;
 use Bingo\Exception\GameException;
 use Bingo\Exception\NotFoundException;
 use Bingo\Model\CardModel;
+use Bingo\Model\GameMetaModel;
 use Bingo\Model\GameModel;
 
 /**
@@ -16,6 +17,16 @@ use Bingo\Model\GameModel;
  */
 class GameController
 {
+	/**
+	 * Gets the metadata for all the games.
+	 *
+	 * @return \Bingo\Model\GameMetaModel[] An array of games' metadata
+	 */
+	public static function getGameList(): array
+	{
+		return GameMetaModel::getGames();
+	}
+
 	/**
 	 * Gets a game, creating a new game if the specified game does not exist.
 	 *
