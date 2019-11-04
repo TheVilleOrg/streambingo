@@ -1,8 +1,14 @@
 (function() {
   'use strict';
 
-  const gulp = require('gulp');
+  const autoprefixer = require('autoprefixer');
+  const cssnano = require('cssnano');
   const del = require('del');
+  const eslint = require('gulp-eslint');
+  const gulp = require('gulp');
+  const postcss = require('gulp-postcss');
+  const rename = require('gulp-rename');
+  const uglify = require('gulp-uglify');
 
   const wwwPath = 'D:/www/bingo/';
 
@@ -11,13 +17,19 @@
   }
 
   function css() {
-    return gulp.src('src/css/*.css')
-      .pipe(gulp.dest('dist/css/'));
+    return gulp.src('src/css/*.css', {sourcemaps: true})
+      .pipe(postcss([autoprefixer(), cssnano()]))
+      .pipe(rename({extname: '.min.css'}))
+      .pipe(gulp.dest('dist/css/', {sourcemaps: '.'}));
   }
 
   function js() {
-    return gulp.src('src/js/*.js')
-      .pipe(gulp.dest('dist/js/'));
+    return gulp.src('src/js/*.js', {sourcemaps: true})
+      .pipe(eslint())
+      .pipe(eslint.format())
+      .pipe(uglify())
+      .pipe(rename({extname: '.min.js'}))
+      .pipe(gulp.dest('dist/js/', {sourcemaps: '.'}));
   }
 
   function php() {

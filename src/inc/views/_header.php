@@ -3,12 +3,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="stylesheet" href="<?php echo $basePath; ?>css/bingo.css">
+	<link rel="stylesheet" href="<?php echo $basePath; ?>css/bingo.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
 <?php if (isset($scripts)): ?>
 <?php foreach ($scripts as $name): ?>
-	<script src="<?php echo $basePath; ?>js/<?php echo $name; ?>.js"></script>
+	<script src="<?php echo $basePath; ?>js/<?php echo $name; ?>.min.js"></script>
 <?php endforeach; ?>
 <?php endif; ?>
     <title>Stream BINGO</title>
