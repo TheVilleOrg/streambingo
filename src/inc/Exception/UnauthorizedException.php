@@ -9,11 +9,11 @@ namespace Bingo\Exception;
  */
 class UnauthorizedException extends HttpException
 {
-	/**
-	 * @param string $message The error message
-	 */
-	public function __construct(string $message = '')
-	{
-		parent::__construct(401, 'Unauthorized', $message);
-	}
+    /**
+     * @param string $message The error message
+     */
+    public function __construct(string $message = '')
+    {
+        parent::__construct(401, 'Unauthorized', $message);
+    }
 }

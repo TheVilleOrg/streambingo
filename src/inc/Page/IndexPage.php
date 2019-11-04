@@ -11,24 +11,24 @@ use Bingo\Controller\GameController;
  */
 class IndexPage extends Page
 {
-	/**
-	 * @inheritDoc
-	 */
-	public function run(array $params): void
-	{
-		$data = [
-			'games'	=> [],
-		];
+    /**
+     * @inheritDoc
+     */
+    public function run(array $params): void
+    {
+        $data = [
+            'games'	=> [],
+        ];
 
-		$games = GameController::getGameList();
-		foreach ($games as $game)
-		{
-			$data['games'][] = [
-				'name'		=> $game->getGameName(),
-				'numCards'	=> $game->getNumCards(),
-			];
-		}
+        $games = GameController::getGameList();
+        foreach ($games as $game)
+        {
+            $data['games'][] = [
+                'name'		=> $game->getGameName(),
+                'numCards'	=> $game->getNumCards(),
+            ];
+        }
 
-		$this->showTemplate('index', $data);
-	}
+        $this->showTemplate('index', $data);
+    }
 }

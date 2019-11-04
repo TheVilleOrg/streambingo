@@ -9,11 +9,11 @@ namespace Bingo\Exception;
  */
 class GameException extends \RuntimeException
 {
-	/**
-	 * @param string $message The error message
-	 */
-	public function __construct(string $message = '')
-	{
-		parent::__construct($message);
-	}
+    /**
+     * @param string $message The error message
+     */
+    public function __construct(string $message = '')
+    {
+        parent::__construct($message);
+    }
 }

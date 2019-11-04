@@ -9,11 +9,11 @@ namespace Bingo\Exception;
  */
 class NotFoundException extends HttpException
 {
-	/**
-	 * @param string $message The error message
-	 */
-	public function __construct(string $message = '')
-	{
-		parent::__construct(404, 'Not Found', $message);
-	}
+    /**
+     * @param string $message The error message
+     */
+    public function __construct(string $message = '')
+    {
+        parent::__construct(404, 'Not Found', $message);
+    }
 }

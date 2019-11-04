@@ -9,11 +9,11 @@ namespace Bingo\Exception;
  */
 class InternalErrorException extends HttpException
 {
-	/**
-	 * @param string $message The error message
-	 */
-	public function __construct(string $message = '')
-	{
-		parent::__construct(500, 'Internal Server Error', $message);
-	}
+    /**
+     * @param string $message The error message
+     */
+    public function __construct(string $message = '')
+    {
+        parent::__construct(500, 'Internal Server Error', $message);
+    }
 }

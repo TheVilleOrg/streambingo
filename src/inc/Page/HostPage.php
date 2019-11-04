@@ -14,98 +14,98 @@ use Bingo\Exception\UnauthorizedException;
  */
 class HostPage extends Page
 {
-	/**
-	 * The unique identifier associated with the current user
-	 *
-	 * @var int
-	 */
-	protected $userId;
+    /**
+     * The unique identifier associated with the current user
+     *
+     * @var int
+     */
+    protected $userId;
 
-	/**
-	 * The unique name identifying the current game
-	 *
-	 * @var string
-	 */
-	protected $gameName;
+    /**
+     * The unique name identifying the current game
+     *
+     * @var string
+     */
+    protected $gameName;
 
-	/**
-	 * @inheritDoc
-	 *
-	 * @throws \Bingo\Exception\UnauthorizedException
-	 */
-	protected function run(array $params): void
-	{
-		$user = UserController::getCurrentUser();
-		if (!$user)
-		{
-			$this->showTemplate('auth');
+    /**
+     * @inheritDoc
+     *
+     * @throws \Bingo\Exception\UnauthorizedException
+     */
+    protected function run(array $params): void
+    {
+        $user = UserController::getCurrentUser();
+        if (!$user)
+        {
+            $this->showTemplate('auth');
 
-			return;
-		}
+            return;
+        }
 
-		if (!$user->getHost())
-		{
-			throw new UnauthorizedException('Your account is not authorized to host games.');
-		}
+        if (!$user->getHost())
+        {
+            throw new UnauthorizedException('Your account is not authorized to host games.');
+        }
 
-		$this->userId = $user->getId();
-		$this->gameName = $user->getName();
+        $this->userId = $user->getId();
+        $this->gameName = $user->getName();
 
-		if (\filter_has_var(INPUT_POST, 'action'))
-		{
-			$this->handleAction();
-		}
-		else
-		{
-			$this->showPage(($params[0] ?? null) === 'source');
-		}
-	}
+        if (\filter_has_var(INPUT_POST, 'action'))
+        {
+            $this->handleAction();
+        }
+        else
+        {
+            $this->showPage(($params[0] ?? null) === 'source');
+        }
+    }
 
-	/**
-	 * Shows the game host page.
-	 */
-	protected function showPage(bool $minimal): void
-	{
-		$game = GameController::getGame($this->userId, $this->gameName);
+    /**
+     * Shows the game host page.
+     */
+    protected function showPage(bool $minimal): void
+    {
+        $game = GameController::getGame($this->userId, $this->gameName);
 
-		$called = $game->getCalled();
+        $called = $game->getCalled();
 
-		$last = '';
-		if (!empty($called))
-		{
-			$last = $called[\count($called) - 1];
-			$last = GameController::getLetter($last) . $last;
-		}
+        $last = '';
+        if (!empty($called))
+        {
+            $last = $called[\count($called) - 1];
+            $last = GameController::getLetter($last) . $last;
+        }
 
-		$data = [
-			'scripts'	=> [
-				'gamehost',
-			],
-			'gameName'	=> \htmlspecialchars($this->gameName),
-			'gameUrl'	=> \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
-			'called'	=> $called,
-			'last'		=> $last,
-		];
+        $data = [
+            'scripts'	=> [
+                'gamehost',
+            ],
+            'gameName'	=> \htmlspecialchars($this->gameName),
+            'gameUrl'	=> \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
+            'called'	=> $called,
+            'last'		=> $last,
+        ];
 
-		$this->showTemplate($minimal ? 'host/source' : 'host', $data);
-	}
+        $this->showTemplate($minimal ? 'host/source' : 'host', $data);
+    }
 
-	/**
-	 * Handles an action request.
-	 *
-	 * @throws \Bingo\Exception\NotFoundException
-	 */
-	protected function handleAction(): void
-	{
-		$data = [];
+    /**
+     * Handles an action request.
+     *
+     * @throws \Bingo\Exception\NotFoundException
+     */
+    protected function handleAction(): void
+    {
+        $data = [];
 
-		switch (\filter_input(INPUT_POST, 'action'))
-		{
-			case 'createGame':
-				GameController::createGame($this->userId, $this->gameName);
-				break;
-		}
+        switch (\filter_input(INPUT_POST, 'action'))
+        {
+            case 'createGame':
+                GameController::createGame($this->userId, $this->gameName);
+                break;
+        }
 
-		echo \json_encode($data);
-	}
+        echo \json_encode($data);
+    }
 }

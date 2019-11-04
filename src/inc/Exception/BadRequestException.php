@@ -9,11 +9,11 @@ namespace Bingo\Exception;
  */
 class BadRequestException extends HttpException
 {
-	/**
-	 * @param string $message The error message
-	 */
-	public function __construct(string $message = '')
-	{
-		parent::__construct(400, 'Bad Request', $message);
-	}
+    /**
+     * @param string $message The error message
+     */
+    public function __construct(string $message = '')
+    {
+        parent::__construct(400, 'Bad Request', $message);
+    }
 }
