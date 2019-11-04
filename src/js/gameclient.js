@@ -1,33 +1,38 @@
-$(function () {
-  const socket = io('//' + window.location.hostname + ':3000');
+jQuery.noConflict();
+(function ($) {
+  'use strict';
 
-  socket.on('connect', function () {
-    $('#status').text('Connected');
-  });
+  $(function () {
+    const socket = io('//' + window.location.hostname + ':3000');
 
-  socket.on('disconnect', function () {
-    console.log('socket connection lost');
-    $('#status').text('Disconnected');
-  });
+    socket.on('connect', function () {
+      $('#status').text('Connected');
+    });
 
-  $('#card .marker').click(function () {
-    const cell = $(this);
-    const index = cell.data('cell');
-    if (index === 12) {
-      return;
-    }
+    socket.on('disconnect', function () {
+      console.log('socket connection lost');
+      $('#status').text('Disconnected');
+    });
 
-    let postData = {
-      json: true,
-      action: 'toggleCell',
-      cell: index
-    };
-    $.post(window.location, postData, function (data) {
-      if (data.marked) {
-        cell.addClass('marked');
-      } else {
-        cell.removeClass('marked');
+    $('#card .marker').click(function () {
+      const cell = $(this);
+      const index = cell.data('cell');
+      if (index === 12) {
+        return;
       }
-    }, 'json');
+
+      let postData = {
+        json: true,
+        action: 'toggleCell',
+        cell: index
+      };
+      $.post(window.location, postData, function (data) {
+        if (data.marked) {
+          cell.addClass('marked');
+        } else {
+          cell.removeClass('marked');
+        }
+      }, 'json');
+    });
   });
-});
+})(jQuery);
