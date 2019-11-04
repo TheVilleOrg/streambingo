@@ -3,12 +3,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="stylesheet" href="/bingo/css/bingo.css">
+	<link rel="stylesheet" href="<?php echo $basePath; ?>css/bingo.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
 <?php if (isset($scripts)): ?>
 <?php foreach ($scripts as $name): ?>
-	<script src="/bingo/js/<?php echo $name; ?>.js"></script>
+	<script src="<?php echo $basePath; ?>js/<?php echo $name; ?>.js"></script>
 <?php endforeach; ?>
 <?php endif; ?>
     <title>Stream BINGO</title>
@@ -17,10 +17,10 @@
 	<div id="main">
 		<h1>Stream BINGO</h1>
 		<div id="nav">
-			<a href="#" id="logo">B</a>
+			<a href="<?php echo $basePath; ?>" id="logo">B</a>
 			<ul>
-				<li><a href="#">Home</a></li>
-				<li><a href="#">Host</a></li>
+				<li><a href="<?php echo $basePath; ?>">Home</a></li>
+				<li><a href="<?php echo $basePath; ?>host">Host</a></li>
 			</ul>
-			<span id="user"><a href="#">Login with Twitch</a></span>
+			<span id="user"><a href="<?php echo $authUrl; ?>">Login with Twitch</a></span>
 		</div>

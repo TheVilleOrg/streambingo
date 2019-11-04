@@ -4,6 +4,8 @@ declare (strict_types = 1);
 
 namespace Bingo\Page;
 
+use Bingo\App;
+use Bingo\Controller\UserController;
 use Bingo\Exception\NotFoundException;
 
 /**
@@ -47,8 +49,11 @@ abstract class Page
 	 */
 	protected final function showTemplate(string $template, array $data = []): void
 	{
-		$dir = __DIR__ . '/../views/';
 		\extract($data);
-		require $dir . $template . '/index.php';
+		$basePath = \explode('/', App::getBaseUrl(), 4);
+		$basePath = '/' . $basePath[3] ?? '';
+		$authUrl = UserController::getAuthUrl();
+
+		require __DIR__ . '/../views/' . $template . '/index.php';
 	}
 }

@@ -38,10 +38,7 @@ class HostPage extends Page
 		$user = UserController::getCurrentUser();
 		if (!$user)
 		{
-			$data = [
-				'authUrl'	=> UserController::getAuthUrl('host'),
-			];
-			$this->showTemplate('auth', $data);
+			$this->showTemplate('auth');
 
 			return;
 		}

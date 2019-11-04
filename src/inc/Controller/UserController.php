@@ -52,14 +52,14 @@ class UserController
 	 *
 	 * @return string The URL
 	 */
-	public static function getAuthUrl(string $returnPath = ''): string
+	public static function getAuthUrl(): string
 	{
 		if (!\session_id())
 		{
 			\session_start();
 		}
 
-		$_SESSION['return_url'] = App::getBaseUrl() . $returnPath;
+		$_SESSION['return_url'] = App::getBaseUrl() . App::getRoute();
 		$_SESSION['state'] = \md5((string) \mt_rand());
 
 		$query = \http_build_query([

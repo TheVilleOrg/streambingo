@@ -42,10 +42,7 @@ class PlayPage extends Page
 
 		if (!$user)
 		{
-			$data = [
-				'authUrl'	=> UserController::getAuthUrl('play/' . $this->gameName),
-			];
-			$this->showTemplate('auth', $data);
+			$this->showTemplate('auth');
 
 			return;
 		}

@@ -123,4 +123,12 @@ class App
 
 		return \sprintf('%s://%s%s', $protocol, $hostname, $path);
 	}
+
+	/**
+	 * @return string The requested route
+	 */
+	public static function getRoute(): string
+	{
+		return self::$route;
+	}
 }
