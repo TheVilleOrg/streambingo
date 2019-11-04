@@ -59,14 +59,14 @@ class HostPage extends Page
 		}
 		else
 		{
-			$this->showPage();
+			$this->showPage(($params[0] ?? null) === 'source');
 		}
 	}
 
 	/**
 	 * Shows the game host page.
 	 */
-	protected function showPage(): void
+	protected function showPage(bool $minimal): void
 	{
 		$game = GameController::getGame($this->userId, $this->gameName);
 
@@ -87,7 +87,7 @@ class HostPage extends Page
 			'last'		=> $last,
 		];
 
-		$this->showTemplate('host', $data);
+		$this->showTemplate($minimal ? 'host/source' : 'host', $data);
 	}
 
 	/**
