@@ -1,3 +1,5 @@
+/* jshint strict: true, browser: true, jquery: true */
+/* globals io */
 jQuery.noConflict();
 (function ($) {
   'use strict';

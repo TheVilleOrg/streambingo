@@ -1,0 +1,16 @@
+{
+  "bitwise": true,
+  "curly": true,
+  "eqeqeq": true,
+  "esversion": 3,
+  "forin": false,
+  "freeze": true,
+  "noarg": true,
+  "nocomma": true,
+  "nonbsp": true,
+  "nonew": true,
+  "undef": true,
+  "unused": true,
+  "strict": true,
+  "latedef": "nofunc"
+}

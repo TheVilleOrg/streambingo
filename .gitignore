@@ -1,4 +1,5 @@
 node_modules/
+vendor/
 dist/
 src/inc/Config.php
 src/nodejs/config.json
