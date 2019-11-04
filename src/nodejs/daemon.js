@@ -1,10 +1,10 @@
 /* jshint esversion: 6, node: true, strict: true */
-(function () {
+(function() {
   'use strict';
 
   const config = require('./config.json');
 
-  const { exec } = require('child_process');
+  const {exec} = require('child_process');
 
   const tmi = require('tmi.js');
 
@@ -42,7 +42,7 @@
   });
 
   client.connect()
-  .then((data) => {
+  .then(() => {
     console.log('connected to Twitch');
   }).catch((err) => {
     console.error(err);
@@ -68,7 +68,7 @@
 
   io.on('connect', (socket) => {
     socket.on('creategame', (token, cb) => {
-      exec(`php ${config.phpcli} getgame ${token}`, (err, stdout, stderr) => {
+      exec(`php ${config.phpcli} getgame ${token}`, (err, stdout) => {
         let data = JSON.parse(stdout);
         if (data.name) {
           client.join(data.name)
@@ -101,14 +101,14 @@
   });
 
   function callNumber(gameName) {
-    exec(`php ${config.phpcli} callnumber ${gameName}`, (err, stdout, stderr) => {
+    exec(`php ${config.phpcli} callnumber ${gameName}`, (err, stdout) => {
       const data = JSON.parse(stdout);
       io.to(gameName).emit('newnumber', data.letter, data.number);
     });
   }
 
-  function joinGame(channel, user) {
-    exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout, stderr) => {
+  function joinGame(channel) {
+    exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout) => {
       let data = JSON.parse(stdout);
       if (data.url) {
         client.say(channel, data.url);
@@ -118,7 +118,7 @@
 
   function callBingo(channel, user) {
     const gameName = channel.substr(1);
-    exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (error, stdout, stderr) => {
+    exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (error, stdout) => {
       let data = JSON.parse(stdout);
       if (data.result) {
         client.say(channel, `Congratulations @${user['display-name']}!`);

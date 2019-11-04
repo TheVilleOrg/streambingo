@@ -1,46 +1,49 @@
 /* jshint strict: true, browser: true, jquery: true */
-/* globals io */
+/* globals console, io */
 jQuery.noConflict();
-(function ($) {
-  $(function () {
-    const socket = io('//' + window.location.hostname + ':3000');
+(function($) {
+  'use strict';
 
-    socket.on('connect', function () {
-      let match = document.cookie.match(/\baccess_token=(.*)[;\b]/);
+  $(function() {
+    var socket = io('//' + window.location.hostname + ':3000');
+
+    socket.on('connect', function() {
+      var match = document.cookie.match(/\baccess_token=(.*)[;\b]/);
       if (match.length === 2) {
-        socket.emit('creategame', match[1], function (gameName) {
+        socket.emit('creategame', match[1], function(gameName) {
           console.log('joined game ' + gameName);
           $('#status').text('Connected');
         });
       }
     });
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function() {
       console.log('socket connection lost');
       $('#status').text('Disconnected');
     });
 
-    socket.on('newnumber', function (letter, number) {
+    socket.on('newnumber', function(letter, number) {
       $('#board td[data-cell=' + number + ']').addClass('marked');
       $('#number').text(letter + number);
     });
 
-    socket.on('winner', function (winner) {
+    socket.on('winner', function(winner) {
       console.log('congrats ' + winner + '!');
     });
-    $('#call-number').click(function () {
+
+    $('#call-number').click(function() {
       socket.emit('callnumber');
     });
 
-    $('#create-game').click(function () {
-      let postData = {
+    $('#create-game').click(function() {
+      var postData = {
         json: true,
         action: 'createGame'
       };
-      $.post(window.location, postData, function (data) {
+      $.post(window.location, postData, function() {
         $('#board td').removeClass('marked');
         $('#number').text('');
       }, 'json');
-    })
+    });
   });
 })(jQuery);

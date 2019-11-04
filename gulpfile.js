@@ -1,5 +1,5 @@
 /* jshint esversion: 6, node: true, strict: true */
-(function () {
+(function() {
   'use strict';
 
   const gulp = require('gulp');
@@ -8,7 +8,7 @@
   const wwwPath = 'D:/www/bingo/';
 
   function clean() {
-    return del(['dist/*', wwwPath + '*'], { dot: true, force: true });
+    return del(['dist/*', wwwPath + '*'], {dot: true, force: true});
   }
 
   function css() {
@@ -32,7 +32,7 @@
   }
 
   function sync() {
-    return gulp.src('dist/**/*', { dot: true })
+    return gulp.src('dist/**/*', {dot: true})
       .pipe(gulp.dest(wwwPath));
   }
 
@@ -41,7 +41,7 @@
     gulp.watch('src/js/*.js', js);
     gulp.watch('src/**/*.php', php);
     gulp.watch('src/.htaccess', misc);
-    gulp.watch('dist/**/*', { dot: true }, sync);
+    gulp.watch('dist/**/*', {dot: true}, sync);
     cb();
   }
 

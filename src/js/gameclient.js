@@ -1,34 +1,34 @@
 /* jshint strict: true, browser: true, jquery: true */
-/* globals io */
+/* globals console, io */
 jQuery.noConflict();
-(function ($) {
+(function($) {
   'use strict';
 
-  $(function () {
-    const socket = io('//' + window.location.hostname + ':3000');
+  $(function() {
+    var socket = io('//' + window.location.hostname + ':3000');
 
-    socket.on('connect', function () {
+    socket.on('connect', function() {
       $('#status').text('Connected');
     });
 
-    socket.on('disconnect', function () {
+    socket.on('disconnect', function() {
       console.log('socket connection lost');
       $('#status').text('Disconnected');
     });
 
-    $('#card .marker').click(function () {
-      const cell = $(this);
-      const index = cell.data('cell');
+    $('#card .marker').click(function() {
+      var cell = $(this);
+      var index = cell.data('cell');
       if (index === 12) {
         return;
       }
 
-      let postData = {
+      var postData = {
         json: true,
         action: 'toggleCell',
         cell: index
       };
-      $.post(window.location, postData, function (data) {
+      $.post(window.location, postData, function(data) {
         if (data.marked) {
           cell.addClass('marked');
         } else {
