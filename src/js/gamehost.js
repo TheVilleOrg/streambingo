@@ -45,5 +45,14 @@ jQuery.noConflict();
         }, 'json');
       }
     });
+
+    $('#source-url').click(function() {
+      $(this).select();
+    });
+
+    $('#copy-source-url').click(function() {
+      $('#source-url').select();
+      document.execCommand('copy');
+    });
   });
 })(jQuery);

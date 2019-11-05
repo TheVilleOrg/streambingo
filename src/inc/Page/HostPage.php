@@ -83,6 +83,7 @@ class HostPage extends Page
             ],
             'gameName' => \htmlspecialchars($this->gameName),
             'gameUrl'  => \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
+            'hostUrl'  => \htmlspecialchars(App::getBaseUrl() . 'host/source'),
             'called'   => $called,
             'last'     => $last,
         ];
