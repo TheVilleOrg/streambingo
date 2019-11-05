@@ -34,14 +34,16 @@ jQuery.noConflict();
     });
 
     $('#create-game').click(function() {
-      var postData = {
-        json: true,
-        action: 'createGame'
-      };
-      $.post(window.location, postData, function() {
-        $('#board td').removeClass('marked');
-        $('#number').text('');
-      }, 'json');
+      if (window.confirm('Create a new game?')) {
+        var postData = {
+          json: true,
+          action: 'createGame'
+        };
+        $.post(window.location, postData, function() {
+          $('#board td').removeClass('marked');
+          $('#number').text('');
+        }, 'json');
+      }
     });
   });
 })(jQuery);
