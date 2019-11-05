@@ -21,7 +21,8 @@ jQuery.noConflict();
     });
 
     socket.on('newnumber', function(letter, number) {
-      $('#board td[data-cell=' + number + ']').addClass('marked');
+      $('.latest').removeClass('latest');
+      $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
       $('#number').text(letter + number);
     });
 

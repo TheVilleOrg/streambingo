@@ -70,22 +70,24 @@ class HostPage extends Page
 
         $called = $game->getCalled();
 
-        $last = '';
+        $lastNumber = '';
+        $lastLetter = '';
         if (!empty($called))
         {
-            $last = $called[\count($called) - 1];
-            $last = GameController::getLetter($last) . $last;
+            $lastNumber = $called[\count($called) - 1];
+            $lastLetter = GameController::getLetter($lastNumber);
         }
 
         $data = [
             'scripts'  => [
                 'gamehost',
             ],
-            'gameName' => \htmlspecialchars($this->gameName),
-            'gameUrl'  => \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
-            'hostUrl'  => \htmlspecialchars(App::getBaseUrl() . 'host/source'),
-            'called'   => $called,
-            'last'     => $last,
+            'gameName'   => \htmlspecialchars($this->gameName),
+            'gameUrl'    => \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
+            'hostUrl'    => \htmlspecialchars(App::getBaseUrl() . 'host/source'),
+            'called'     => $called,
+            'lastNumber' => $lastNumber,
+            'lastLetter' => $lastLetter,
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);
