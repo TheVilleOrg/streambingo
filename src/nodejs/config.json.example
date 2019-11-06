@@ -4,7 +4,8 @@
   "phpcli": "../cli.php",
   "twitch": {
     "username": "",
-    "password": ""
+    "password": "",
+    "chatTimeout": 5
   },
 	"ssl": {
 		"enabled": false,

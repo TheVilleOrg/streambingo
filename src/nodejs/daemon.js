@@ -47,25 +47,38 @@
     console.error(err);
   });
 
+  const channels = [];
+  const chatTimes = {};
+
   client.on('chat', (channel, userstate, message, self) => {
     if (self) {
       return;
     }
 
-    console.log(channel, message);
     message = message.trim().toLowerCase();
-    if (message === 'bingo' || message === '!bingo') {
-      callBingo(channel, userstate);
-    } else if (message === '!play') {
-      joinGame(channel, userstate);
+    if (message === 'bingo' || message === '!bingo' || message === '!play') {
+      const now = new Date().getTime();
+      if (now - (chatTimes[userstate['user-id']] || 0) < config.twitch.chatTimeout * 1000) {
+        return;
+      }
+
+      chatTimes[userstate['user-id']] = now;
+
+      console.log(channel, message);
+
+      if (channels.indexOf(channel.substr(1)) === -1) {
+        client.say(channel, 'Stream BINGO is currently offline.');
+      } else if (message === 'bingo' || message === '!bingo') {
+        callBingo(channel, userstate);
+      } else if (message === '!play') {
+        joinGame(channel, userstate);
+      }
     }
   });
 
   http.listen(config.port, config.host, () => {
     console.log(`listening on ${config.host}:${config.port}`);
   });
-
-  const channels = [];
 
   io.on('connect', (socket) => {
     socket.on('creategame', (token, cb) => {
@@ -84,16 +97,6 @@
 
           socket.on('disconnect', () => {
             channels.splice(channels.indexOf(data.name), 1);
-
-            if (channels.indexOf(data.name) === -1) {
-              client.part(data.name)
-              .then(() => {
-                console.log(`parted #${data.name}`);
-              })
-              .catch((err) => {
-                console.warn(err);
-              });
-            }
           });
 
           if (channels.indexOf(data.name) === -1) {
