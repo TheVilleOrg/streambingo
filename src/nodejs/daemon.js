@@ -112,6 +112,10 @@
         }
       });
     });
+
+    socket.on('joingame', (gameName) => {
+      socket.join(gameName);
+    });
   });
 
   function callNumber(gameName) {

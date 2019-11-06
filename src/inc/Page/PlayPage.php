@@ -96,6 +96,10 @@ class PlayPage extends Page
                 $cell = \filter_input(INPUT_POST, 'cell', FILTER_VALIDATE_INT);
                 $data['marked'] = GameController::toggleCell($this->userId, $this->gameName, $cell);
                 break;
+            case 'newCard':
+                $card = GameController::getCard($this->userId, $this->gameName);
+                $data['grid'] = $card->getGrid();
+                break;
         }
 
         echo \json_encode($data);
