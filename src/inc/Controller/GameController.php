@@ -4,7 +4,7 @@ declare (strict_types = 1);
 
 namespace Bingo\Controller;
 
-use Bingo\App;
+use Bingo\Config;
 use Bingo\Exception\BadRequestException;
 use Bingo\Exception\GameException;
 use Bingo\Exception\NotFoundException;
@@ -121,7 +121,7 @@ class GameController
             return null;
         }
 
-        return App::getBaseUrl() . 'play/' . $game->getGameName();
+        return Config::BASE_URL . Config::BASE_PATH . 'play/' . $game->getGameName();
     }
 
     /**

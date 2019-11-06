@@ -71,12 +71,12 @@ class UserController
             \session_start();
         }
 
-        $_SESSION['return_url'] = App::getBaseUrl() . App::getRoute();
+        $_SESSION['return_url'] = Config::BASE_URL . Config::BASE_PATH . App::getRoute();
         $_SESSION['state'] = \md5((string) \mt_rand());
 
         $query = \http_build_query([
             'client_id'     => Config::TWITCH_APP_ID,
-            'redirect_uri'  => App::getBaseUrl() . 'auth',
+            'redirect_uri'  => Config::BASE_URL . Config::BASE_PATH . 'auth',
             'response_type' => 'code',
             'scope'         => 'chat:read',
             'state'         => $_SESSION['state'],
@@ -108,7 +108,7 @@ class UserController
             'client_secret' => Config::TWITCH_APP_SECRET,
             'code'          => $code,
             'grant_type'    => 'authorization_code',
-            'redirect_uri'  => App::getBaseUrl() . 'auth',
+            'redirect_uri'  => Config::BASE_URL . Config::BASE_PATH . 'auth',
         ]);
         \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

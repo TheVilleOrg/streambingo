@@ -10,6 +10,16 @@ namespace Bingo;
 class Config
 {
     /**
+     * The base URL for the site
+     */
+    const BASE_URL = 'http://localhost';
+
+    /**
+     * The base path of the site
+     */
+    const BASE_PATH = '/bingo/';
+
+    /**
      * MySQL host
      */
     const DBHOST = 'localhost';

@@ -112,19 +112,6 @@ class App
     }
 
     /**
-     * @return string The base URL to the application
-     */
-    public static function getBaseUrl(): string
-    {
-        $protocol = ($_SERVER['HTTPS'] ?? null) === 'on' ? 'https' : 'http';
-        $hostname = $_SERVER['HTTP_HOST'];
-        $path = \explode('?', $_SERVER['REQUEST_URI'], 2)[0];
-        $path = empty(self::$route) ? $path : \substr($path, 0, -(\strlen(self::$route)));
-
-        return \sprintf('%s://%s%s', $protocol, $hostname, $path);
-    }
-
-    /**
      * @return string The requested route
      */
     public static function getRoute(): string
