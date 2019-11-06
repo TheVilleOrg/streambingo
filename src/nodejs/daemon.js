@@ -65,22 +65,23 @@
     console.log(`listening on ${config.host}:${config.port}`);
   });
 
+  const channels = [];
+
   io.on('connect', (socket) => {
     socket.on('creategame', (token, cb) => {
       exec(`php ${config.phpcli} getgame ${token}`, (err, stdout) => {
         let data = JSON.parse(stdout);
         if (data.name) {
-          client.join(data.name)
-          .then(() => {
-            console.log(`joined #${data.name}`);
+          socket.join(data.name);
 
-            socket.join(data.name);
+          socket.on('callnumber', () => {
+            callNumber(data.name);
+          });
 
-            socket.on('callnumber', () => {
-              callNumber(data.name);
-            });
+          socket.on('disconnect', () => {
+            channels.splice(channels.indexOf(data.name), 1);
 
-            socket.on('disconnect', () => {
+            if (channels.indexOf(data.name) === -1) {
               client.part(data.name)
               .then(() => {
                 console.log(`parted #${data.name}`);
@@ -88,12 +89,22 @@
               .catch((err) => {
                 console.warn(err);
               });
-            });
-            cb(data.name);
-          })
-          .catch((err) => {
-            console.warn(err);
+            }
           });
+
+          if (channels.indexOf(data.name) === -1) {
+            client.join(data.name)
+            .then(() => {
+              console.log(`joined #${data.name}`);
+            })
+            .catch((err) => {
+              console.warn(err);
+            });
+          }
+
+          channels.push(data.name);
+
+          cb(data.name);
         }
       });
     });
