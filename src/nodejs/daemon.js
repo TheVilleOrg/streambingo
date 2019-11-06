@@ -78,6 +78,10 @@
             callNumber(data.name);
           });
 
+          socket.on('newgame', () => {
+            io.to(data.name).emit('newgame');
+          });
+
           socket.on('disconnect', () => {
             channels.splice(channels.indexOf(data.name), 1);
 

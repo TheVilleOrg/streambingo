@@ -29,6 +29,11 @@ jQuery.noConflict();
       console.log('congrats ' + winner + '!');
     });
 
+    socket.on('newgame', function() {
+      $('#board td').removeClass('marked');
+      $('#number').text('');
+    });
+
     $('#call-number').click(function() {
       socket.emit('callnumber');
     });
@@ -40,8 +45,7 @@ jQuery.noConflict();
           action: 'createGame'
         };
         $.post(window.location, postData, function() {
-          $('#board td').removeClass('marked');
-          $('#number').text('');
+          socket.emit('newgame');
         }, 'json');
       }
     });
