@@ -115,7 +115,7 @@ class GameController
      */
     public static function getGameUrl(string $gameName): ?string
     {
-        $game = GameModel::loadGame($gameName);
+        $game = GameModel::loadGameFromName($gameName);
         if (!$game || $game->getEnded())
         {
             return null;
