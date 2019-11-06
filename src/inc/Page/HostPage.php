@@ -8,6 +8,8 @@ use Bingo\App;
 use Bingo\Controller\UserController;
 use Bingo\Controller\GameController;
 use Bingo\Exception\UnauthorizedException;
+use Bingo\Model\GameModel;
+use Bingo\Model\UserModel;
 
 /**
  * Represents the handler for the game host page.
@@ -15,59 +17,52 @@ use Bingo\Exception\UnauthorizedException;
 class HostPage extends Page
 {
     /**
-     * The unique identifier associated with the current user
-     *
-     * @var int
-     */
-    protected $userId;
-
-    /**
-     * The unique name identifying the current game
-     *
-     * @var string
-     */
-    protected $gameName;
-
-    /**
      * @inheritDoc
      *
      * @throws \Bingo\Exception\UnauthorizedException
      */
     protected function run(array $params): void
     {
-        $user = UserController::getCurrentUser();
-        if (!$user)
+        if (\count($params) === 2 && $params[0] === 'source')
         {
-            $this->showTemplate('auth');
-
-            return;
-        }
-
-        if (!$user->getHost())
-        {
-            throw new UnauthorizedException('Your account is not authorized to host games.');
-        }
-
-        $this->userId = $user->getId();
-        $this->gameName = $user->getName();
-
-        if (\filter_has_var(INPUT_POST, 'action'))
-        {
-            $this->handleAction();
+            $game = GameController::getGameFromToken($params[1]);
+            $this->showPage($game, UserController::getUser($game->getUserId()), true);
         }
         else
         {
-            $this->showPage(($params[0] ?? null) === 'source');
+            $user = UserController::getCurrentUser();
+            if (!$user)
+            {
+                $this->showTemplate('auth');
+
+                return;
+            }
+
+            if (!$user->getHost())
+            {
+                throw new UnauthorizedException('Your account is not authorized to host games.');
+            }
+
+            if (\filter_has_var(INPUT_POST, 'action'))
+            {
+                $this->handleAction();
+            }
+            else
+            {
+                $this->showPage(GameController::getGame($user->getId(), $user->getName()), $user, false);
+            }
         }
     }
 
     /**
      * Shows the game host page.
+     *
+     * @param \Bingo\Model\GameModel $game The game
+     * @param \Bingo\Model\UserModel $user The user
+     * @param bool $minimal True to use the minimal source view, false to use the full view
      */
-    protected function showPage(bool $minimal): void
+    protected function showPage(GameModel $game, UserModel $user, bool $minimal): void
     {
-        $game = GameController::getGame($this->userId, $this->gameName);
-
         $called = $game->getCalled();
 
         $lastNumber = '';
@@ -82,9 +77,10 @@ class HostPage extends Page
             'scripts'  => [
                 'gamehost',
             ],
-            'gameName'   => \htmlspecialchars($this->gameName),
-            'gameUrl'    => \htmlspecialchars(App::getBaseUrl() . 'play/' . $this->gameName),
-            'hostUrl'    => \htmlspecialchars(App::getBaseUrl() . 'host/source'),
+            'gameName'   => \htmlspecialchars($game->getGameName()),
+            'gameToken'  => $user->getGameToken(),
+            'gameUrl'    => App::getBaseUrl() . 'play/' . $game->getGameName(),
+            'hostUrl'    => App::getBaseUrl() . 'host/source/' . $user->getGameToken(),
             'called'     => $called,
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,

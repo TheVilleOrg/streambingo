@@ -37,7 +37,27 @@ class GameController
      */
     public static function getGame(int $userId, string $gameName): GameModel
     {
-        return GameModel::loadGame($gameName) ?? self::createGame($userId, $gameName);
+        return GameModel::loadGameFromName($gameName) ?? self::createGame($userId, $gameName);
+    }
+
+    /**
+     * Gets a game from the database based on the secret game token associated with the game.
+     *
+     * @param string $gameToken The secret game token associated with the game
+     *
+     * @return \Bingo\Model\GameModel The game
+     *
+     * @throws \Bingo\Exception\NotFoundException
+     */
+    public static function getGameFromToken(string $gameToken): GameModel
+    {
+        $game = GameModel::loadGameFromToken($gameToken);
+        if (!$game)
+        {
+            throw new NotFoundException('Game not found');
+        }
+
+        return $game;
     }
 
     /**
@@ -74,9 +94,16 @@ class GameController
         $game->setEnded(true)->setWinner($cardId)->save();
     }
 
-    public static function getGameFromToken(string $token): ?string
+    /**
+     * Gets a game name from a secret game token.
+     *
+     * @param string $token The secret game token
+     *
+     * @return string|null The name of the game, or null if the game does not exist
+     */
+    public static function getNameFromToken(string $token): ?string
     {
-        return GameModel::getGameFromToken($token);
+        return GameModel::getNameFromToken($token);
     }
 
     /**
@@ -109,7 +136,7 @@ class GameController
      */
     public static function callNumber(string $gameName): int
     {
-        $game = GameModel::loadGame($gameName);
+        $game = GameModel::loadGameFromName($gameName);
         if (!$game)
         {
             throw new NotFoundException('Attemped to call number for unknown game');
@@ -210,7 +237,7 @@ class GameController
             throw new NotFoundException('Attemped to submit unknown card');
         }
 
-        $game = GameModel::loadGame($gameName);
+        $game = GameModel::loadGameFromName($gameName);
 
         $result = $card->checkCard($game->getCalled());
 

@@ -78,38 +78,27 @@ class GameModel extends Model
     }
 
     /**
-     * Loads a game from the database.
+     * Loads a game from the database based on the unique name used to identify the game.
      *
-     * @param string $gameName The unique name identifying the game
+     * @param string $gameName The unique name used to identify the game
      *
      * @return \Bingo\Model\GameModel|null The game, or null if the game does not exist
      */
-    public static function loadGame(string $gameName): ?GameModel
+    public static function loadGameFromName(string $gameName): ?GameModel
     {
-        $game = $gameId = $balls = $called = $ended = $winner = $created = $updated = null;
+        return self::loadGame($gameName, false);
+    }
 
-        $stmt = self::db()->prepare('SELECT id, userId, balls, called, ended, winner, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE gameName = ?;');
-        $stmt->bind_param('s', $gameName);
-        $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $balls, $called, $ended, $winner, $created, $updated);
-        if ($stmt->fetch())
-        {
-            $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
-            $called = !empty($called) ? \array_map('intval', \explode(',', $called)) : [];
-
-            $game = new self($userId, $gameName);
-            $game->id = $gameId;
-            $game->balls = $balls;
-            $game->called = $called;
-            $game->ended = (bool) $ended;
-            $game->winner = $winner;
-            $game->created = $created;
-            $game->updated = $updated;
-        }
-
-        $stmt->close();
-
-        return $game;
+    /**
+     * Loads a game from the database based on the secret game token associated with the game.
+     *
+     * @param string $gameToken The secret game token associated with the game
+     *
+     * @return \Bingo\Model\GameModel|null The game, or null if the game does not exist
+     */
+    public static function loadGameFromToken(string $gameToken): ?GameModel
+    {
+        return self::loadGame($gameToken, true);
     }
 
     /**
@@ -162,11 +151,18 @@ class GameModel extends Model
         return $result;
     }
 
-    public static function getGameFromToken(string $token): ?string
+    /**
+     * Gets a game name from a secret game token.
+     *
+     * @param string $token The secret game token
+     *
+     * @return string|null The name of the game, or null if the game does not exist
+     */
+    public static function getNameFromToken(string $token): ?string
     {
         $gameName = null;
 
-        $stmt = self::db()->prepare('SELECT gameName FROM games WHERE userId = (SELECT id FROM users WHERE accessToken = ?);');
+        $stmt = self::db()->prepare('SELECT gameName FROM games WHERE userId = (SELECT id FROM users WHERE gameToken = ?);');
         $stmt->bind_param('s', $token);
         $stmt->execute();
         $stmt->bind_result($gameName);
@@ -319,5 +315,45 @@ class GameModel extends Model
         $this->called[] = $number;
 
         return $number;
+    }
+
+    /**
+     * Loads a game from the database.
+     *
+     * @param string $ident The unique identifier associated with the game
+     * @param bool $name True if the unique identifier is a secret game token, false if it is a name
+     *
+     * @return \Bingo\Model\GameModel|null The game, or null if the game does not exist
+     */
+    protected static function loadGame(string $ident, bool $useToken): ?GameModel
+    {
+        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $created = $updated = null;
+
+        $sql = 'SELECT id, userId, gameName, balls, called, ended, winner, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
+
+        $sql .= $useToken ? 'userId = (SELECT id FROM users WHERE gameToken = ?);' : 'gameName = ?;';
+        $stmt = self::db()->prepare($sql);
+
+        $stmt->bind_param('s', $ident);
+        $stmt->execute();
+        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $created, $updated);
+        if ($stmt->fetch())
+        {
+            $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
+            $called = !empty($called) ? \array_map('intval', \explode(',', $called)) : [];
+
+            $game = new self($userId, $gameName);
+            $game->id = $gameId;
+            $game->balls = $balls;
+            $game->called = $called;
+            $game->ended = (bool) $ended;
+            $game->winner = $winner;
+            $game->created = $created;
+            $game->updated = $updated;
+        }
+
+        $stmt->close();
+
+        return $game;
     }
 }

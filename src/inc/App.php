@@ -54,7 +54,7 @@ class App
         switch ($argv[1])
         {
             case 'getgame':
-                $return['name'] = GameController::getGameFromToken($argv[2]);
+                $return['name'] = GameController::getNameFromToken($argv[2]);
                 break;
             case 'getgameurl':
                 $return['url'] = GameController::getGameUrl($argv[2]);

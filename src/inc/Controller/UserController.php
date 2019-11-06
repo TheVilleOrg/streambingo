@@ -46,6 +46,18 @@ class UserController
     }
 
     /**
+     * Gets a user from the database.
+     *
+     * @param int $userId The unique identifier associated with the user
+     *
+     * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
+     */
+    public static function getUser(int $userId): ?UserModel
+    {
+        return UserModel::loadUser($userId);
+    }
+
+    /**
      * Gets an Twitch OAuth2 authorization URL.
      *
      * @param string $returnPath The URL path to which to return the user after authorization

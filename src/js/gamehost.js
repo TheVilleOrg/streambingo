@@ -3,16 +3,15 @@ jQuery.noConflict();
   'use strict';
 
   $(function() {
+    var gameVars = JSON.parse($('#game-vars').text());
+
     var socket = io('//' + window.location.hostname + ':3000');
 
     socket.on('connect', function() {
-      var match = document.cookie.match(/\baccess_token=(.*)[;\b]/);
-      if (match.length === 2) {
-        socket.emit('creategame', match[1], function(gameName) {
-          console.log('joined game ' + gameName);
-          $('#status').text('Connected');
-        });
-      }
+      socket.emit('creategame', gameVars.gameToken, function(gameName) {
+        console.log('joined game ' + gameName);
+        $('#status').text('Connected');
+      });
     });
 
     socket.on('disconnect', function() {

@@ -19,6 +19,13 @@ class UserModel extends Model
     protected $name = '';
 
     /**
+     * The secret game token for this user
+     *
+     * @var string
+     */
+    protected $gameToken;
+
+    /**
      * The Twitch access token for this user
      *
      * @var string
@@ -48,12 +55,14 @@ class UserModel extends Model
 
     /**
      * @param int $userId The unique identifier associated with the user
+     * @param string $gameToken The secret game token for the user
      * @param string $accessToken The Twitch access token for the user
      * @param string|null $refreshToken The Twitch refresh token for the user, or null if one is not provided
      */
-    protected function __construct(int $userId, string $accessToken, string $refreshToken = null)
+    protected function __construct(int $userId, string $gameToken, string $accessToken, string $refreshToken = null)
     {
         $this->id = $userId;
+        $this->gameToken = $gameToken;
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;
     }
@@ -67,15 +76,15 @@ class UserModel extends Model
      */
     public static function loadUser(int $userId): ?UserModel
     {
-        $user = $name = $accessToken = $refreshToken = $host = $created = null;
+        $user = $name = $gameToken = $accessToken = $refreshToken = $host = $created = null;
 
-        $stmt = self::db()->prepare('SELECT name, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users WHERE id = ?;');
+        $stmt = self::db()->prepare('SELECT name, gameToken, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users WHERE id = ?;');
         $stmt->bind_param('i', $userId);
         $stmt->execute();
-        $stmt->bind_result($name, $accessToken, $refreshToken, $host, $created);
+        $stmt->bind_result($name, $gameToken, $accessToken, $refreshToken, $host, $created);
         if ($stmt->fetch())
         {
-            $user = new self($userId, $accessToken, $refreshToken);
+            $user = new self($userId, $gameToken, $accessToken, $refreshToken);
             $user->name = $name;
             $user->host = (bool) $host;
             $user->created = $created;
@@ -98,7 +107,9 @@ class UserModel extends Model
      */
     public static function createUser(int $userId, string $name, string $accessToken, string $refreshToken = null): UserModel
     {
-        $user = new self($userId, $accessToken, $refreshToken);
+        $gameToken = self::generateGameToken();
+
+        $user = new self($userId, $gameToken, $accessToken, $refreshToken);
         $user->name = $name;
         $user->created = time();
 
@@ -116,8 +127,8 @@ class UserModel extends Model
         $refreshToken = $this->refreshToken;
         $host = $this->host;
 
-        $stmt = self::db()->prepare('INSERT INTO users (id, name, accessToken, refreshToken, host) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, accessToken = ?, refreshToken = ?, host = ?;');
-        $stmt->bind_param('isssisssi', $userId, $name, $accessToken, $refreshToken, $host, $name, $accessToken, $refreshToken, $host);
+        $stmt = self::db()->prepare('INSERT INTO users (id, name, gameToken, accessToken, refreshToken, host) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, accessToken = ?, refreshToken = ?, host = ?;');
+        $stmt->bind_param('isssisssi', $userId, $name, $gameToken, $accessToken, $refreshToken, $host, $name, $accessToken, $refreshToken, $host);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -142,6 +153,22 @@ class UserModel extends Model
         $this->name = $name;
 
         return $this;
+    }
+
+    /**
+     * @return string The secret game token for this user
+     */
+    public function getGameToken(): string
+    {
+        return $this->gameToken;
+    }
+
+    /**
+     * Replaces the secret game token for this user with a newly generated one.
+     */
+    public function invalidateGameToken(): void
+    {
+        $this->gameToken = self::generateGameToken();
     }
 
     /**
@@ -190,5 +217,15 @@ class UserModel extends Model
     public function getCreated(): int
     {
         return $this->created;
+    }
+
+    /**
+     * Generates a random unique token.
+     *
+     * @return string The token
+     */
+    protected static function generateGameToken(): string
+    {
+        return \base_convert((\microtime(true) * 1000), 10, 16) . \md5((string)\mt_rand());
     }
 }
