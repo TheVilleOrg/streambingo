@@ -45,7 +45,7 @@ class HostPage extends Page
 
             if (\filter_has_var(INPUT_POST, 'action'))
             {
-                $this->handleAction();
+                $this->handleAction($user);
             }
             else
             {
@@ -91,17 +91,19 @@ class HostPage extends Page
 
     /**
      * Handles an action request.
+
+     * @param \Bingo\Model\UserModel $user The user
      *
      * @throws \Bingo\Exception\NotFoundException
      */
-    protected function handleAction(): void
+    protected function handleAction(UserModel $user): void
     {
         $data = [];
 
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'createGame':
-                GameController::createGame($this->userId, $this->gameName);
+                GameController::createGame($user->getId(), $user->getName());
                 break;
         }
 
