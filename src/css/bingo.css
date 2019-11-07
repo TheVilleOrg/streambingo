@@ -146,6 +146,108 @@ h2 {
 	color: #800;
 }
 
+.bingo-ball {
+    animation-delay: 0ms, 5000ms;
+    animation-duration: 800ms, 2000ms;
+    animation-fill-mode: forwards;
+    animation-name: ball-slide-in, ball-fade-out;
+    animation-play-state: paused;
+    animation-timing-function: ease-out, ease-in;
+    border-radius: 50%;
+    box-shadow: .5em 1em 1.5em #444, inset -1em -1em 5em #444;
+    height: 30em;
+    left: -60em;
+    margin: -15em;
+    position: absolute;
+    top: 50%;
+    width: 30em;
+    z-index: 1000;
+}
+
+.bingo-ball .inner-ball {
+    animation: ball-roll-in 800ms ease-out forwards paused;
+    background: #fff;
+    border-radius: 50%;
+    color: #000;
+    font-size: 2.5em;
+    font-weight: bold;
+    height: 5em;
+    left: 50%;
+    margin: -2.5em;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 5em;
+}
+
+.bingo-ball .ball-shine {
+    background: #fff;
+    border-radius: 80% 20%;
+    box-shadow: 0 0 2em 2em #fff;
+    height: 2em;
+    left: 25%;
+    opacity: .4;
+    position: absolute;
+    top: 15%;
+    width: 3em;
+}
+
+.bingo-ball.b {
+	background-color: #f80;
+}
+
+.bingo-ball.i {
+	background-color: #fd0;
+}
+
+.bingo-ball.n {
+	background-color: #4c4;
+}
+
+.bingo-ball.g {
+	background-color: #08c;
+}
+
+.bingo-ball.o {
+	background-color: #d4d;
+}
+
+.bingo-ball .letter {
+    font-size: 1.5em;
+    line-height: 1.3em;
+}
+
+.bingo-ball .number {
+    font-size: 2.5em;
+    line-height: .8em;
+}
+
+@keyframes ball-slide-in {
+    from {
+        left: -60em;
+    }
+
+    to {
+        left: 50%;
+    }
+}
+
+@keyframes ball-roll-in {
+    from {
+        transform: rotate(-180deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ball-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
 @media (min-width: 1920px) {
 	#board {
 		font-size: 2.6em;

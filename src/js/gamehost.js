@@ -7,6 +7,8 @@ jQuery.noConflict();
 
     var socket = io('//' + window.location.hostname + ':3000');
 
+    var bingoBall = $('.bingo-ball');
+
     socket.on('connect', function() {
       socket.emit('getgame', gameVars.gameToken, function(gameName) {
         console.log('joined game ' + gameName);
@@ -22,7 +24,17 @@ jQuery.noConflict();
     socket.on('newnumber', function(letter, number) {
       $('.latest').removeClass('latest');
       $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
-      $('#number').text(letter + number);
+      $('#last-number').text(letter + number);
+
+      var ball = bingoBall.clone();
+      ball.addClass(letter.toLowerCase());
+      ball.find('.letter').text(letter);
+      ball.find('.number').text(number);
+      bingoBall.before(ball);
+      ball.css('animation-play-state', 'running').find('.inner-ball').css('animation-play-state', 'running');
+      setTimeout(function() {
+        ball.remove();
+      }, 8000);
     });
 
     socket.on('winner', function(winner) {
@@ -31,7 +43,8 @@ jQuery.noConflict();
 
     socket.on('newgame', function() {
       $('#board td').removeClass('marked');
-      $('#number').text('');
+      $('#last-number').text('');
+      $('.bingo-ball').finish();
     });
 
     $('#create-game').click(function() {

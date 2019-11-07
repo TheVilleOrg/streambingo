@@ -11,5 +11,12 @@
 </head>
 <body>
 <?php require __DIR__ . '/../_board.php'; ?>
+    <div class="bingo-ball">
+        <div class="ball-shine"></div>
+        <div class="inner-ball">
+            <div class="letter"></div>
+            <div class="number"></div>
+        </div>
+    </div>
 </body>
 </html>

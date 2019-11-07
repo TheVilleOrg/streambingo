@@ -32,7 +32,6 @@
 <?php endfor; ?>
 			</tr>
 		</table>
-		<p>Last Number: <span id="number"><?php echo $lastLetter; ?><?php echo $lastNumber; ?></span></p>
         <script type="application/json" id="game-vars">
             {
                 "gameToken": "<?php echo $gameToken; ?>"

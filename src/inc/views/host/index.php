@@ -1,6 +1,7 @@
 <?php require __DIR__ . '/../_header.php'; ?>
 		<p>Status: <span id="status">Connecting...</p>
 <?php require '_board.php'; ?>
+        <p>Last Number: <span id="last-number"><?php echo $lastLetter; ?><?php echo $lastNumber; ?></span></p>
         <div id="game-controls">
             <div>
                 <h4>Game Controls</h4>
