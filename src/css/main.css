@@ -1,0 +1,153 @@
+body {
+	background: #fff;
+	color: #000;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-size: 14px;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+h1 {
+	font-size: 2em;
+}
+
+h2 {
+	font-size: 1.6em;
+}
+
+#nav {
+	background: #9146FF;
+	font-size: 1.3em;
+	height: 40px;
+	line-height: 20px;
+}
+
+#nav a {
+	color: #fff;
+	text-decoration: none;
+}
+
+#nav ul, #nav li {
+	float: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#nav li a, #nav #user li a {
+	line-height: 40px;
+	padding: 10px;
+}
+
+#nav #logo {
+	color: #f80;
+	float: left;
+	font-size: 30px;
+	font-weight: bold;
+	margin: 0;
+	padding: 8px;
+}
+
+#user {
+	float: right;
+	padding: 10px;
+}
+
+#main {
+	background: #eee;
+	margin: 0 auto;
+	max-width: 1200px;
+}
+
+#footer {
+	text-align: center;
+}
+
+.letter-b {
+	color: #f80;
+}
+
+.letter-i {
+	color: #fd0;
+}
+
+.letter-n {
+	color: #4c4;
+}
+
+.letter-g {
+	color: #08c;
+}
+
+.letter-o {
+	color: #d4d;
+}
+
+.grid {
+	background-color: #222;
+	font-size: 2.6em;
+}
+
+.grid td {
+	background: #eee;
+	text-align: center;
+	user-select: none;
+}
+
+#board {
+	width: 100%;
+}
+
+#board td {
+	color: #eee;
+}
+
+#board td.marked {
+	color: #000;
+}
+
+#board td.marked.latest {
+    background: #800;
+    color: #fff;
+}
+
+#card {
+	margin: 0 auto;
+}
+
+#card td {
+	height: 1.6em;
+	width: 1.6em;
+}
+
+#card .marker {
+	border-radius: 50%;
+	cursor: pointer;
+	height: 90%;
+	margin: 0 auto;
+	width: 90%;
+}
+
+#card .marker.marked, #card .marker.free {
+	background-color: #f33;
+}
+
+#card .free {
+	cursor: default;
+	font-size: .6em;
+	font-weight: bold;
+	padding-top: 6px;
+	transform: rotate(45deg);
+}
+
+#game-name {
+	color: #800;
+}
+
+@media (min-width: 1920px) {
+	#board {
+		font-size: 2.6em;
+	}
+}
