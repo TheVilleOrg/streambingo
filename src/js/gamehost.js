@@ -34,10 +34,6 @@ jQuery.noConflict();
       $('#number').text('');
     });
 
-    $('#call-number').click(function() {
-      socket.emit('callnumber');
-    });
-
     $('#create-game').click(function() {
       if (window.confirm('Create a new game?')) {
         var postData = {
@@ -48,6 +44,16 @@ jQuery.noConflict();
           socket.emit('newgame');
         }, 'json');
       }
+    });
+
+    $('#call-number').click(function() {
+      var postData = {
+        json: true,
+        action: 'callNumber'
+      };
+      $.post(window.location, postData, function(data) {
+        socket.emit('newnumber', data.letter, data.number);
+      }, 'json');
     });
 
     $('#source-url').click(function() {

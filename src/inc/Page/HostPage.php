@@ -105,6 +105,10 @@ class HostPage extends Page
             case 'createGame':
                 GameController::createGame($user->getId(), $user->getName());
                 break;
+            case 'callNumber':
+                $data['number'] = GameController::callNumber($user->getName());
+                $data['letter'] = GameController::getLetter($data['number']);
+                break;
         }
 
         echo \json_encode($data);

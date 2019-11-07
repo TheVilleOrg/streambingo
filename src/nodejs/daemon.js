@@ -87,8 +87,8 @@
         if (data.name) {
           socket.join(data.name);
 
-          socket.on('callnumber', () => {
-            callNumber(data.name);
+          socket.on('newnumber', (letter, number) => {
+            io.to(data.name).emit('newnumber', letter, number);
           });
 
           socket.on('newgame', () => {
@@ -120,13 +120,6 @@
       socket.join(gameName);
     });
   });
-
-  function callNumber(gameName) {
-    exec(`php ${config.phpcli} callnumber ${gameName}`, (err, stdout) => {
-      const data = JSON.parse(stdout);
-      io.to(gameName).emit('newnumber', data.letter, data.number);
-    });
-  }
 
   function joinGame(channel) {
     exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout) => {
