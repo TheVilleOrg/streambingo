@@ -81,7 +81,7 @@
   });
 
   io.on('connect', (socket) => {
-    socket.on('creategame', (token, cb) => {
+    socket.on('getgame', (token, cb) => {
       exec(`php ${config.phpcli} getgame ${token}`, (err, stdout) => {
         let data = JSON.parse(stdout);
         if (data.name) {

@@ -8,7 +8,7 @@ jQuery.noConflict();
     var socket = io('//' + window.location.hostname + ':3000');
 
     socket.on('connect', function() {
-      socket.emit('creategame', gameVars.gameToken, function(gameName) {
+      socket.emit('getgame', gameVars.gameToken, function(gameName) {
         console.log('joined game ' + gameName);
         $('#status').text('Connected');
       });
