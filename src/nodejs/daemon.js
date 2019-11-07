@@ -83,35 +83,39 @@
   io.on('connect', (socket) => {
     socket.on('getgame', (token, cb) => {
       exec(`php ${config.phpcli} getgame ${token}`, (err, stdout) => {
-        let data = JSON.parse(stdout);
-        if (data.name) {
-          socket.join(data.name);
+        try {
+          const data = JSON.parse(stdout);
+          if (data.name) {
+            socket.join(data.name);
 
-          socket.on('newnumber', (letter, number) => {
-            io.to(data.name).emit('newnumber', letter, number);
-          });
-
-          socket.on('newgame', () => {
-            io.to(data.name).emit('newgame');
-          });
-
-          socket.on('disconnect', () => {
-            channels.splice(channels.indexOf(data.name), 1);
-          });
-
-          if (channels.indexOf(data.name) === -1) {
-            client.join(data.name)
-            .then(() => {
-              console.log(`joined #${data.name}`);
-            })
-            .catch((err) => {
-              console.warn(err);
+            socket.on('newnumber', (letter, number) => {
+              io.to(data.name).emit('newnumber', letter, number);
             });
+
+            socket.on('newgame', () => {
+              io.to(data.name).emit('newgame');
+            });
+
+            socket.on('disconnect', () => {
+              channels.splice(channels.indexOf(data.name), 1);
+            });
+
+            if (channels.indexOf(data.name) === -1) {
+              client.join(data.name)
+              .then(() => {
+                console.log(`joined #${data.name}`);
+              })
+              .catch((err) => {
+                console.warn(err);
+              });
+            }
+
+            channels.push(data.name);
+
+            cb(data.name);
           }
-
-          channels.push(data.name);
-
-          cb(data.name);
+        } catch (e) {
+          console.error(e);
         }
       });
     });
@@ -123,9 +127,13 @@
 
   function joinGame(channel) {
     exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout) => {
-      let data = JSON.parse(stdout);
-      if (data.url) {
-        client.say(channel, data.url);
+      try {
+        const data = JSON.parse(stdout);
+        if (data.url) {
+          client.say(channel, data.url);
+        }
+      } catch(e) {
+        console.error(e);
       }
     });
   }
@@ -133,12 +141,18 @@
   function callBingo(channel, user) {
     const gameName = channel.substr(1);
     exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (error, stdout) => {
-      let data = JSON.parse(stdout);
-      if (data.result) {
-        client.say(channel, `Congratulations @${user['display-name']}!`);
-        io.to(gameName).emit('winner', user['display-name']);
-      } else {
-        client.say(channel, `@${user['display-name']}, your card does not meet the win conditions.`);
+      try {
+        const data = JSON.parse(stdout);
+        if (data.result) {
+          client.say(channel, `Congratulations @${user['display-name']}!`);
+          io.to(gameName).emit('winner', user['display-name']);
+        } else if(data.result === null) {
+          client.say(channel, `@${user['display-name']}, you do not have a BINGO card.`);
+        } else {
+          client.say(channel, `@${user['display-name']}, your card does not meet the win conditions.`);
+        }
+      } catch (e) {
+        console.error(e);
       }
     });
   }

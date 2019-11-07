@@ -226,15 +226,13 @@ class GameController
      * @param string $gameName The unique name identifying the game associated with the card
      *
      * @return bool True if the card meets the win conditions, false otherwise
-     *
-     * @throws \Bingo\Exception\NotFoundException
      */
-    public static function submitCard(int $userId, string $gameName): bool
+    public static function submitCard(int $userId, string $gameName): ?bool
     {
         $card = CardModel::loadCard($userId, $gameName);
         if (!$card)
         {
-            throw new NotFoundException('Attemped to submit unknown card');
+            return null;
         }
 
         $game = GameModel::loadGameFromName($gameName);
