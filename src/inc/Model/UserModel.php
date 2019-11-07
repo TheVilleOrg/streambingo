@@ -123,12 +123,13 @@ class UserModel extends Model
     {
         $userId = $this->id;
         $name = $this->name;
+        $gameToken = $this->gameToken;
         $accessToken = $this->accessToken;
         $refreshToken = $this->refreshToken;
         $host = $this->host;
 
         $stmt = self::db()->prepare('INSERT INTO users (id, name, gameToken, accessToken, refreshToken, host) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, accessToken = ?, refreshToken = ?, host = ?;');
-        $stmt->bind_param('isssisssi', $userId, $name, $gameToken, $accessToken, $refreshToken, $host, $name, $accessToken, $refreshToken, $host);
+        $stmt->bind_param('issssisssi', $userId, $name, $gameToken, $accessToken, $refreshToken, $host, $name, $accessToken, $refreshToken, $host);
         $result = $stmt->execute();
         $stmt->close();
 
