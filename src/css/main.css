@@ -66,6 +66,10 @@ h2 {
     padding: 1em;
 }
 
+#main > p {
+    text-align: center;
+}
+
 #footer {
 	text-align: center;
 }
@@ -88,6 +92,26 @@ h2 {
 
 .letter-o {
 	color: #d4d;
+}
+
+#game-list {
+    background: #eee;
+    font-family: 'Courier New', Courier, monospace;
+    width: 100%;
+}
+
+#game-list tr:hover td {
+    background: #ddd;
+}
+
+#game-list td, #game-list th {
+    border-bottom: solid 1px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+#game-list td.player-count {
+    text-align: right;
 }
 
 .grid {

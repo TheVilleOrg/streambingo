@@ -1,17 +1,17 @@
 <?php require __DIR__ . '/../_header.php'; ?>
 		<h2>Welcome to Stream BINGO</h2>
-		<p>Stream BINGO is a game made for live streaming.</p>
-		<table>
+        <p>Stream BINGO is a game made for live streaming.</p>
+		<table id="game-list">
 			<tr>
 				<th>Game</th>
-				<th>Players</th>
-				<th></th>
+				<th width="1%">Players</th>
+				<th width="1%">&nbsp;</th>
 			</tr>
 <?php foreach ($games as $game): ?>
 			<tr>
-				<td><?php echo $game['name']; ?></td>
-				<td><?php echo $game['numCards']; ?></td>
-				<td><a href="<?php echo $basePath; ?>play/<?php echo $game['name']; ?>">Join</a></td>
+				<td><a href="https://www.twitch.tv/<?php echo $game['name']; ?>" target="_blank"><?php echo $game['name']; ?></a></td>
+				<td class="player-count"><?php echo $game['numCards']; ?></td>
+				<td><a href="<?php echo $basePath; ?>play/<?php echo $game['name']; ?>">Get Card</a></td>
 			</tr>
 <?php endforeach; ?>
 		</table>
