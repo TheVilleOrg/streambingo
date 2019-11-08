@@ -29,4 +29,4 @@
         </span>
     </div>
 	<div id="main">
-		<h1>Stream BINGO</h1>
+		<h1>Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span></h1>
