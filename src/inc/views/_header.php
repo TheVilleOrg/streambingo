@@ -20,7 +20,13 @@
             <li><a href="<?php echo $basePath; ?>">Home</a></li>
             <li><a href="<?php echo $basePath; ?>host">Host</a></li>
         </ul>
-        <span id="user"><a href="<?php echo $authUrl; ?>">Login with Twitch</a></span>
+        <span id="user">
+<?php if ($user['loggedIn']): ?>
+            Welcome, <strong><?php echo $user['name']; ?></strong>
+<?php else: ?>
+            <a href="<?php echo $authUrl; ?>">Login with Twitch</a>
+<?php endif; ?>
+        </span>
     </div>
 	<div id="main">
 		<h1>Stream BINGO</h1>

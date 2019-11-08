@@ -52,6 +52,21 @@ abstract class Page
         \extract($data);
         $basePath = Config::BASE_PATH;
         $authUrl = UserController::getAuthUrl();
+        $user = [
+            'loggedIn' => false,
+            'name'     => 'guest',
+        ];
+
+        $userModel = UserController::getCurrentUser();
+        if ($userModel)
+        {
+            $user = [
+                'loggedIn' => true,
+                'name'     => \htmlspecialchars($userModel->getName()),
+            ];
+        }
+
+        unset($userModel);
 
         require __DIR__ . '/../views/' . $template . '/index.php';
     }

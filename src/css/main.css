@@ -22,7 +22,8 @@ h2 {
 }
 
 #nav {
-	background: #9146FF;
+    background: #9146FF;
+    color: #fff;
 	font-size: 1.3em;
 	height: 40px;
 	line-height: 20px;
