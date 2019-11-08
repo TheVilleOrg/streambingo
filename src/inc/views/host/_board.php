@@ -1,5 +1,3 @@
-		<h2><?php echo $gameName; ?></h2>
-		<h3><?php echo $gameUrl; ?></h3>
 		<table id="board" class="grid">
 			<tr>
 				<th class="letter-b">B</th>

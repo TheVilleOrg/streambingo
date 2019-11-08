@@ -1,3 +1,7 @@
+* {
+    margin: 0;
+}
+
 body {
 	background: #fff;
 	color: #000;
@@ -56,9 +60,9 @@ h2 {
 }
 
 #main {
-	background: #eee;
 	margin: 0 auto;
-	max-width: 1200px;
+    max-width: 1200px;
+    padding: 1em;
 }
 
 #footer {

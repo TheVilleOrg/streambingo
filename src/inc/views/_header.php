@@ -14,13 +14,13 @@
     <title>Stream BINGO</title>
 </head>
 <body>
+    <div id="nav">
+        <a href="<?php echo $basePath; ?>" id="logo">B</a>
+        <ul>
+            <li><a href="<?php echo $basePath; ?>">Home</a></li>
+            <li><a href="<?php echo $basePath; ?>host">Host</a></li>
+        </ul>
+        <span id="user"><a href="<?php echo $authUrl; ?>">Login with Twitch</a></span>
+    </div>
 	<div id="main">
 		<h1>Stream BINGO</h1>
-		<div id="nav">
-			<a href="<?php echo $basePath; ?>" id="logo">B</a>
-			<ul>
-				<li><a href="<?php echo $basePath; ?>">Home</a></li>
-				<li><a href="<?php echo $basePath; ?>host">Host</a></li>
-			</ul>
-			<span id="user"><a href="<?php echo $authUrl; ?>">Login with Twitch</a></span>
-		</div>

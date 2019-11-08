@@ -11,12 +11,18 @@
     <title>Stream BINGO</title>
 </head>
 <body>
-<?php require __DIR__ . '/../_board.php'; ?>
-    <div class="bingo-ball">
-        <div class="ball-shine"></div>
-        <div class="inner-ball">
-            <div class="letter"></div>
-            <div class="number"></div>
+    <div id="main-container">
+        <div id="inner-container">
+            <h1><?php echo $gameName; ?></h1>
+            <h2><?php echo $gameUrl; ?></h2>
+        <?php require __DIR__ . '/../_board.php'; ?>
+            <div class="bingo-ball">
+                <div class="ball-shine"></div>
+                <div class="inner-ball">
+                    <div class="letter"></div>
+                    <div class="number"></div>
+                </div>
+            </div>
         </div>
     </div>
 </body>

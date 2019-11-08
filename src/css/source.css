@@ -1,3 +1,34 @@
+html, body, #main-container, #inner-container {
+    height: 100%;
+}
+
+body {
+    color: #fff;
+    overflow: hidden;
+}
+
+h1, h2 {
+    text-shadow: .05em .05em .08em #666;
+}
+
+h1 {
+    font-size: 4em;
+}
+
+h2 {
+    font-size: 2em;
+    margin: .4em 0 .5em;
+}
+
+#main-container {
+    animation: background-fade 60s infinite;
+}
+
+#inner-container {
+    background: linear-gradient(rgba(63, 63, 63, .4), rgba(255, 255, 255, .4));
+    padding: 1em;
+}
+
 .bingo-ball {
     animation-delay: 0ms, 5000ms;
     animation-duration: 800ms, 2000ms;
@@ -97,5 +128,31 @@
 @keyframes ball-fade-out {
     to {
         opacity: 0;
+    }
+}
+
+@keyframes background-fade {
+    0% {
+        background: #f80;
+    }
+
+    20% {
+        background: #fd0;
+    }
+
+    40% {
+        background: #4c4;
+    }
+
+    60% {
+        background: #08c;
+    }
+
+    80% {
+        background: #d4d;
+    }
+
+    100% {
+        background: #f80;
     }
 }
