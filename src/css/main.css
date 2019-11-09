@@ -196,6 +196,24 @@ h2 {
     padding: 8px;
 }
 
+#version, #beta-notice {
+    bottom: 0;
+    color: #000;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 4px;
+    position: fixed;
+}
+
+#version {
+    right: 0;
+}
+
+#beta-notice {
+    font-size: 2em;
+    font-weight: bold;
+    opacity: .3;
+}
+
 @media (min-width: 1920px) {
 	#board {
 		font-size: 2.6em;

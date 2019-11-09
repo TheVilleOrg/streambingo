@@ -14,7 +14,12 @@ use Bingo\Page\Page;
 class App
 {
     /**
-     * The requested route.
+     * The application version string
+     */
+    const APP_VERSION = 'v0.1.0';
+
+    /**
+     * The requested route
      *
      * @var string
      */

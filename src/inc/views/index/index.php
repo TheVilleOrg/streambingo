@@ -11,7 +11,7 @@
 			<tr>
 				<td><a href="https://www.twitch.tv/<?php echo $game['name']; ?>" target="_blank"><?php echo $game['name']; ?></a></td>
 				<td class="player-count"><?php echo $game['numCards']; ?></td>
-				<td><a href="<?php echo $basePath; ?>play/<?php echo $game['name']; ?>">Get Card</a></td>
+				<td><a href="<?php echo $app['basePath']; ?>play/<?php echo $game['name']; ?>">Get Card</a></td>
 			</tr>
 <?php endforeach; ?>
 		</table>

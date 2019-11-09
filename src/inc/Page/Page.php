@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Bingo\Page;
 
+use Bingo\App;
 use Bingo\Config;
 use Bingo\Controller\UserController;
 use Bingo\Exception\NotFoundException;
@@ -50,17 +51,22 @@ abstract class Page
     final protected function showTemplate(string $template, array $data = []): void
     {
         \extract($data);
-        $basePath = Config::BASE_PATH;
-        $authUrl = UserController::getAuthUrl();
-        $user = [
-            'loggedIn' => false,
-            'name'     => 'guest',
+        $app = [
+            'basePath' => Config::BASE_PATH,
+            'authUrl'  => UserController::getAuthUrl(),
+            'user'     => [
+                'loggedIn' => false,
+                'name'     => 'guest',
+            ],
+            'version'  => [
+                'string' => App::APP_VERSION,
+            ],
         ];
 
         $userModel = UserController::getCurrentUser();
         if ($userModel)
         {
-            $user = [
+            $app['user'] = [
                 'loggedIn' => true,
                 'name'     => \htmlspecialchars($userModel->getName()),
             ];
