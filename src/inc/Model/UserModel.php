@@ -26,6 +26,13 @@ class UserModel extends Model
     protected $gameToken;
 
     /**
+     * The Twitch user identifier for this user
+     *
+     * @var int
+     */
+    protected $twitchId;
+
+    /**
      * The Twitch access token for this user
      *
      * @var string
@@ -54,14 +61,12 @@ class UserModel extends Model
     protected $created;
 
     /**
-     * @param int $userId The unique identifier associated with the user
      * @param string $gameToken The secret game token for the user
      * @param string $accessToken The Twitch access token for the user
      * @param string|null $refreshToken The Twitch refresh token for the user, or null if one is not provided
      */
-    protected function __construct(int $userId, string $gameToken, string $accessToken, string $refreshToken = null)
+    protected function __construct(string $gameToken, string $accessToken, string $refreshToken = null)
     {
-        $this->id = $userId;
         $this->gameToken = $gameToken;
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;
@@ -76,16 +81,18 @@ class UserModel extends Model
      */
     public static function loadUser(int $userId): ?UserModel
     {
-        $user = $name = $gameToken = $accessToken = $refreshToken = $host = $created = null;
+        $user = $name = $gameToken = $twitchId = $accessToken = $refreshToken = $host = $created = null;
 
-        $stmt = self::db()->prepare('SELECT name, gameToken, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users WHERE id = ?;');
+        $stmt = self::db()->prepare('SELECT name, gameToken, twitchId, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users WHERE id = ?;');
         $stmt->bind_param('i', $userId);
         $stmt->execute();
-        $stmt->bind_result($name, $gameToken, $accessToken, $refreshToken, $host, $created);
+        $stmt->bind_result($name, $gameToken, $twitchId, $accessToken, $refreshToken, $host, $created);
         if ($stmt->fetch())
         {
-            $user = new self($userId, $gameToken, $accessToken, $refreshToken);
+            $user = new self($gameToken, $accessToken, $refreshToken);
+            $user->id = $userId;
             $user->name = $name;
+            $user->twitchId = $twitchId;
             $user->host = (bool) $host;
             $user->created = $created;
         }
@@ -98,19 +105,16 @@ class UserModel extends Model
     /**
      * Creates a new user.
      *
-     * @param int $userId The unique identifier associated with the user
-     * @param string $name The name of the user
      * @param string $accessToken The Twitch access token for the user
      * @param string|null $refreshToken The Twitch refresh token for the user, or null if one is not provided
      *
      * @return \Bingo\Model\UserModel The user
      */
-    public static function createUser(int $userId, string $name, string $accessToken, string $refreshToken = null): UserModel
+    public static function createUser(string $accessToken, string $refreshToken = null): UserModel
     {
         $gameToken = self::generateGameToken();
 
-        $user = new self($userId, $gameToken, $accessToken, $refreshToken);
-        $user->name = $name;
+        $user = new self($gameToken, $accessToken, $refreshToken);
         $user->created = time();
 
         return $user;
@@ -121,17 +125,24 @@ class UserModel extends Model
      */
     public function save(): bool
     {
-        $userId = $this->id;
         $name = $this->name;
         $gameToken = $this->gameToken;
+        $twitchId = $this->twitchId;
         $accessToken = $this->accessToken;
         $refreshToken = $this->refreshToken;
-        $host = $this->host;
 
-        $stmt = self::db()->prepare('INSERT INTO users (id, name, gameToken, accessToken, refreshToken, host) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, accessToken = ?, refreshToken = ?, host = ?;');
-        $stmt->bind_param('issssisssi', $userId, $name, $gameToken, $accessToken, $refreshToken, $host, $name, $accessToken, $refreshToken, $host);
+        $stmt = self::db()->prepare('INSERT INTO users (name, gameToken, twitchId, accessToken, refreshToken) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, accessToken = ?, refreshToken = ?;');
+        $stmt->bind_param('ssisssss', $name, $gameToken, $twitchId, $accessToken, $refreshToken, $name, $accessToken, $refreshToken);
         $result = $stmt->execute();
         $stmt->close();
+
+        if ($result)
+        {
+            if ($this->id === 0)
+            {
+                $this->id = self::db()->insert_id;
+            }
+        }
 
         return $result;
     }
@@ -170,6 +181,26 @@ class UserModel extends Model
     public function invalidateGameToken(): void
     {
         $this->gameToken = self::generateGameToken();
+    }
+
+    /**
+     * @return int The Twitch user identifier for this user
+     */
+    public function getTwitchId(): int
+    {
+        return $this->twitchId;
+    }
+
+    /**
+     * @param int $twitchId The Twitch user identifier for this user
+     *
+     * @return \Bingo\Model\UserModel This object
+     */
+    public function setTwitchId(int $twitchId): UserModel
+    {
+        $this->twitchId = $twitchId;
+
+        return $this;
     }
 
     /**

@@ -31,14 +31,21 @@ class UserController
             return UserModel::loadUser($_SESSION['user_id']);
         }
 
+        $userId = \filter_input(INPUT_COOKIE, 'uid', FILTER_VALIDATE_INT);
         $accessToken = \filter_input(INPUT_COOKIE, 'access_token');
-        if ($accessToken)
+        if ($userId && $accessToken)
         {
-            $userData = self::validateToken($accessToken);
-            if ($userData)
+            $user = UserModel::loadUser($userId);
+            if (!$user || $accessToken !== $user->getAccessToken())
             {
-                $_SESSION['user_id'] = (int) $userData['user_id'];
-                return UserModel::loadUser((int) $userData['user_id']);
+                return null;
+            }
+
+            if (self::validateToken($user))
+            {
+                self::setCookies($user);
+                $_SESSION['user_id'] = $user->getId();
+                return $user;
             }
         }
 
@@ -120,9 +127,11 @@ class UserController
         if ($responseCode === 200)
         {
             $response = \json_decode($response, true);
-            if (self::setUserTokens($response['access_token'], $response['refresh_token']))
+            $user = UserModel::createUser($response['access_token'], $response['refresh_token']);
+
+            if (self::validateToken($user))
             {
-                \setcookie('access_token', $response['access_token'], time() + 2592000);
+                self::setCookies($user);
                 return true;
             }
         }
@@ -131,50 +140,16 @@ class UserController
     }
 
     /**
-     * Sets the access and refresh tokens for a user.
-     *
-     * @param string $access The access token
-     * @param string $refresh The refresh token
-     *
-     * @return bool True if the tokens were valid, false otherwise
-     */
-    protected static function setUserTokens(string $access, string $refresh): bool
-    {
-        $userData = self::validateToken($access);
-        if ($userData === null)
-        {
-            return false;
-        }
-
-        $userId = (int) $userData['user_id'];
-        $name = $userData['login'];
-
-        $user = UserModel::loadUser($userId);
-        if ($user)
-        {
-            $user->setName($name);
-            $user->setTokens($access, $refresh);
-        }
-        else
-        {
-            $user = UserModel::createUser($userId, $name, $access, $refresh);
-        }
-
-        $user->save();
-
-        return true;
-    }
-
-    /**
      * Validates an access token with the Twitch server.
      *
-     * @param string $token The access token
+     * @param \Bingo\Model\UserModel $user The user to validate
+     * @param bool $refresh True to attempt to refresh the access token, false otherwise
      *
-     * @return array|bool An array of user data from the Twitch API, or false if validation failed
+     * @return bool True if the validation was successful, false otherwise
      *
      * @throws \Bingo\Exception\InternalErrorException
      */
-    protected static function validateToken(string $token)
+    protected static function validateToken(UserModel $user, bool $refresh = true): bool
     {
         $ch = \curl_init('https://id.twitch.tv/oauth2/validate');
         if ($ch === false)
@@ -183,7 +158,7 @@ class UserController
         }
 
         \curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: OAuth ' . $token,
+            'Authorization: OAuth ' . $user->getAccessToken(),
         ]);
         \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
@@ -194,9 +169,79 @@ class UserController
 
         if ($responseCode === 200)
         {
-            return \json_decode($response, true);
+            $response = \json_decode($response, true);
+            if (!$response)
+            {
+                return false;
+            }
+
+            if ($response['login'] !== $user->getName())
+            {
+                $user->setName($response['login']);
+                $user->setTwitchId((int) $response['user_id']);
+                $user->save();
+            }
+
+            return true;
+        }
+        elseif ($responseCode === 401 && $refresh && $user->getRefreshToken())
+        {
+            return self::refreshToken($user);
         }
 
         return false;
+    }
+
+    /**
+     * Refreshes a Twitch access token.
+     *
+     * @param \Bingo\Model\UserModel $user The user to refresh
+     *
+     * @return bool True if the access token was refreshed, false otherwise
+     */
+    protected static function refreshToken(UserModel $user): bool
+    {
+        $ch = \curl_init('https://id.twitch.tv/oauth2/token');
+        if ($ch === false)
+        {
+            throw new InternalErrorException('Failed to connect to the Twitch API.');
+        }
+
+        \curl_setopt($ch, CURLOPT_POST, true);
+        \curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'client_id'     => Config::TWITCH_APP_ID,
+            'client_secret' => Config::TWITCH_APP_SECRET,
+            'refresh_token' => $user->getRefreshToken(),
+            'grant_type'    => 'refresh_token',
+        ]);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = \curl_exec($ch);
+        $responseCode = \curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        \curl_close($ch);
+
+        if ($responseCode === 200)
+        {
+            $response = \json_decode($response, true);
+            $user->setTokens($response['access_token'], $response['refresh_token']);
+            $user->save();
+
+            return self::validateToken($user, false);
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets the cookies for a user.
+     *
+     * @param \Bingo\Model\UserModel $user The user for which to set cookies
+     */
+    protected static function setCookies(UserModel $user): void
+    {
+        $expire = time() + 2592000;
+        \setcookie('uid', (string) $user->getId(), $expire);
+        \setcookie('access_token', $user->getAccessToken(), $expire);
     }
 }
