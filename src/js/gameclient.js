@@ -6,13 +6,13 @@ jQuery.noConflict();
     var socket = io('//' + window.location.hostname + ':3000');
 
     socket.on('connect', function() {
-      socket.emit('joingame', $('#game-name').text());
-      $('#status').text('Connected');
+      socket.emit('joingame', $('.game-name').text());
+      $('#connection-status span').text('Connected');
     });
 
     socket.on('disconnect', function() {
       console.log('socket connection lost');
-      $('#status').text('Disconnected');
+      $('#connection-status span').text('Disconnected');
     });
 
     socket.on('newgame', function() {

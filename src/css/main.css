@@ -64,6 +64,7 @@ h2 {
 	margin: 0 auto;
     max-width: 1200px;
     padding: 1em;
+    position: relative;
 }
 
 #main > p {
@@ -171,8 +172,28 @@ h2 {
 	transform: rotate(45deg);
 }
 
-#game-name {
+#connection-status {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15em;
+}
+
+.game-name {
 	color: #800;
+}
+
+#game-controls {
+    border: 2px inset;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+#game-controls > div {
+    border: 2px solid;
+    border-radius: 6px;
+    margin: 4px 0;
+    padding: 8px;
 }
 
 @media (min-width: 1920px) {

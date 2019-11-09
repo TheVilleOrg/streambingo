@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../_header.php'; ?>
-		<h2>Game: <span id="game-name"><?php echo $gameName; ?></span></h2>
-		<p>Status: <span id="status">Connecting...</p>
+		<h2>Channel: <span class="game-name"><?php echo $gameName; ?></span></h2>
+        <div id="connection-status">Status: <span>Connecting...</span></div>
 		<table id="card" class="grid">
 			<tr>
 				<th class="letter-b">B</th>

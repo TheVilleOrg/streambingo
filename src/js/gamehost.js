@@ -12,13 +12,13 @@ jQuery.noConflict();
     socket.on('connect', function() {
       socket.emit('getgame', gameVars.gameToken, function(gameName) {
         console.log('joined game ' + gameName);
-        $('#status').text('Connected');
+        $('#connection-status span').text('Connected');
       });
     });
 
     socket.on('disconnect', function() {
       console.log('socket connection lost');
-      $('#status').text('Disconnected');
+      $('#connection-status span').text('Disconnected');
     });
 
     socket.on('newnumber', function(letter, number) {

@@ -13,7 +13,7 @@
 <body>
     <div id="main-container">
         <div id="inner-container">
-            <h1><?php echo $gameName; ?></h1>
+    		<h1>Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span></h1>
             <h2><?php echo $gameUrl; ?></h2>
         <?php require __DIR__ . '/../_board.php'; ?>
             <div class="bingo-ball">
