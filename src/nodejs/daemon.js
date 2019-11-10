@@ -55,6 +55,10 @@
       return;
     }
 
+    if (channels.indexOf(channel.substr(1)) === -1) {
+      return;
+    }
+
     message = message.trim().toLowerCase();
     if (message === 'bingo' || message === '!bingo' || message === '!play') {
       const now = new Date().getTime();
@@ -66,9 +70,7 @@
 
       console.log(channel, message);
 
-      if (channels.indexOf(channel.substr(1)) === -1) {
-        client.say(channel, 'Stream BINGO is currently offline.');
-      } else if (message === 'bingo' || message === '!bingo') {
+      if (message === 'bingo' || message === '!bingo') {
         callBingo(channel, userstate);
       } else if (message === '!play') {
         joinGame(channel, userstate);
@@ -98,6 +100,15 @@
 
             socket.on('disconnect', () => {
               channels.splice(channels.indexOf(data.name), 1);
+              if (channels.indexOf(data.name) === -1) {
+                client.part(data.name)
+                .then(() => {
+                  console.log(`parted #${data.name}`);
+                })
+                .catch((err) => {
+                  console.warn(err);
+                });
+              }
             });
 
             if (channels.indexOf(data.name) === -1) {
