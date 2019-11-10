@@ -26,11 +26,6 @@ class AuthPage extends Page
             throw new BadRequestException('No `code` parameter present.');
         }
 
-        if (!\session_id())
-        {
-            \session_start();
-        }
-
         if (\filter_input(INPUT_GET, 'state') !== $_SESSION['state'])
         {
             throw new BadRequestException('The `state` parameter does not match the state.');

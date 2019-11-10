@@ -30,6 +30,9 @@ class App
      */
     public static function run(): void
     {
+        \session_set_cookie_params(0, Config::BASE_PATH);
+        \session_start();
+
         \set_exception_handler(['Bingo\App', 'exceptionHandler']);
 
         $options = [

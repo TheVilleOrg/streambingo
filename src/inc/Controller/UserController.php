@@ -21,11 +21,6 @@ class UserController
      */
     public static function getCurrentUser(): ?UserModel
     {
-        if (!\session_id())
-        {
-            \session_start();
-        }
-
         if (isset($_SESSION['user_id']))
         {
             return UserModel::loadUser($_SESSION['user_id']);
@@ -73,11 +68,6 @@ class UserController
      */
     public static function getAuthUrl(): string
     {
-        if (!\session_id())
-        {
-            \session_start();
-        }
-
         $_SESSION['return_url'] = Config::BASE_URL . Config::BASE_PATH . App::getRoute();
         $_SESSION['state'] = \md5((string) \mt_rand());
 
@@ -241,7 +231,7 @@ class UserController
     protected static function setCookies(UserModel $user): void
     {
         $expire = time() + 2592000;
-        \setcookie('uid', (string) $user->getId(), $expire);
-        \setcookie('access_token', $user->getAccessToken(), $expire);
+        \setcookie('uid', (string) $user->getId(), $expire, Config::BASE_PATH);
+        \setcookie('access_token', $user->getAccessToken(), $expire, Config::BASE_PATH);
     }
 }
