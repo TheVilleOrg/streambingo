@@ -79,36 +79,34 @@ class App
      */
     public static function exceptionHandler(\Throwable $e): void
     {
-        $code = 500;
-        $message = 'Internal Server Error';
-        $details = '';
+        $data = [
+            'code'    => 500,
+            'message' => 'Internal Server Error',
+            'details' => '',
+        ];
 
         if ($e instanceof HttpException)
         {
-            $code = $e->getCode();
-            $message = $e->getMessage();
-            $details = $e->getDetails();
+            $data['code'] = $e->getCode();
+            $data['message'] = $e->getMessage();
+            $data['details'] = $e->getDetails();
         }
         else
         {
-            $details = $e->getMessage();
+            $data['details'] = $e->getMessage();
         }
 
-        \header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $message);
+        \header($_SERVER['SERVER_PROTOCOL'] . ' ' . $data['code'] . ' ' . $data['message']);
         if (\filter_input(INPUT_POST, 'json') || \filter_input(INPUT_GET, 'json'))
         {
             \header('Content-Type: application/json');
             echo \json_encode([
-                'error' => [
-                    'code'    => $code,
-                    'message' => $message,
-                    'details' => $details,
-                ],
+                'error' => $data,
             ]);
         }
         else
         {
-            require __DIR__ . '/views/error.php';
+            Page::route('error', $data);
         }
     }
 
