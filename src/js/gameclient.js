@@ -16,19 +16,7 @@ jQuery.noConflict();
     });
 
     socket.on('newgame', function() {
-      var postData = {
-        json: true,
-        action: 'newCard'
-      };
-      $.post(window.location, postData, function(data) {
-        for (var i = 0; i < data.grid.length; i++) {
-          if (i === 12) {
-            continue;
-          }
-
-          $('#card .marker[data-cell=' + i + ']').removeClass('marked').text(data.grid[i]);
-        }
-      }, 'json');
+      $('#game-over-wrapper').show();
     });
 
     $('#card .marker').click(function() {
@@ -50,6 +38,28 @@ jQuery.noConflict();
           cell.removeClass('marked');
         }
       }, 'json');
+    });
+
+    $('#game-over-buttons .confirm').click(function() {
+      var postData = {
+        json: true,
+        action: 'newCard'
+      };
+      $.post(window.location, postData, function(data) {
+        for (var i = 0; i < data.grid.length; i++) {
+          if (i === 12) {
+            continue;
+          }
+
+          $('#card .marker[data-cell=' + i + ']').removeClass('marked').text(data.grid[i]);
+        }
+
+        $('#game-over-wrapper').hide();
+      }, 'json');
+    });
+
+    $('#game-over-buttons .cancel').click(function() {
+      window.location = window.location.href.substr(0, window.location.href.substr(0, window.location.href.lastIndexOf('/')).lastIndexOf('/'));
     });
   });
 })(jQuery);

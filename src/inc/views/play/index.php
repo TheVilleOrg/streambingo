@@ -19,4 +19,13 @@
 	        </tr>
 <?php endfor; ?>
 	    </table>
+        <div id="game-over-wrapper">
+            <div id="game-over">
+                <h3>Game Over</h3>
+                <div id="game-over-buttons">
+                    <button class="confirm">Get New Card</button>
+                    <button class="cancel">Leave</button>
+                </div>
+            </div>
+        </div>
 <?php require __DIR__ . '/../_footer.php'; ?>
