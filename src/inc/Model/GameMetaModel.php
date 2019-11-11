@@ -110,6 +110,27 @@ class GameMetaModel extends Model
     }
 
     /**
+     * Gets the number of cards associated with a game.
+     *
+     * @param string $gameName The unique name identifying the game
+     *
+     * @return string The number of cards associated with the game
+     */
+    public static function getCardCount(string $gameName): int
+    {
+        $count = 0;
+
+        $stmt = self::db()->prepare('SELECT COUNT(1) FROM cards WHERE gameName = ?;');
+        $stmt->bind_param('s', $gameName);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+
+        return $count;
+    }
+
+    /**
      * @return int The unique identifier associated with the user that owns this game
      */
     public function getUserId(): int

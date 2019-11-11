@@ -61,6 +61,20 @@ class GameController
     }
 
     /**
+     * Gets the number of cards associated with a game as a formatted string.
+     *
+     * @param string $gameName The unique name identifying the game
+     *
+     * @return string The number of cards associated with the game as a formatted string
+     */
+    public static function getCardCount(string $gameName): string
+    {
+        $count = GameMetaModel::getCardCount($gameName);
+        $label = $count === 1 ? 'Player' : 'Players';
+        return $count . ' ' . $label;
+    }
+
+    /**
      * Creates a new game.
      *
      * @param int $userId The unique identifier associated with the user that owns the game

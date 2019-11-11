@@ -179,6 +179,11 @@ h2 {
     width: 15em;
 }
 
+#card-count {
+    font-size: 2em;
+    text-align: right;
+}
+
 .game-name {
 	color: #800;
 }

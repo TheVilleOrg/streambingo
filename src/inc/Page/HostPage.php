@@ -23,10 +23,14 @@ class HostPage extends Page
      */
     protected function run(array $params): void
     {
+        $game = $user = null;
+        $minimal = false;
+
         if (\count($params) === 2 && $params[0] === 'source')
         {
             $game = GameController::getGameFromToken($params[1]);
-            $this->showPage($game, UserController::getUser($game->getUserId()), true);
+            $user = UserController::getUser($game->getUserId());
+            $minimal = true;
         }
         else
         {
@@ -43,14 +47,16 @@ class HostPage extends Page
                 throw new UnauthorizedException('Your account is not authorized to host games.');
             }
 
-            if (\filter_has_var(INPUT_POST, 'action'))
-            {
-                $this->handleAction($user);
-            }
-            else
-            {
-                $this->showPage(GameController::getGame($user->getId(), $user->getName()), $user, false);
-            }
+            $game = GameController::getGame($user->getId(), $user->getName());
+        }
+
+        if (\filter_has_var(INPUT_POST, 'action'))
+        {
+            $this->handleAction($user);
+        }
+        else
+        {
+            $this->showPage($game, $user, $minimal);
         }
     }
 
@@ -84,6 +90,7 @@ class HostPage extends Page
             'called'     => $called,
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,
+            'cardCount'  => GameController::getCardCount($game->getGameName()),
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);
@@ -108,6 +115,9 @@ class HostPage extends Page
             case 'callNumber':
                 $data['number'] = GameController::callNumber($user->getName());
                 $data['letter'] = GameController::getLetter($data['number']);
+                break;
+            case 'getStats':
+                $data['cardCount'] = GameController::getCardCount($user->getName());
                 break;
         }
 

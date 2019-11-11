@@ -44,7 +44,7 @@ jQuery.noConflict();
     socket.on('newgame', function() {
       $('#board td').removeClass('marked');
       $('#last-number').text('');
-      $('.bingo-ball').finish();
+      $('#card-count').text('0 Players');
     });
 
     $('#create-game').click(function() {
@@ -77,5 +77,15 @@ jQuery.noConflict();
       $('#source-url').select();
       document.execCommand('copy');
     });
+
+    setInterval(function() {
+      var postData = {
+        json: true,
+        action: 'getStats'
+      };
+      $.post(window.location, postData, function(data) {
+        $('#card-count').text(data.cardCount);
+      }, 'json');
+    }, 10000);
   });
 })(jQuery);
