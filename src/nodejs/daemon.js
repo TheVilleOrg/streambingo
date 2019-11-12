@@ -90,12 +90,12 @@
           if (data.name) {
             socket.join(data.name);
 
-            socket.on('newnumber', (letter, number) => {
-              io.to(data.name).emit('newnumber', letter, number);
+            socket.on('callnumber', (letter, number) => {
+              io.to(data.name).emit('numbercalled', letter, number);
             });
 
-            socket.on('newgame', () => {
-              io.to(data.name).emit('gameended', data.name);
+            socket.on('resetgame', () => {
+              io.to(data.name).emit('gameover', data.name);
             });
 
             socket.on('disconnect', () => {
@@ -131,7 +131,7 @@
       });
     });
 
-    socket.on('play', (userId, gameNames) => {
+    socket.on('playgame', (userId, gameNames) => {
       socket.join(`user${userId}`);
       gameNames.forEach((gameName) => {
         socket.join(gameName);
@@ -156,7 +156,7 @@
         const data = JSON.parse(stdout);
         if (data.result) {
           client.say(channel, `Congratulations @${user['display-name']}!`);
-          io.to(gameName).emit('winner', user['display-name']);
+          io.to(gameName).emit('gameover', gameName, user['display-name']);
         } else if(data.result === null) {
           client.say(channel, `@${user['display-name']}, you do not have a BINGO card.`);
         } else {

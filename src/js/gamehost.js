@@ -21,7 +21,7 @@ jQuery.noConflict();
       $('#connection-status span').text('Disconnected');
     });
 
-    socket.on('newnumber', function(letter, number) {
+    socket.on('numbercalled', function(letter, number) {
       $('.latest').removeClass('latest');
       $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
       $('#last-number').text(letter + number);
@@ -37,11 +37,11 @@ jQuery.noConflict();
       }, 8000);
     });
 
-    socket.on('winner', function(winner) {
-      console.log('congrats ' + winner + '!');
-    });
+    socket.on('gameover', function(gameName, winner) {
+      if (winner) {
+        console.log('congrats ' + winner + '!');
+      }
 
-    socket.on('gameended', function() {
       $('#board td').removeClass('marked');
       $('#last-number').text('');
       $('#card-count').text('0 Players');
@@ -54,7 +54,7 @@ jQuery.noConflict();
           action: 'createGame'
         };
         $.post(window.location, postData, function() {
-          socket.emit('newgame');
+          socket.emit('resetgame');
         }, 'json');
       }
     });
@@ -65,7 +65,7 @@ jQuery.noConflict();
         action: 'callNumber'
       };
       $.post(window.location, postData, function(data) {
-        socket.emit('newnumber', data.letter, data.number);
+        socket.emit('callnumber', data.letter, data.number);
       }, 'json');
     });
 

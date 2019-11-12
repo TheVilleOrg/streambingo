@@ -15,7 +15,7 @@ jQuery.noConflict();
       $('.card').each(function() {
         gameNames.push($(this).data('game-name'));
       });
-      socket.emit('play', gameVars.twitchId, gameNames);
+      socket.emit('playgame', gameVars.twitchId, gameNames);
       $('#connection-status span').text('Connected');
     });
 
@@ -24,7 +24,11 @@ jQuery.noConflict();
       $('#connection-status span').text('Disconnected');
     });
 
-    socket.on('gameended', function(gameName) {
+    socket.on('gameover', function(gameName, winner) {
+      if (winner) {
+        console.log('congrats ' + winner + '!');
+      }
+
       $('.card[data-game-name=' + gameName + '] .game-over-wrapper').show();
     });
 
