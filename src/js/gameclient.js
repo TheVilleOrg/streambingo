@@ -3,10 +3,19 @@ jQuery.noConflict();
   'use strict';
 
   $(function() {
+    var gameVars = JSON.parse($('#game-vars').text());
+
+    var blankCard = $('.card.template');
+    blankCard.removeClass('template').remove();
+
     var socket = io('//' + window.location.hostname + ':3000');
 
     socket.on('connect', function() {
-      socket.emit('joingame', $('.game-name').text());
+      var gameNames = [];
+      $('.card').each(function() {
+        gameNames.push($(this).data('game-name'));
+      });
+      socket.emit('play', gameVars.twitchId, gameNames);
       $('#connection-status span').text('Connected');
     });
 
@@ -15,11 +24,32 @@ jQuery.noConflict();
       $('#connection-status span').text('Disconnected');
     });
 
-    socket.on('newgame', function() {
-      $('#game-over-wrapper').show();
+    socket.on('gameended', function(gameName) {
+      $('.card[data-game-name=' + gameName + '] .game-over-wrapper').show();
     });
 
-    $('#card .marker').click(function() {
+    socket.on('newcard', function(gameName) {
+      var postData = {
+        json: true,
+        action: 'fetchCard',
+        gameName: gameName
+      };
+      $.post(window.location, postData, function(data) {
+        var card = blankCard.clone();
+        card.attr('data-game-name', gameName);
+        card.find('.game-name').text(gameName);
+
+        for (var i = 0; i < data.grid.length; i++) {
+          card.find('.marker[data-cell=' + i + ']').text(data.grid[i]);
+        }
+
+        $('#cards').prepend(card);
+      }, 'json');
+
+      socket.emit('joingame', gameName);
+    });
+
+    $(document).on('click', '.card .marker', function() {
       var cell = $(this);
       var index = cell.data('cell');
       if (index === 12) {
@@ -29,6 +59,7 @@ jQuery.noConflict();
       var postData = {
         json: true,
         action: 'toggleCell',
+        gameName: cell.parents('.card').data('game-name'),
         cell: index
       };
       $.post(window.location, postData, function(data) {
@@ -40,26 +71,8 @@ jQuery.noConflict();
       }, 'json');
     });
 
-    $('#game-over-buttons .confirm').click(function() {
-      var postData = {
-        json: true,
-        action: 'newCard'
-      };
-      $.post(window.location, postData, function(data) {
-        for (var i = 0; i < data.grid.length; i++) {
-          if (i === 12) {
-            continue;
-          }
-
-          $('#card .marker[data-cell=' + i + ']').removeClass('marked').text(data.grid[i]);
-        }
-
-        $('#game-over-wrapper').hide();
-      }, 'json');
-    });
-
-    $('#game-over-buttons .cancel').click(function() {
-      window.location = window.location.href.substr(0, window.location.href.substr(0, window.location.href.lastIndexOf('/')).lastIndexOf('/'));
+    $(document).on('click', '.game-over-buttons .cancel', function() {
+      $(this).parents('.card').remove();
     });
   });
 })(jQuery);

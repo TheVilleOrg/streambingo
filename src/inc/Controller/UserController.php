@@ -60,6 +60,28 @@ class UserController
     }
 
     /**
+     * Gets the unique identifier associated with a user based on their Twitch identifier, creating a user if necessary.
+     *
+     * @param string $name The Twitch name of the user
+     * @param int $twitchId The Twitch identifier of the user
+     *
+     * @return int The unique identifier associated with the user
+     */
+    public static function getIdFromTwitchUser(string $name, int $twitchId): int
+    {
+        $userId = UserModel::getIdFromTwitchId($twitchId);
+        if ($userId)
+        {
+            return $userId;
+        }
+
+        $user = UserModel::createUserFromTwitchId($twitchId, $name);
+        $user->save();
+
+        return $user->getId();
+    }
+
+    /**
      * Gets an Twitch OAuth2 authorization URL.
      *
      * @param string $returnPath The URL path to which to return the user after authorization
@@ -117,7 +139,7 @@ class UserController
         if ($responseCode === 200)
         {
             $response = \json_decode($response, true);
-            $user = UserModel::createUser($response['access_token'], $response['refresh_token']);
+            $user = UserModel::createUserFromToken($response['access_token'], $response['refresh_token']);
 
             if (self::validateToken($user))
             {

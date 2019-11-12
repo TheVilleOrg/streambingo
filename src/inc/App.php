@@ -64,8 +64,8 @@ class App
             case 'getgame':
                 $return['name'] = GameController::getNameFromToken($argv[2]);
                 break;
-            case 'getgameurl':
-                $return['url'] = GameController::getGameUrl($argv[2]);
+            case 'getcard':
+                GameController::createCard((int) $argv[2], $argv[3], $argv[4]);
                 break;
             case 'submitcard':
                 $return['result'] = GameController::submitCard((int) $argv[2], $argv[3]);

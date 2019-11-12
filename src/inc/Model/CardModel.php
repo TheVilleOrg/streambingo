@@ -115,6 +115,62 @@ class CardModel extends Model
     }
 
     /**
+     * Checks whether a card exists.
+     *
+     * @param int $userId The unique identifier associated with the user that owns the card
+     * @param string $gameName The unique name identifying the game associated with the card
+     *
+     * @return bool True if the card exists, false otherwise
+     */
+    public static function cardExists(int $userId, string $gameName): bool
+    {
+        $stmt = self::db()->prepare('SELECT 1 FROM cards WHERE userId = ? AND gameName = ?;');
+        $stmt->bind_param('is', $userId, $gameName);
+        $stmt->execute();
+        $result = $stmt->fetch() === true;
+        $stmt->close();
+
+        return $result;
+    }
+
+    /**
+     * Gets the cards for a user.
+     *
+     * @param int $userId The unique identifier associated with the user that owns the cards
+     *
+     * @return \Bingo\Model\CardModel[] The cards
+     */
+    public static function loadUserCards(int $userId): array
+    {
+        $cards = [];
+
+        $card = $cardId = $gameName = $grid = $marked = $created = $updated = null;
+
+        $stmt = self::db()->prepare('SELECT id, gameName, grid, marked, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM cards WHERE userId = ? ORDER BY created DESC;');
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated);
+        while ($stmt->fetch())
+        {
+            $grid = \array_map('intval', \explode(',', $grid));
+            $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
+
+            $card = new self($userId, $gameName);
+            $card->id = $cardId;
+            $card->grid = $grid;
+            $card->marked = \array_fill_keys($marked, true);
+            $card->created = $created;
+            $card->updated = $updated;
+
+            $cards[] = $card;
+        }
+
+        $stmt->close();
+
+        return $cards;
+    }
+
+    /**
      * Creates a new card.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
@@ -132,10 +188,10 @@ class CardModel extends Model
             \shuffle($column);
             $column = \array_slice($column, 0, 5);
             $card->grid = \array_merge($card->grid, $column);
-            $card->created = $card->updated = time();
         }
 
         $card->grid[12] = null;
+        $card->created = $card->updated = time();
 
         return $card;
     }

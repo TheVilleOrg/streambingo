@@ -6,6 +6,7 @@ namespace Bingo\Page;
 
 use Bingo\Controller\UserController;
 use Bingo\Controller\GameController;
+use Bingo\Model\UserModel;
 
 /**
  * Represents the handler for the game player page.
@@ -13,31 +14,10 @@ use Bingo\Controller\GameController;
 class PlayPage extends Page
 {
     /**
-     * The unique identifier associated with the current user
-     *
-     * @var int
-     */
-    protected $userId;
-
-    /**
-     * The unique name identifying the current game.
-     *
-     * @var string
-     */
-    protected $gameName;
-
-    /**
      * @inheritDoc
      */
     protected function run(array $params): void
     {
-        if (empty($params))
-        {
-            return;
-        }
-
-        $this->gameName = $params[0];
-
         $user = UserController::getCurrentUser();
 
         if (!$user)
@@ -47,58 +27,73 @@ class PlayPage extends Page
             return;
         }
 
-        $this->userId = $user->getId();
-
         if (\filter_has_var(INPUT_POST, 'action'))
         {
-            $this->handleAction();
+            $this->handleAction($user);
         }
         else
         {
-            $this->showPage();
+            $this->showPage($user);
         }
     }
 
     /**
      * Shows the game player page.
+
+     * @param \Bingo\Model\UserModel $user The user
      */
-    protected function showPage(): void
+    protected function showPage(UserModel $user): void
     {
-        $card = GameController::getCard($this->userId, $this->gameName);
-
-        $grid = $card->getGrid();
-        $grid[12] = 'Free';
-
         $data = [
             'scripts'  => [
-                'gameclient',
+                'gameClient',
             ],
-            'gameName' => \htmlspecialchars($this->gameName),
-            'grid'     => $grid,
-            'marked'   => $card->getMarked(),
+            'twitchId' => $user->getTwitchId(),
+            'cards'    => [],
         ];
+
+        $cards = GameController::getUserCards($user->getId());
+
+        foreach ($cards as $card)
+        {
+            $grid = $card->getGrid();
+            $grid[12] = 'Free';
+
+            $data['cards'][] = [
+                'cardId'   => $card->getId(),
+                'gameName' => \htmlspecialchars($card->getGameName()),
+                'grid'     => $grid,
+                'marked'   => $card->getMarked(),
+            ];
+        }
 
         $this->showTemplate('play', $data);
     }
 
     /**
      * Handles an action request.
+
+     * @param \Bingo\Model\UserModel $user The user
      *
      * @throws \Bingo\Exception\NotFoundException
      */
-    protected function handleAction(): void
+    protected function handleAction(UserModel $user): void
     {
         $data = [];
 
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'toggleCell':
+                $gameName = \filter_input(INPUT_POST, 'gameName');
                 $cell = \filter_input(INPUT_POST, 'cell', FILTER_VALIDATE_INT);
-                $data['marked'] = GameController::toggleCell($this->userId, $this->gameName, $cell);
+                $data['marked'] = GameController::toggleCell($user->getId(), $gameName, $cell);
                 break;
-            case 'newCard':
-                $card = GameController::getCard($this->userId, $this->gameName);
+            case 'fetchCard':
+                $gameName = \filter_input(INPUT_POST, 'gameName');
+                $card = GameController::getCard($user->getId(), $gameName);
+                $data['cardId'] = $card->getId();
                 $data['grid'] = $card->getGrid();
+                $data['grid'][12] = 'Free';
                 break;
         }
 

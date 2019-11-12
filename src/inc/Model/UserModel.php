@@ -37,14 +37,14 @@ class UserModel extends Model
      *
      * @var string
      */
-    protected $accessToken;
+    protected $accessToken = '';
 
     /**
      * The Twitch refresh token for this user
      *
      * @var string|null
      */
-    protected $refreshToken;
+    protected $refreshToken = null;
 
     /**
      * Whether this user is authorized to host games
@@ -62,14 +62,10 @@ class UserModel extends Model
 
     /**
      * @param string $gameToken The secret game token for the user
-     * @param string $accessToken The Twitch access token for the user
-     * @param string|null $refreshToken The Twitch refresh token for the user, or null if one is not provided
      */
-    protected function __construct(string $gameToken, string $accessToken, string $refreshToken = null)
+    protected function __construct(string $gameToken)
     {
         $this->gameToken = $gameToken;
-        $this->accessToken = $accessToken;
-        $this->refreshToken = $refreshToken;
     }
 
     /**
@@ -89,10 +85,12 @@ class UserModel extends Model
         $stmt->bind_result($name, $gameToken, $twitchId, $accessToken, $refreshToken, $host, $created);
         if ($stmt->fetch())
         {
-            $user = new self($gameToken, $accessToken, $refreshToken);
+            $user = new self($gameToken);
             $user->id = $userId;
             $user->name = $name;
             $user->twitchId = $twitchId;
+            $user->accessToken = $accessToken;
+            $user->refreshToken = $refreshToken;
             $user->host = (bool) $host;
             $user->created = $created;
         }
@@ -103,19 +101,62 @@ class UserModel extends Model
     }
 
     /**
-     * Creates a new user.
+     * Gets the unique identifier associated with the user based on their Twitch identifier.
+     *
+     * @param int $twitchId The Twitch identifier associated with the user
+     *
+     * @return int The unique identifier associated with the user, or 0 if the user does not exist
+     */
+    public static function getIdFromTwitchId(int $twitchId): int
+    {
+        $userId = 0;
+
+        $stmt = self::db()->prepare('SELECT id FROM users WHERE twitchId = ?;');
+        $stmt->bind_param('i', $twitchId);
+        $stmt->execute();
+        $stmt->bind_result($userId);
+        $stmt->fetch();
+        $stmt->close();
+
+        return $userId;
+    }
+
+    /**
+     * Creates a new user based on a Twitch access token.
      *
      * @param string $accessToken The Twitch access token for the user
      * @param string|null $refreshToken The Twitch refresh token for the user, or null if one is not provided
      *
      * @return \Bingo\Model\UserModel The user
      */
-    public static function createUser(string $accessToken, string $refreshToken = null): UserModel
+    public static function createUserFromToken(string $accessToken, string $refreshToken = null): UserModel
     {
         $gameToken = self::generateGameToken();
 
-        $user = new self($gameToken, $accessToken, $refreshToken);
-        $user->created = time();
+        $user = new self($gameToken);
+        $user->accessToken = $accessToken;
+        $user->refreshToken = $refreshToken;
+        $user->created = \time();
+
+        return $user;
+    }
+
+    /**
+     * Creates a new user based on a Twitch identifier.
+     *
+     * @param string $twitchId The Twitch identifier of the user
+     * @param string $name The Twitch login name of the user
+     *
+     * @return \Bingo\Model\UserModel The user
+     */
+    public static function createUserFromTwitchId(int $twitchId, string $name = ''): UserModel
+    {
+        $gameToken = self::generateGameToken();
+
+        $user = new self($gameToken);
+        $user->name = $name;
+        $user->twitchId = $twitchId;
+        $user->created = \time();
 
         return $user;
     }

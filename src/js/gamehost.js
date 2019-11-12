@@ -41,7 +41,7 @@ jQuery.noConflict();
       console.log('congrats ' + winner + '!');
     });
 
-    socket.on('newgame', function() {
+    socket.on('gameended', function() {
       $('#board td').removeClass('marked');
       $('#last-number').text('');
       $('#card-count').text('0 Players');

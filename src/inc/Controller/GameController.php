@@ -8,9 +8,11 @@ use Bingo\Config;
 use Bingo\Exception\BadRequestException;
 use Bingo\Exception\GameException;
 use Bingo\Exception\NotFoundException;
+use Bingo\Exception\UnauthorizedException;
 use Bingo\Model\CardModel;
 use Bingo\Model\GameMetaModel;
 use Bingo\Model\GameModel;
+use Bingo\Model\UserModel;
 
 /**
  * Provides an interface to the game functionality.
@@ -99,7 +101,7 @@ class GameController
      */
     public static function endGame(string $gameName, int $cardId = null): void
     {
-        $game = GameModel::loadGame($gameName);
+        $game = GameModel::loadGameFromName($gameName);
         if (!$game)
         {
             throw new NotFoundException('Attempted to end a non-existent game');
@@ -118,24 +120,6 @@ class GameController
     public static function getNameFromToken(string $token): ?string
     {
         return GameModel::getNameFromToken($token);
-    }
-
-    /**
-     * Gets the URL to get a card.
-     *
-     * @param string $gameName The unique name identifying the game
-     *
-     * @return string|null The URL to the card page, or null if the game does not exist
-     */
-    public static function getGameUrl(string $gameName): ?string
-    {
-        $game = GameModel::loadGameFromName($gameName);
-        if (!$game || $game->getEnded())
-        {
-            return null;
-        }
-
-        return Config::BASE_URL . Config::BASE_PATH . 'play/' . $game->getGameName();
     }
 
     /**
@@ -170,7 +154,7 @@ class GameController
     }
 
     /**
-     * Gets a card for a game, creating a new card if the specified card does not exist.
+     * Gets a card for a game.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
      * @param string $gameName The unique name identifying the game associated with the card
@@ -181,19 +165,48 @@ class GameController
      */
     public static function getCard(int $userId, string $gameName): CardModel
     {
-        if (!GameModel::gameExists($gameName))
-        {
-            throw new NotFoundException('Attempted to get card for unknown game');
-        }
-
         $card = CardModel::loadCard($userId, $gameName);
         if (!$card)
+        {
+            throw new NotFoundException('Card not found');
+        }
+
+        return $card;
+    }
+
+    /**
+     * Creates a new card.
+     *
+     * @param int $twitchId The Twitch identifier associated with the user creating the card
+     * @param string $userName The user name of the user creating the card
+     * @param string $gameName The name of the game with which to associate the card
+     */
+    public static function createCard(int $twitchId, string $userName, string $gameName): void
+    {
+        if (!GameModel::gameExists($gameName))
+        {
+            throw new NotFoundException('Attempted to create card for unknown game');
+        }
+
+        $userId = UserController::getIdFromTwitchUser($userName, $twitchId);
+
+        if (!CardModel::cardExists($userId, $gameName))
         {
             $card = CardModel::createCard($userId, $gameName);
             $card->save();
         }
+    }
 
-        return $card;
+    /**
+     * Gets the cards for a user.
+     *
+     * @param int $userId The unique identifier associated with the user that owns the cards
+     *
+     * @return \Bingo\Model\CardModel[] The cards
+     */
+    public static function getUserCards(int $userId): array
+    {
+        return CardModel::loadUserCards($userId);
     }
 
     /**
@@ -236,13 +249,15 @@ class GameController
     /**
      * Checks a card against the win conditions, ending the game if it meets the win conditions.
      *
-     * @param int $userId The unique identifier associated with the user that owns the card
+     * @param int $twitchId The Twitch identifier associated with the user that owns the card
      * @param string $gameName The unique name identifying the game associated with the card
      *
-     * @return bool True if the card meets the win conditions, false otherwise
+     * @return bool|null True if the card meets the win conditions, false otherwise, null if the game does not exist
      */
-    public static function submitCard(int $userId, string $gameName): ?bool
+    public static function submitCard(int $twitchId, string $gameName): ?bool
     {
+        $userId = UserModel::getIdFromTwitchId($twitchId);
+
         $card = CardModel::loadCard($userId, $gameName);
         if (!$card)
         {
@@ -259,6 +274,7 @@ class GameController
 
         return $result;
     }
+
     /**
      * Gets the letter associated with a grid number.
      *

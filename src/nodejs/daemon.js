@@ -95,7 +95,7 @@
             });
 
             socket.on('newgame', () => {
-              io.to(data.name).emit('newgame');
+              io.to(data.name).emit('gameended', data.name);
             });
 
             socket.on('disconnect', () => {
@@ -131,21 +131,21 @@
       });
     });
 
+    socket.on('play', (userId, gameNames) => {
+      socket.join(`user${userId}`);
+      gameNames.forEach((gameName) => {
+        socket.join(gameName);
+      });
+    });
+
     socket.on('joingame', (gameName) => {
       socket.join(gameName);
     });
   });
 
-  function joinGame(channel) {
-    exec(`php ${config.phpcli} getgameurl ${channel.substr(1)}`, (err, stdout) => {
-      try {
-        const data = JSON.parse(stdout);
-        if (data.url) {
-          client.say(channel, data.url);
-        }
-      } catch(e) {
-        console.error(e);
-      }
+  function joinGame(channel, user) {
+    exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, () => {
+      io.to(`user${user['user-id']}`).emit('newcard', channel.substr(1));
     });
   }
 
