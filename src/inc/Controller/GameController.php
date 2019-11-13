@@ -106,7 +106,7 @@ class GameController
      * @param int|null $cardId The unique identifier associated with the winning card, or null if there is no winner
      * @param string|null $winnerName The name of the winning user, or null if there is no winner
      */
-    public static function endGame(string $gameName, int $cardId = null, string $winnerName): void
+    public static function endGame(string $gameName, int $cardId = null, string $winnerName = null): void
     {
         $game = GameModel::loadGameFromName($gameName);
         if (!$game)

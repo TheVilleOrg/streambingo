@@ -169,9 +169,10 @@ class GameModel extends Model
         $called = \implode(',', $this->getCalled());
         $ended = $this->getEnded();
         $winner = $this->getWinner();
+        $winnerName = $this->getWinnerName();
 
-        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, ended, winner) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, ended = ?, winner = ?, updated = CURRENT_TIMESTAMP;');
-        $stmt->bind_param('isssiissii', $userId, $gameName, $balls, $called, $ended, $winner, $balls, $called, $ended, $winner);
+        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
+        $stmt->bind_param('isssiisssiis', $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $balls, $called, $ended, $winner, $winnerName);
         $result = $stmt->execute();
         $stmt->close();
 
