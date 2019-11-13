@@ -104,30 +104,20 @@ class CardModel extends Model
      */
     public static function loadCard(int $userId, string $gameName): ?CardModel
     {
-        $card = $cardId = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
+        $cards = self::loadCards($userId, $gameName);
+        return $cards[0] ?? null;
+    }
 
-        $stmt = self::db()->prepare('SELECT c.id, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? AND c.gameName = ?;');
-        $stmt->bind_param('is', $userId, $gameName);
-        $stmt->execute();
-        $stmt->bind_result($cardId, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
-        if ($stmt->fetch())
-        {
-            $grid = \array_map('intval', \explode(',', $grid));
-            $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
-
-            $card = new self($userId, $gameName);
-            $card->id = $cardId;
-            $card->grid = $grid;
-            $card->marked = \array_fill_keys($marked, true);
-            $card->created = $created;
-            $card->updated = $updated;
-            $card->gameEnded = (bool) $gameEnded;
-            $card->gameWinner = $gameWinner;
-        }
-
-        $stmt->close();
-
-        return $card;
+    /**
+     * Gets the cards for a user.
+     *
+     * @param int $userId The unique identifier associated with the user that owns the cards
+     *
+     * @return \Bingo\Model\CardModel[] The cards
+     */
+    public static function loadUserCards(int $userId): array
+    {
+        return self::loadCards($userId);
     }
 
     /**
@@ -147,45 +137,6 @@ class CardModel extends Model
         $stmt->close();
 
         return $result;
-    }
-
-    /**
-     * Gets the cards for a user.
-     *
-     * @param int $userId The unique identifier associated with the user that owns the cards
-     *
-     * @return \Bingo\Model\CardModel[] The cards
-     */
-    public static function loadUserCards(int $userId): array
-    {
-        $cards = [];
-
-        $card = $cardId = $gameName = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
-
-        $stmt = self::db()->prepare('SELECT c.id, c.gameName, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? ORDER BY c.created DESC;');
-        $stmt->bind_param('i', $userId);
-        $stmt->execute();
-        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
-        while ($stmt->fetch())
-        {
-            $grid = \array_map('intval', \explode(',', $grid));
-            $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
-
-            $card = new self($userId, $gameName);
-            $card->id = $cardId;
-            $card->grid = $grid;
-            $card->marked = \array_fill_keys($marked, true);
-            $card->created = $created;
-            $card->updated = $updated;
-            $card->gameEnded = (bool) $gameEnded;
-            $card->gameWinner = $gameWinner;
-
-            $cards[] = $card;
-        }
-
-        $stmt->close();
-
-        return $cards;
     }
 
     /**
@@ -390,5 +341,61 @@ class CardModel extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Gets cards from the database.
+     *
+     * @param int $userId The unique identifier associated with the user that owns the cards
+     * @param string|null $gameName The unique name identifying the game associated with the card, or null for all games
+     *
+     * @return \Bingo\Model\CardModel[] The cards
+     */
+    protected static function loadCards(int $userId, string $gameName = null): array
+    {
+        $cards = [];
+
+        $card = $cardId = $gameName = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
+
+        $sql = 'SELECT c.id, c.gameName, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? ';
+        if ($gameName)
+        {
+            $sql .= 'AND c.gameName = ? ';
+        }
+
+        $sql .= 'ORDER BY c.created DESC;';
+
+        $stmt = self::db()->prepare($sql);
+        if ($gameName)
+        {
+            $stmt->bind_param('is', $userId, $gameName);
+        }
+        else
+        {
+            $stmt->bind_param('i', $userId);
+        }
+
+        $stmt->execute();
+        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
+        while ($stmt->fetch())
+        {
+            $grid = \array_map('intval', \explode(',', $grid));
+            $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
+
+            $card = new self($userId, $gameName);
+            $card->id = $cardId;
+            $card->grid = $grid;
+            $card->marked = \array_fill_keys($marked, true);
+            $card->created = $created;
+            $card->updated = $updated;
+            $card->gameEnded = (bool) $gameEnded;
+            $card->gameWinner = $gameWinner;
+
+            $cards[] = $card;
+        }
+
+        $stmt->close();
+
+        return $cards;
     }
 }
