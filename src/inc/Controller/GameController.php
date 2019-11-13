@@ -104,8 +104,9 @@ class GameController
      *
      * @param string $gameName The unique name identifying the game
      * @param int|null $cardId The unique identifier associated with the winning card, or null if there is no winner
+     * @param string|null $winnerName The name of the winning user, or null if there is no winner
      */
-    public static function endGame(string $gameName, int $cardId = null): void
+    public static function endGame(string $gameName, int $cardId = null, string $winnerName): void
     {
         $game = GameModel::loadGameFromName($gameName);
         if (!$game)
@@ -113,7 +114,7 @@ class GameController
             throw new NotFoundException('Attempted to end a non-existent game');
         }
 
-        $game->setEnded(true)->setWinner($cardId)->save();
+        $game->setEnded(true)->setWinner($cardId)->setWinnerName($winnerName)->save();
     }
 
     /**
@@ -256,9 +257,13 @@ class GameController
      */
     public static function submitCard(int $twitchId, string $gameName): ?bool
     {
-        $userId = UserModel::getIdFromTwitchId($twitchId);
+        $user = UserModel::loadUserFromTwitchId($twitchId);
+        if (!$user)
+        {
+            return null;
+        }
 
-        $card = CardModel::loadCard($userId, $gameName);
+        $card = CardModel::loadCard($user->getId(), $gameName);
         if (!$card)
         {
             return null;
@@ -269,7 +274,7 @@ class GameController
         $result = $card->checkCard($game->getCalled());
 
         if ($result) {
-            self::endGame($gameName, $card->getId());
+            self::endGame($gameName, $card->getId(), $user->getName());
         }
 
         return $result;

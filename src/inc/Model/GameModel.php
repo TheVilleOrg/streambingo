@@ -54,6 +54,13 @@ class GameModel extends Model
     protected $winner = null;
 
     /**
+     * The name of the winning user, or null if there is no winner
+     *
+     * @var string|null
+     */
+    protected $winnerName = null;
+
+    /**
      * The Unix timestamp when this game was created
      *
      * @var int
@@ -256,6 +263,26 @@ class GameModel extends Model
     }
 
     /**
+     * @return string|null The name of the winning user, or null if there is no winner
+     */
+    public function getWinnerName(): ?string
+    {
+        return $this->winnerName;
+    }
+
+    /**
+     * @param string $winnerName The name of the winning user, or null if there is no winner
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setWinnerName(string $winnerName): GameModel
+    {
+        $this->winnerName = $winnerName;
+
+        return $this;
+    }
+
+    /**
      * @return int The Unix timestamp when this game was created
      */
     public function getCreated(): int
@@ -306,16 +333,15 @@ class GameModel extends Model
      */
     protected static function loadGame(string $ident, bool $useToken): ?GameModel
     {
-        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $created = $updated = null;
+        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = null;
 
-        $sql = 'SELECT id, userId, gameName, balls, called, ended, winner, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
-
+        $sql = 'SELECT id, userId, gameName, balls, called, ended, winner, winnerName, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
         $sql .= $useToken ? 'userId = (SELECT id FROM users WHERE gameToken = ?);' : 'gameName = ?;';
-        $stmt = self::db()->prepare($sql);
 
+        $stmt = self::db()->prepare($sql);
         $stmt->bind_param('s', $ident);
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $created, $updated);
+        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated);
         if ($stmt->fetch())
         {
             $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
@@ -327,6 +353,7 @@ class GameModel extends Model
             $game->called = $called;
             $game->ended = (bool) $ended;
             $game->winner = $winner;
+            $game->winnerName = $winnerName;
             $game->created = $created;
             $game->updated = $updated;
         }

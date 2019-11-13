@@ -23,14 +23,14 @@ class UserController
     {
         if (isset($_SESSION['user_id']))
         {
-            return UserModel::loadUser($_SESSION['user_id']);
+            return UserModel::loadUserFromId($_SESSION['user_id']);
         }
 
         $userId = \filter_input(INPUT_COOKIE, 'uid', FILTER_VALIDATE_INT);
         $accessToken = \filter_input(INPUT_COOKIE, 'access_token');
         if ($userId && $accessToken)
         {
-            $user = UserModel::loadUser($userId);
+            $user = UserModel::loadUserFromId($userId);
             if (!$user || $accessToken !== $user->getAccessToken())
             {
                 return null;
@@ -56,7 +56,7 @@ class UserController
      */
     public static function getUser(int $userId): ?UserModel
     {
-        return UserModel::loadUser($userId);
+        return UserModel::loadUserFromId($userId);
     }
 
     /**
@@ -69,14 +69,12 @@ class UserController
      */
     public static function getIdFromTwitchUser(string $name, int $twitchId): int
     {
-        $userId = UserModel::getIdFromTwitchId($twitchId);
-        if ($userId)
+        $user = UserModel::loadUserFromTwitchId($twitchId);
+        if (!$user)
         {
-            return $userId;
+            $user = UserModel::createUserFromTwitchId($twitchId, $name);
+            $user->save();
         }
-
-        $user = UserModel::createUserFromTwitchId($twitchId, $name);
-        $user->save();
 
         return $user->getId();
     }

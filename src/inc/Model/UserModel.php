@@ -69,56 +69,27 @@ class UserModel extends Model
     }
 
     /**
-     * Loads a user from the database.
+     * Loads a user from the database based on the unique identifier associated with the user.
      *
      * @param int $userId The unique identifier associated with the user
      *
      * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
      */
-    public static function loadUser(int $userId): ?UserModel
+    public static function loadUserFromId(int $userId): ?UserModel
     {
-        $user = $name = $gameToken = $twitchId = $accessToken = $refreshToken = $host = $created = null;
-
-        $stmt = self::db()->prepare('SELECT name, gameToken, twitchId, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users WHERE id = ?;');
-        $stmt->bind_param('i', $userId);
-        $stmt->execute();
-        $stmt->bind_result($name, $gameToken, $twitchId, $accessToken, $refreshToken, $host, $created);
-        if ($stmt->fetch())
-        {
-            $user = new self($gameToken);
-            $user->id = $userId;
-            $user->name = $name;
-            $user->twitchId = $twitchId;
-            $user->accessToken = $accessToken;
-            $user->refreshToken = $refreshToken;
-            $user->host = (bool) $host;
-            $user->created = $created;
-        }
-
-        $stmt->close();
-
-        return $user;
+        return self::loadUser($userId, false);
     }
 
     /**
-     * Gets the unique identifier associated with the user based on their Twitch identifier.
+     * Loads a user from the database based on the Twitch identifier associated with the user.
      *
      * @param int $twitchId The Twitch identifier associated with the user
      *
-     * @return int The unique identifier associated with the user, or 0 if the user does not exist
+     * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
      */
-    public static function getIdFromTwitchId(int $twitchId): int
+    public static function loadUserFromTwitchId(int $twitchId): ?UserModel
     {
-        $userId = 0;
-
-        $stmt = self::db()->prepare('SELECT id FROM users WHERE twitchId = ?;');
-        $stmt->bind_param('i', $twitchId);
-        $stmt->execute();
-        $stmt->bind_result($userId);
-        $stmt->fetch();
-        $stmt->close();
-
-        return $userId;
+        return self::loadUser($twitchId, true);
     }
 
     /**
@@ -290,6 +261,42 @@ class UserModel extends Model
     public function getCreated(): int
     {
         return $this->created;
+    }
+
+    /**
+     * Loads a user from the database.
+     *
+     * @param string $ident The unique identifier associated with the game
+     * @param bool $useTwitch True if the unique identifier is a Twitch identifier, false if it is a unique identifier
+     *
+     * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
+     */
+    protected static function loadUser(int $ident, bool $useTwitch): ?UserModel
+    {
+        $user = $userId = $name = $gameToken = $twitchId = $accessToken = $refreshToken = $host = $created = null;
+
+        $sql = 'SELECT id, name, gameToken, twitchId, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users ';
+        $sql .= $useTwitch ? 'WHERE twitchId = ?;' : 'WHERE id = ?;';
+
+        $stmt = self::db()->prepare($sql);
+        $stmt->bind_param('i', $ident);
+        $stmt->execute();
+        $stmt->bind_result($userId, $name, $gameToken, $twitchId, $accessToken, $refreshToken, $host, $created);
+        if ($stmt->fetch())
+        {
+            $user = new self($gameToken);
+            $user->id = $userId;
+            $user->name = $name;
+            $user->twitchId = $twitchId;
+            $user->accessToken = $accessToken;
+            $user->refreshToken = $refreshToken;
+            $user->host = (bool) $host;
+            $user->created = $created;
+        }
+
+        $stmt->close();
+
+        return $user;
     }
 
     /**
