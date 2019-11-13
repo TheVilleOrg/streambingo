@@ -7,7 +7,8 @@ jQuery.noConflict();
 
     var socket = io('//' + window.location.hostname + ':3000');
 
-    var bingoBall = $('.bingo-ball');
+    var bingoBall = $('.bingo-ball.template');
+    bingoBall.removeClass('template').remove();
 
     socket.on('connect', function() {
       socket.emit('getgame', gameVars.gameToken, function(gameName, ended) {
@@ -27,7 +28,7 @@ jQuery.noConflict();
       $('#connection-status span').text('Disconnected');
       $('#call-number').prop('disabled', true);
       $('#create-game').prop('disabled', true);
-  });
+    });
 
     socket.on('numbercalled', function(letter, number) {
       $('.latest').removeClass('latest');
@@ -38,8 +39,7 @@ jQuery.noConflict();
       ball.addClass(letter.toLowerCase());
       ball.find('.letter').text(letter);
       ball.find('.number').text(number);
-      bingoBall.before(ball);
-      ball.css('animation-play-state', 'running').find('.inner-ball').css('animation-play-state', 'running');
+      $('#inner-container').append(ball);
       setTimeout(function() {
         ball.remove();
       }, 8000);

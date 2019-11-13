@@ -8,6 +8,10 @@ jQuery.noConflict();
     var blankCard = $('.card.template');
     blankCard.removeClass('template').remove();
 
+    var gameOverModal = $('.game-over-wrapper.template');
+    gameOverModal.removeClass('template').remove();
+    gameOverModal.find('p').hide();
+
     var socket = io('//' + window.location.hostname + ':3000');
 
     socket.on('connect', function() {
@@ -25,14 +29,15 @@ jQuery.noConflict();
     });
 
     socket.on('gameover', function(gameName, winner) {
-      var card = $('.card[data-game-name=' + gameName + '] .game-over-wrapper');
+      var card = $('.card[data-game-name=' + gameName + ']');
+      var gameOver = gameOverModal.clone();
 
       if (winner) {
         console.log('congrats ' + winner + '!');
-        card.find('p').show().find('.game-winner').text(winner);
+        gameOver.find('p').show().find('.game-winner').text(winner);
       }
 
-      card.show();
+      card.append(gameOver);
     });
 
     socket.on('newcard', function(gameName) {

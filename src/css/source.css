@@ -34,7 +34,6 @@ h2 {
     animation-duration: 800ms, 2000ms;
     animation-fill-mode: forwards;
     animation-name: ball-slide-in, ball-fade-out;
-    animation-play-state: paused;
     animation-timing-function: ease-out, ease-in;
     border-radius: 50%;
     box-shadow: .5em 1em 1.5em #444, inset -1em -1em 5em #444;
@@ -48,7 +47,7 @@ h2 {
 }
 
 .bingo-ball .inner-ball {
-    animation: ball-roll-in 800ms ease-out forwards paused;
+    animation: ball-roll-in 800ms ease-out forwards;
     background: #fff;
     border-radius: 50%;
     color: #000;

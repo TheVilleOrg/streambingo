@@ -215,7 +215,6 @@ h2 {
 
 .game-over-wrapper {
     background: rgba(0, 0, 0, .6);
-    display: none;
     height: 100%;
     left: 0;
     position: absolute;
@@ -231,10 +230,6 @@ h2 {
     padding: 20px 0;
     text-align: center;
     width: 90%;
-}
-
-.game-over p {
-    display: none;
 }
 
 #version, #beta-notice {
