@@ -63,17 +63,23 @@ class GameController
     }
 
     /**
-     * Gets the number of cards associated with a game as a formatted string.
+     * Gets the metadata for a game.
      *
-     * @param string $gameName The unique name identifying the game
+     * @param \Bingo\Model\GameModel $game The game
      *
-     * @return string The number of cards associated with the game as a formatted string
+     * @return \Bingo\Model\GameMetaModel The metadata
+     *
+     * @throws \Bingo\Exception\NotFoundException
      */
-    public static function getCardCount(string $gameName): string
+    public static function getGameMetaData(GameModel $game): GameMetaModel
     {
-        $count = GameMetaModel::getCardCount($gameName);
-        $label = $count === 1 ? 'Player' : 'Players';
-        return $count . ' ' . $label;
+        $meta = GameMetaModel::getGame($game->getId());
+        if (!$meta)
+        {
+            throw new NotFoundException('Attempted to get metadata for an unknown game');
+        }
+
+        return $meta;
     }
 
     /**
@@ -108,18 +114,6 @@ class GameController
         }
 
         $game->setEnded(true)->setWinner($cardId)->save();
-    }
-
-    /**
-     * Gets a game name from a secret game token.
-     *
-     * @param string $token The secret game token
-     *
-     * @return string|null The name of the game, or null if the game does not exist
-     */
-    public static function getNameFromToken(string $token): ?string
-    {
-        return GameModel::getNameFromToken($token);
     }
 
     /**
@@ -216,6 +210,7 @@ class GameController
      * @param string $gameName The unique name identifying the game associated with the card
      * @param int $cell The index of the cell
      *
+     * @throws \Bingo\Exception\BadRequestException
      * @throws \Bingo\Exception\NotFoundException
      */
     public static function toggleCell(int $userId, string $gameName, int $cell): bool
@@ -224,6 +219,11 @@ class GameController
         if (!$card)
         {
             throw new NotFoundException('Attemped to mark unknown card');
+        }
+
+        if ($card->getGameEnded())
+        {
+            throw new BadRequestException('Attempted to mark a card for a game that has ended');
         }
 
         try {

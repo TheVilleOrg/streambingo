@@ -52,7 +52,7 @@ class HostPage extends Page
 
         if (\filter_has_var(INPUT_POST, 'action'))
         {
-            $this->handleAction($user);
+            $this->handleAction($game, $user);
         }
         else
         {
@@ -69,10 +69,12 @@ class HostPage extends Page
      */
     protected function showPage(GameModel $game, UserModel $user, bool $minimal): void
     {
+        $meta = GameController::getGameMetaData($game);
+
         $called = $game->getCalled();
 
-        $lastNumber = '';
-        $lastLetter = '';
+        $lastNumber = '-';
+        $lastLetter = '-';
         if (!empty($called))
         {
             $lastNumber = $called[\count($called) - 1];
@@ -90,7 +92,8 @@ class HostPage extends Page
             'called'     => $called,
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,
-            'cardCount'  => GameController::getCardCount($game->getGameName()),
+            'cardCount'  => $meta->getNumCards(),
+            'winner'     => $meta->getWinnerName() ?? '--',
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);
@@ -99,11 +102,12 @@ class HostPage extends Page
     /**
      * Handles an action request.
 
+     * @param \Bingo\Model\GameModel $game The game
      * @param \Bingo\Model\UserModel $user The user
      *
      * @throws \Bingo\Exception\NotFoundException
      */
-    protected function handleAction(UserModel $user): void
+    protected function handleAction(GameModel $game, UserModel $user): void
     {
         $data = [];
 
@@ -117,7 +121,7 @@ class HostPage extends Page
                 $data['letter'] = GameController::getLetter($data['number']);
                 break;
             case 'getStats':
-                $data['cardCount'] = GameController::getCardCount($user->getName());
+                $data['cardCount'] = GameController::getGameMetaData($game)->getNumCards();
                 break;
         }
 

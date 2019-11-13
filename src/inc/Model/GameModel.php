@@ -152,27 +152,6 @@ class GameModel extends Model
     }
 
     /**
-     * Gets a game name from a secret game token.
-     *
-     * @param string $token The secret game token
-     *
-     * @return string|null The name of the game, or null if the game does not exist
-     */
-    public static function getNameFromToken(string $token): ?string
-    {
-        $gameName = null;
-
-        $stmt = self::db()->prepare('SELECT gameName FROM games WHERE userId = (SELECT id FROM users WHERE gameToken = ?);');
-        $stmt->bind_param('s', $token);
-        $stmt->execute();
-        $stmt->bind_result($gameName);
-        $stmt->fetch();
-        $stmt->close();
-
-        return $gameName;
-    }
-
-    /**
      * @inheritDoc
      */
     public function save(): bool

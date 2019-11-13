@@ -96,6 +96,7 @@
 
             socket.on('resetgame', () => {
               io.to(data.name).emit('gameover', data.name);
+              io.to(data.name).emit('resetgame', data.name);
             });
 
             socket.on('disconnect', () => {
@@ -123,7 +124,7 @@
 
             channels.push(data.name);
 
-            cb(data.name);
+            cb(data.name, data.ended);
           }
         } catch (e) {
           console.error(e);

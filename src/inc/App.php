@@ -62,7 +62,9 @@ class App
         switch ($argv[1])
         {
             case 'getgame':
-                $return['name'] = GameController::getNameFromToken($argv[2]);
+                $game = GameController::getGameFromToken($argv[2]);
+                $return['name'] = $game->getGameName();
+                $return['ended'] = $game->getEnded();
                 break;
             case 'getcard':
                 GameController::createCard((int) $argv[2], $argv[3], $argv[4]);

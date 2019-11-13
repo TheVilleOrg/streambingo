@@ -20,16 +20,19 @@ jQuery.noConflict();
     });
 
     socket.on('disconnect', function() {
-      console.log('socket connection lost');
+      console.warn('socket connection lost');
       $('#connection-status span').text('Disconnected');
     });
 
     socket.on('gameover', function(gameName, winner) {
+      var card = $('.card[data-game-name=' + gameName + '] .game-over-wrapper');
+
       if (winner) {
         console.log('congrats ' + winner + '!');
+        card.find('p').show().find('.game-winner').text(winner);
       }
 
-      $('.card[data-game-name=' + gameName + '] .game-over-wrapper').show();
+      card.show();
     });
 
     socket.on('newcard', function(gameName) {

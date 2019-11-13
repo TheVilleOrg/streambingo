@@ -233,6 +233,10 @@ h2 {
     width: 90%;
 }
 
+.game-over p {
+    display: none;
+}
+
 #version, #beta-notice {
     bottom: 0;
     color: #000;

@@ -60,10 +60,12 @@ class PlayPage extends Page
             $grid[12] = 'Free';
 
             $data['cards'][] = [
-                'cardId'   => $card->getId(),
-                'gameName' => \htmlspecialchars($card->getGameName()),
-                'grid'     => $grid,
-                'marked'   => $card->getMarked(),
+                'cardId'     => $card->getId(),
+                'gameName'   => \htmlspecialchars($card->getGameName()),
+                'grid'       => $grid,
+                'marked'     => $card->getMarked(),
+                'gameEnded'  => $card->getGameEnded(),
+                'gameWinner' => $card->getGameWinner(),
             ];
         }
 

@@ -10,16 +10,24 @@ jQuery.noConflict();
     var bingoBall = $('.bingo-ball');
 
     socket.on('connect', function() {
-      socket.emit('getgame', gameVars.gameToken, function(gameName) {
+      socket.emit('getgame', gameVars.gameToken, function(gameName, ended) {
         console.log('joined game ' + gameName);
         $('#connection-status span').text('Connected');
+
+        if (!ended) {
+          $('#call-number').prop('disabled', false);
+        }
+
+        $('#create-game').prop('disabled', false);
       });
     });
 
     socket.on('disconnect', function() {
-      console.log('socket connection lost');
+      console.warn('socket connection lost');
       $('#connection-status span').text('Disconnected');
-    });
+      $('#call-number').prop('disabled', true);
+      $('#create-game').prop('disabled', true);
+  });
 
     socket.on('numbercalled', function(letter, number) {
       $('.latest').removeClass('latest');
@@ -40,11 +48,17 @@ jQuery.noConflict();
     socket.on('gameover', function(gameName, winner) {
       if (winner) {
         console.log('congrats ' + winner + '!');
+        $('.game-winner').text(winner);
       }
 
+      $('#call-number').prop('disabled', true);
+    });
+
+    socket.on('resetgame', function() {
       $('#board td').removeClass('marked');
       $('#last-number').text('');
       $('#card-count').text('0 Players');
+      $('#call-number').prop('disabled', false);
     });
 
     $('#create-game').click(function() {

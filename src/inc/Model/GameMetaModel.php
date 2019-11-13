@@ -38,6 +38,13 @@ class GameMetaModel extends Model
     protected $winner = null;
 
     /**
+     * The name of the user associated with the winning card, or null if there is no winner
+     *
+     * @var string|null
+     */
+    protected $winnerName = null;
+
+    /**
      * The Unix timestamp when this game was created
      *
      * @var int
@@ -87,16 +94,17 @@ class GameMetaModel extends Model
     {
         $games = [];
 
-        $gameId = $userId = $gameName = $ended = $winner = $created = $updated = $numCards = null;
+        $gameId = $userId = $gameName = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
 
-        $stmt = self::db()->prepare('SELECT id, userId, gameName, ended, winner, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated), (SELECT COUNT(1) FROM cards WHERE gameName = games.gameName) FROM games ORDER BY created ASC;');
+        $stmt = self::db()->prepare('SELECT g.id, g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameName = g.gameName) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id ORDER BY g.created ASC;');
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $ended, $winner, $created, $updated, $numCards);
+        $stmt->bind_result($gameId, $userId, $gameName, $ended, $winner, $winnerName, $created, $updated, $numCards);
         while ($stmt->fetch())
         {
             $game = new self($gameId, $userId, $gameName);
             $game->ended = (bool) $ended;
             $game->winner = $winner;
+            $game->winnerName = $winnerName;
             $game->created = $created;
             $game->updated = $updated;
             $game->numCards = $numCards;
@@ -110,24 +118,34 @@ class GameMetaModel extends Model
     }
 
     /**
-     * Gets the number of cards associated with a game.
+     * Gets a game.
      *
-     * @param string $gameName The unique name identifying the game
+     * @param int $gameId The unique identifier associated with the game
      *
-     * @return string The number of cards associated with the game
+     * @return \Bingo\Model\GameMetaModel The games' metadata, or null if the game does not exist
      */
-    public static function getCardCount(string $gameName): int
+    public static function getGame(int $gameId): ?GameMetaModel
     {
-        $count = 0;
+        $game = $userId = $gameName = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
 
-        $stmt = self::db()->prepare('SELECT COUNT(1) FROM cards WHERE gameName = ?;');
-        $stmt->bind_param('s', $gameName);
+        $stmt = self::db()->prepare('SELECT g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameName = g.gameName) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id WHERE g.id = ?;');
+        $stmt->bind_param('i', $gameId);
         $stmt->execute();
-        $stmt->bind_result($count);
-        $stmt->fetch();
+        $stmt->bind_result($userId, $gameName, $ended, $winner, $winnerName, $created, $updated, $numCards);
+        if ($stmt->fetch())
+        {
+            $game = new self($gameId, $userId, $gameName);
+            $game->ended = (bool) $ended;
+            $game->winner = $winner;
+            $game->winnerName = $winnerName;
+            $game->created = $created;
+            $game->updated = $updated;
+            $game->numCards = $numCards;
+        }
+
         $stmt->close();
 
-        return $count;
+        return $game;
     }
 
     /**
@@ -160,6 +178,14 @@ class GameMetaModel extends Model
     public function getWinner(): ?int
     {
         return $this->winner;
+    }
+
+    /**
+     * @return string|null The name of the user associated with the winning card, or null if there is no winner
+     */
+    public function getWinnerName(): ?string
+    {
+        return $this->winnerName;
     }
 
     /**

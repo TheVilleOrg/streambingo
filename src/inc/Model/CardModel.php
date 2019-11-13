@@ -71,6 +71,20 @@ class CardModel extends Model
     protected $updated;
 
     /**
+     * True if the game associated with this card has ended, false otherwise
+     *
+     * @var bool
+     */
+    protected $gameEnded = false;
+
+    /**
+     * The name of the winner of the game associated with this card, or null if there is no winner
+     *
+     * @var string|null
+     */
+    protected $gameWinner = null;
+
+    /**
      * @param int $userId The unique identifier associated with the user that owns the card
      * @param string $gameName The unique name identifying the game associated with the card
      */
@@ -90,12 +104,12 @@ class CardModel extends Model
      */
     public static function loadCard(int $userId, string $gameName): ?CardModel
     {
-        $card = $cardId = $grid = $marked = $created = $updated = null;
+        $card = $cardId = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
 
-        $stmt = self::db()->prepare('SELECT id, grid, marked, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM cards WHERE userId = ? AND gameName = ?;');
+        $stmt = self::db()->prepare('SELECT c.id, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? AND c.gameName = ?;');
         $stmt->bind_param('is', $userId, $gameName);
         $stmt->execute();
-        $stmt->bind_result($cardId, $grid, $marked, $created, $updated);
+        $stmt->bind_result($cardId, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
         if ($stmt->fetch())
         {
             $grid = \array_map('intval', \explode(',', $grid));
@@ -107,6 +121,8 @@ class CardModel extends Model
             $card->marked = \array_fill_keys($marked, true);
             $card->created = $created;
             $card->updated = $updated;
+            $card->gameEnded = (bool) $gameEnded;
+            $card->gameWinner = $gameWinner;
         }
 
         $stmt->close();
@@ -144,12 +160,12 @@ class CardModel extends Model
     {
         $cards = [];
 
-        $card = $cardId = $gameName = $grid = $marked = $created = $updated = null;
+        $card = $cardId = $gameName = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
 
-        $stmt = self::db()->prepare('SELECT id, gameName, grid, marked, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM cards WHERE userId = ? ORDER BY created DESC;');
+        $stmt = self::db()->prepare('SELECT c.id, c.gameName, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? ORDER BY c.created DESC;');
         $stmt->bind_param('i', $userId);
         $stmt->execute();
-        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated);
+        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
         while ($stmt->fetch())
         {
             $grid = \array_map('intval', \explode(',', $grid));
@@ -161,6 +177,8 @@ class CardModel extends Model
             $card->marked = \array_fill_keys($marked, true);
             $card->created = $created;
             $card->updated = $updated;
+            $card->gameEnded = (bool) $gameEnded;
+            $card->gameWinner = $gameWinner;
 
             $cards[] = $card;
         }
@@ -291,6 +309,22 @@ class CardModel extends Model
     public function getUpdated(): int
     {
         return $this->updated;
+    }
+
+    /**
+     * @return bool True if the game associated with this card has ended, false otherwise
+     */
+    public function getGameEnded(): bool
+    {
+        return $this->gameEnded;
+    }
+
+    /**
+     * @return string|null The name of the winner of the game associated with this card, or null if there is no winner
+     */
+    public function getGameWinner(): ?string
+    {
+        return $this->gameWinner;
     }
 
     /**

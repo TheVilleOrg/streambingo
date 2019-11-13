@@ -22,11 +22,12 @@
                     </tr>
 <?php endfor; ?>
                 </table>
-                <div class="game-over-wrapper">
+                <div class="game-over-wrapper"<?php if ($card['gameEnded']): ?> style="display: block;"<?php endif; ?>>
                     <div class="game-over">
                         <h3>Game Over</h3>
+                        <p<?php if ($card['gameWinner']): ?> style="display: block;"<?php endif; ?>>Winner: <span class="game-winner"><?php echo $card['gameWinner']; ?></span></p>
                         <div class="game-over-buttons">
-    !                        <button class="cancel">Close</button>
+                            <button class="cancel">Close</button>
                         </div>
                     </div>
                 </div>
@@ -56,6 +57,7 @@
             <div class="game-over-wrapper">
                 <div class="game-over">
                     <h3>Game Over</h3>
+                    <p>Winner: <span class="game-winner"></span></p>
                     <div class="game-over-buttons">
                         <button class="cancel">Close</button>
                     </div>
