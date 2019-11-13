@@ -59,10 +59,14 @@ jQuery.noConflict();
       $('#last-number').text('');
       $('#card-count').text('0 Players');
       $('#call-number').prop('disabled', false);
+      $('#create-game').prop('disabled', false);
     });
 
     $('#create-game').click(function() {
       if (window.confirm('Create a new game?')) {
+        $('#call-number').prop('disabled', true);
+        $('#create-game').prop('disabled', true);
+
         var postData = {
           json: true,
           action: 'createGame'
@@ -74,12 +78,19 @@ jQuery.noConflict();
     });
 
     $('#call-number').click(function() {
+      $(this).prop('disabled', true);
+      $('#create-game').prop('disabled', true);
+
       var postData = {
         json: true,
         action: 'callNumber'
       };
       $.post(window.location, postData, function(data) {
         socket.emit('callnumber', data.letter, data.number);
+        $('#create-game').prop('disabled', false);
+        setTimeout(function() {
+          $('#call-number').prop('disabled', false);
+        }, 10000);
       }, 'json');
     });
 
