@@ -18,6 +18,7 @@
         <a href="<?php echo $app['basePath']; ?>" id="logo">B</a>
         <ul>
             <li><a href="<?php echo $app['basePath']; ?>">Home</a></li>
+            <li><a href="<?php echo $app['basePath']; ?>play">Play</a></li>
             <li><a href="<?php echo $app['basePath']; ?>host">Host</a></li>
         </ul>
         <span id="user">
