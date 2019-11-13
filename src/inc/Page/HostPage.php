@@ -8,6 +8,7 @@ use Bingo\Config;
 use Bingo\Controller\UserController;
 use Bingo\Controller\GameController;
 use Bingo\Exception\UnauthorizedException;
+use Bingo\Model\GameMetaModel;
 use Bingo\Model\GameModel;
 use Bingo\Model\UserModel;
 
@@ -92,7 +93,7 @@ class HostPage extends Page
             'called'     => $called,
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,
-            'cardCount'  => $meta->getNumCards(),
+            'cardCount'  => $this->getCardCount($meta),
             'winner'     => $meta->getWinnerName() ?? '--',
         ];
 
@@ -121,10 +122,23 @@ class HostPage extends Page
                 $data['letter'] = GameController::getLetter($data['number']);
                 break;
             case 'getStats':
-                $data['cardCount'] = GameController::getGameMetaData($game)->getNumCards();
+                $data['cardCount'] = $this->getCardCount(GameController::getGameMetaData($game));
                 break;
         }
 
         echo \json_encode($data);
+    }
+
+    /**
+     * Gets the number of cards in the game as a formatted string.
+     *
+     * @param \Bingo\Model\GameMetaModel $game The metadata for the game
+     *
+     * @return string The number of cards as a formatted string
+     */
+    protected function getCardCount(GameMetaModel $game): string
+    {
+        $count = $game->getNumCards();
+        return $count . ($count === 1 ? ' Player' : ' Players');
     }
 }
