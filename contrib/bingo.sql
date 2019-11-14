@@ -25,8 +25,10 @@ CREATE TABLE `games` (
   `gameName` varchar(32) NOT NULL,
   `balls` text NOT NULL,
   `called` text NOT NULL,
+  `autoCall` int(11) NOT NULL DEFAULT 0,
   `ended` tinyint(1) NOT NULL DEFAULT 0,
   `winner` int(11) DEFAULT NULL,
+  `winnerName` varchar(32) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -34,6 +36,8 @@ CREATE TABLE `games` (
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `name` varchar(32) NOT NULL,
+  `gameToken` varchar(64) NOT NULL,
+  `twitchId` int(11) DEFAULT NULL,
   `accessToken` varchar(64) NOT NULL,
   `refreshToken` varchar(64) NOT NULL,
   `host` tinyint(1) NOT NULL DEFAULT 0,
@@ -55,6 +59,8 @@ ALTER TABLE `games`
 
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `gameToken` (`gameToken`),
+  ADD UNIQUE KEY `twitchId` (`twitchId`),
   ADD KEY `name` (`name`);
 
 
@@ -64,14 +70,17 @@ ALTER TABLE `cards`
 ALTER TABLE `games`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 
 ALTER TABLE `cards`
   ADD CONSTRAINT `cards_ibfk_1` FOREIGN KEY (`gameName`) REFERENCES `games` (`gameName`) ON DELETE CASCADE,
   ADD CONSTRAINT `cards_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `games`
-  ADD CONSTRAINT `games_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `games_ibfk_2` FOREIGN KEY (`winner`) REFERENCES `cards` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `games_ibfk_2` FOREIGN KEY (`winner`) REFERENCES `cards` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `games_ibfk_3` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
