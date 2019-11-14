@@ -87,14 +87,15 @@ class GameController
      *
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name to identify the game
+     * @param int $autoCall The auto call interval in seconds, or 0 to disable
      *
      * @return \Bingo\Model\GameModel The game
      */
-    public static function createGame(int $userId, string $gameName): GameModel
+    public static function createGame(int $userId, string $gameName, int $autoCall): GameModel
     {
         GameModel::deleteGame($gameName);
         $game = GameModel::createGame($userId, $gameName);
-        $game->save();
+        $game->setAutoCall($autoCall)->save();
 
         return $game;
     }
@@ -151,6 +152,11 @@ class GameController
         $game->save();
 
         return $number;
+    }
+
+    public static function setAutoCall(GameModel $game, int $interval): void
+    {
+        $game->setAutoCall($interval)->save();
     }
 
     /**

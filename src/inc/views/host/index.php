@@ -10,6 +10,10 @@
                 <button id="create-game" disabled>New Game</button>
             </div>
             <div>
+                <h4>Automatic Call</h4>
+                <label><input type="checkbox" id="auto-call"<?php if ($autoCall): ?> checked<?php endif; ?>> Automatically call a number every <input type="number" id="auto-call-interval" min="20" max="600" value="<?php echo $autoCall | 20; ?>"> seconds.</label>
+            </div>
+            <div>
                 <h4>Browser Source</h4>
                 <input type="text" id="source-url" readonly value="<?php echo $hostUrl; ?>">
                 <button id="copy-source-url">Copy</button>

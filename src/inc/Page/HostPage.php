@@ -93,6 +93,7 @@ class HostPage extends Page
             'called'     => $called,
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,
+            'autoCall'   => $game->getAutoCall(),
             'cardCount'  => $this->getCardCount($meta),
             'winner'     => $meta->getWinnerName() ?? '--',
         ];
@@ -115,7 +116,8 @@ class HostPage extends Page
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'createGame':
-                GameController::createGame($user->getId(), $user->getName());
+                $autoCall = \filter_input(INPUT_POST, 'autoCall', FILTER_VALIDATE_INT);
+                GameController::createGame($user->getId(), $user->getName(), $autoCall);
                 break;
             case 'callNumber':
                 $data['number'] = GameController::callNumber($user->getName());
@@ -123,6 +125,10 @@ class HostPage extends Page
                 break;
             case 'getStats':
                 $data['cardCount'] = $this->getCardCount(GameController::getGameMetaData($game));
+                break;
+            case 'updateAutoCall':
+                $interval = \filter_input(INPUT_POST, 'interval', FILTER_VALIDATE_INT);
+                GameController::setAutoCall($game, $interval);
                 break;
         }
 

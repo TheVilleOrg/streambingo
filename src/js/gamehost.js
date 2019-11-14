@@ -10,6 +10,8 @@ jQuery.noConflict();
     var bingoBall = $('.bingo-ball.template');
     bingoBall.removeClass('template').remove();
 
+    var autoCallTimer;
+
     socket.on('connect', function() {
       socket.emit('getgame', gameVars.gameToken, function(gameName, ended) {
         console.log('joined game ' + gameName);
@@ -20,6 +22,8 @@ jQuery.noConflict();
         }
 
         $('#create-game').prop('disabled', false);
+
+        setAutoCall()
       });
     });
 
@@ -70,7 +74,8 @@ jQuery.noConflict();
 
         var postData = {
           json: true,
-          action: 'createGame'
+          action: 'createGame',
+          autoCall: $('#auto-call').prop('checked') ? $('#auto-call-interval').val() : 0
         };
         $.post(window.location, postData, function() {
           socket.emit('resetgame');
@@ -79,20 +84,15 @@ jQuery.noConflict();
     });
 
     $('#call-number').click(function() {
-      $(this).prop('disabled', true);
-      $('#create-game').prop('disabled', true);
+      callNumber();
+    });
 
-      var postData = {
-        json: true,
-        action: 'callNumber'
-      };
-      $.post(window.location, postData, function(data) {
-        socket.emit('callnumber', data.letter, data.number);
-        $('#create-game').prop('disabled', false);
-        setTimeout(function() {
-          $('#call-number').prop('disabled', false);
-        }, 10000);
-      }, 'json');
+    $('#auto-call').change(function() {
+      setAutoCall();
+    });
+
+    $('#auto-call-interval').change(function() {
+      setAutoCall();
     });
 
     $('#source-url').click(function() {
@@ -113,5 +113,51 @@ jQuery.noConflict();
         $('#card-count').text(data.cardCount);
       }, 'json');
     }, 10000);
+
+    function callNumber() {
+      if (autoCallTimer) {
+        clearInterval(autoCallTimer);
+        autoCallTimer = undefined;
+      }
+
+      $('#call-number').prop('disabled', true);
+      $('#create-game').prop('disabled', true);
+
+      var postData = {
+        json: true,
+        action: 'callNumber'
+      };
+      $.post(window.location, postData, function(data) {
+        socket.emit('callnumber', data.letter, data.number);
+        $('#create-game').prop('disabled', false);
+        setTimeout(function() {
+          $('#call-number').prop('disabled', false);
+        }, 10000);
+        setAutoCall();
+      }, 'json');
+    }
+
+    function setAutoCall() {
+      if (autoCallTimer) {
+        clearInterval(autoCallTimer);
+        autoCallTimer = undefined;
+      }
+
+      var enabled = $('#auto-call').prop('checked');
+      var interval = $('#auto-call-interval').val();
+
+      if (enabled) {
+        autoCallTimer = setInterval(function() {
+          callNumber();
+        }, interval * 1000);
+      }
+
+      var postData = {
+        json: true,
+        action: 'updateAutoCall',
+        interval: enabled ? interval : 0
+      };
+      $.post(window.location, postData);
+    }
   });
 })(jQuery);

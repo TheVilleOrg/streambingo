@@ -40,6 +40,13 @@ class GameModel extends Model
     protected $called = [];
 
     /**
+     * The auto call interval in seconds, or 0 to disable
+     *
+     * @var int
+     */
+    protected $autoCall = 0;
+
+    /**
      * Whether the game is in the ended state
      *
      * @var bool
@@ -167,12 +174,13 @@ class GameModel extends Model
         $gameName = $this->getGameName();
         $balls = \implode(',', $this->getBalls());
         $called = \implode(',', $this->getCalled());
+        $autoCall = $this->getAutoCall();
         $ended = $this->getEnded();
         $winner = $this->getWinner();
         $winnerName = $this->getWinnerName();
 
-        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
-        $stmt->bind_param('isssiisssiis', $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $balls, $called, $ended, $winner, $winnerName);
+        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, autoCall, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, autoCall = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
+        $stmt->bind_param('isssiiisssiiis', $userId, $gameName, $balls, $called, $autoCall, $ended, $winner, $winnerName, $balls, $called, $autoCall, $ended, $winner, $winnerName);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -221,6 +229,33 @@ class GameModel extends Model
     public function getCalled(): array
     {
         return $this->called;
+    }
+
+    /**
+     * @return int The auto call interval in seconds, or 0 to disable
+     */
+    public function getAutoCall(): int
+    {
+        return $this->autoCall;
+    }
+
+    /**
+     * @param int $autoCall The auto call interval in seconds, or 0 to disable
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setAutoCall(int $autoCall): GameModel
+    {
+        if ($autoCall <= 0)
+        {
+            $this->autoCall = 0;
+        }
+        else
+        {
+            $this->autoCall = \min(600, \max(20, $autoCall));
+        }
+
+        return $this;
     }
 
     /**
@@ -334,15 +369,15 @@ class GameModel extends Model
      */
     protected static function loadGame(string $ident, bool $useToken): ?GameModel
     {
-        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = null;
+        $game = $gameId = $userId = $gameName = $balls = $called = $autoCall = $ended = $winner = $winnerName = $created = $updated = null;
 
-        $sql = 'SELECT id, userId, gameName, balls, called, ended, winner, winnerName, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
+        $sql = 'SELECT id, userId, gameName, balls, called, autoCall, ended, winner, winnerName, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
         $sql .= $useToken ? 'userId = (SELECT id FROM users WHERE gameToken = ?);' : 'gameName = ?;';
 
         $stmt = self::db()->prepare($sql);
         $stmt->bind_param('s', $ident);
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated);
+        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $autoCall, $ended, $winner, $winnerName, $created, $updated);
         if ($stmt->fetch())
         {
             $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
@@ -352,6 +387,7 @@ class GameModel extends Model
             $game->id = $gameId;
             $game->balls = $balls;
             $game->called = $called;
+            $game->autoCall = $autoCall;
             $game->ended = (bool) $ended;
             $game->winner = $winner;
             $game->winnerName = $winnerName;
