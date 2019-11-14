@@ -68,6 +68,7 @@ class App
                 break;
             case 'getcard':
                 GameController::createCard((int) $argv[2], $argv[3], $argv[4]);
+                $return['url'] = Config::BASE_URL . Config::BASE_PATH . 'play';
                 break;
             case 'submitcard':
                 $return['result'] = GameController::submitCard((int) $argv[2], $argv[3]);

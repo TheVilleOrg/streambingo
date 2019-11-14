@@ -145,14 +145,20 @@
   });
 
   function joinGame(channel, user) {
-    exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, () => {
-      io.to(`user${user['user-id']}`).emit('newcard', channel.substr(1));
+    exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, (err, stdout) => {
+      try {
+        const data = JSON.parse(stdout);
+        io.to(`user${user['user-id']}`).emit('newcard', channel.substr(1));
+        client.say(channel, `@${user['display-name']} see your BINGO card at ${data.url}`);
+      } catch (e) {
+        console.error(e);
+      }
     });
   }
 
   function callBingo(channel, user) {
     const gameName = channel.substr(1);
-    exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (error, stdout) => {
+    exec(`php ${config.phpcli} submitcard ${user['user-id']} ${gameName}`, (err, stdout) => {
       try {
         const data = JSON.parse(stdout);
         if (data.result) {
