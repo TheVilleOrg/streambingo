@@ -25,7 +25,7 @@ CREATE TABLE `games` (
   `gameName` varchar(32) NOT NULL,
   `balls` text NOT NULL,
   `called` text NOT NULL,
-  `autoCall` int(11) NOT NULL DEFAULT 0,
+  `autoCall` int(11) NOT NULL DEFAULT 30,
   `ended` tinyint(1) NOT NULL DEFAULT 0,
   `winner` int(11) DEFAULT NULL,
   `winnerName` varchar(32) DEFAULT NULL,

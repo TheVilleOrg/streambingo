@@ -22,8 +22,6 @@ jQuery.noConflict();
         }
 
         $('#create-game').prop('disabled', false);
-
-        setAutoCall()
       });
     });
 
@@ -155,7 +153,7 @@ jQuery.noConflict();
       var postData = {
         json: true,
         action: 'updateAutoCall',
-        interval: enabled ? interval : 0
+        interval: interval
       };
       $.post(window.location, postData);
     }

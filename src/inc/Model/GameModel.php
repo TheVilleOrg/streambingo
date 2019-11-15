@@ -40,11 +40,11 @@ class GameModel extends Model
     protected $called = [];
 
     /**
-     * The auto call interval in seconds, or 0 to disable
+     * The auto call interval in seconds
      *
      * @var int
      */
-    protected $autoCall = 0;
+    protected $autoCall = 30;
 
     /**
      * Whether the game is in the ended state
@@ -232,7 +232,7 @@ class GameModel extends Model
     }
 
     /**
-     * @return int The auto call interval in seconds, or 0 to disable
+     * @return int The auto call interval in seconds
      */
     public function getAutoCall(): int
     {
@@ -240,20 +240,13 @@ class GameModel extends Model
     }
 
     /**
-     * @param int $autoCall The auto call interval in seconds, or 0 to disable
+     * @param int $autoCall The auto call interval in seconds
      *
      * @return \Bingo\Model\GameModel This object
      */
     public function setAutoCall(int $autoCall): GameModel
     {
-        if ($autoCall <= 0)
-        {
-            $this->autoCall = 0;
-        }
-        else
-        {
-            $this->autoCall = \min(600, \max(20, $autoCall));
-        }
+        $this->autoCall = \min(600, \max(20, $autoCall));
 
         return $this;
     }
