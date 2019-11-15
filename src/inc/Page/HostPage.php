@@ -20,6 +20,7 @@ class HostPage extends Page
     /**
      * @inheritDoc
      *
+     * @throws \Bingo\Exception\NotFoundException
      * @throws \Bingo\Exception\UnauthorizedException
      */
     protected function run(array $params): void
@@ -67,6 +68,8 @@ class HostPage extends Page
      * @param \Bingo\Model\GameModel $game The game
      * @param \Bingo\Model\UserModel $user The user
      * @param bool $minimal True to use the minimal source view, false to use the full view
+     *
+     * @throws \Bingo\Exception\NotFoundException
      */
     protected function showPage(GameModel $game, UserModel $user, bool $minimal): void
     {
@@ -107,6 +110,7 @@ class HostPage extends Page
      * @param \Bingo\Model\GameModel $game The game
      * @param \Bingo\Model\UserModel $user The user
      *
+     * @throws \Bingo\Exception\BadRequestException
      * @throws \Bingo\Exception\NotFoundException
      */
     protected function handleAction(GameModel $game, UserModel $user): void

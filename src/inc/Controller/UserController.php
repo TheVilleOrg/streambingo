@@ -208,6 +208,8 @@ class UserController
      * @param \Bingo\Model\UserModel $user The user to refresh
      *
      * @return bool True if the access token was refreshed, false otherwise
+     *
+     * @throws \Bingo\Exception\InternalErrorException
      */
     protected static function refreshToken(UserModel $user): bool
     {

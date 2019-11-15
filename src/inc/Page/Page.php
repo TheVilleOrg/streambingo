@@ -19,6 +19,11 @@ abstract class Page
      *
      * @param string $page The name of the page
      * @param string[] $params The list of parameters to send to the handler
+     *
+     * @throws \Bingo\Exception\BadRequestException
+     * @throws \Bingo\Exception\InternalErrorException
+     * @throws \Bingo\Exception\NotFoundException
+     * @throws \Bingo\Exception\UnauthorizedException
      */
     public static function route(string $page, array $params): void
     {

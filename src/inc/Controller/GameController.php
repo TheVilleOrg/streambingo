@@ -106,6 +106,8 @@ class GameController
      * @param string $gameName The unique name identifying the game
      * @param int|null $cardId The unique identifier associated with the winning card, or null if there is no winner
      * @param string|null $winnerName The name of the winning user, or null if there is no winner
+     *
+     * @throws \Bingo\Exception\NotFoundException
      */
     public static function endGame(string $gameName, int $cardId = null, string $winnerName = null): void
     {
@@ -186,6 +188,8 @@ class GameController
      * @param int $twitchId The Twitch identifier associated with the user creating the card
      * @param string $userName The user name of the user creating the card
      * @param string $gameName The name of the game with which to associate the card
+     *
+     * @throws \Bingo\Exception\NotFoundException
      */
     public static function createCard(int $twitchId, string $userName, string $gameName): void
     {
