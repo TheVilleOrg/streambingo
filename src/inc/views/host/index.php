@@ -17,6 +17,7 @@
                 <h4>Browser Source</h4>
                 <input type="text" id="source-url" readonly value="<?php echo $hostUrl; ?>">
                 <button id="copy-source-url">Copy</button>
+                <p>Use this for your browser source URL in your streaming software.</p>
             </div>
         </div>
 <?php require __DIR__ . '/../_footer.php'; ?>
