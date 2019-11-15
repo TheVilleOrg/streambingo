@@ -156,6 +156,12 @@ class GameController
         return $number;
     }
 
+    /**
+     * Set the auto call setting for a game.
+     *
+     * @param \Bingo\Model\GameModel $game The game
+     * @param int $interval The auto call interval in seconds
+     */
     public static function setAutoCall(GameModel $game, int $interval): void
     {
         $game->setAutoCall($interval)->save();
