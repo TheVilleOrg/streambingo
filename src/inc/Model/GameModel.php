@@ -356,7 +356,7 @@ class GameModel extends Model
      * Loads a game from the database.
      *
      * @param string $ident The unique identifier associated with the game
-     * @param bool $name True if the unique identifier is a secret game token, false if it is a name
+     * @param bool $useToken True if the unique identifier is a secret game token, false if it is a name
      *
      * @return \Bingo\Model\GameModel|null The game, or null if the game does not exist
      */
