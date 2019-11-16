@@ -26,7 +26,7 @@ class GameController
      */
     public static function getGameList(): array
     {
-        return GameMetaModel::getGames();
+        return GameMetaModel::loadActiveGames();
     }
 
     /**
@@ -73,7 +73,7 @@ class GameController
      */
     public static function getGameMetaData(GameModel $game): GameMetaModel
     {
-        $meta = GameMetaModel::getGame($game->getId());
+        $meta = GameMetaModel::loadGameFromId($game->getId());
         if (!$meta)
         {
             throw new NotFoundException('Attempted to get metadata for an unknown game');
@@ -201,7 +201,7 @@ class GameController
      */
     public static function createCard(int $twitchId, string $userName, string $gameName): int
     {
-        $game = GameModel::loadGameFromName($gameName);
+        $game = GameMetaModel::loadGameFromName($gameName);
         if (!$game)
         {
             throw new NotFoundException('Attempted to create card for unknown game');

@@ -86,25 +86,38 @@ class GameMetaModel extends Model
     }
 
     /**
-     * Gets all the games.
+     * Gets all the active games.
      *
      * @return \Bingo\Model\GameMetaModel[] An array of games' metadata
      */
-    public static function getGames(): array
+    public static function loadActiveGames(): array
     {
         return self::loadGames(null, null, true);
     }
 
     /**
-     * Gets a game.
+     * Gets a game based on the unique identifier associated with the game.
      *
      * @param int $gameId The unique identifier associated with the game
      *
      * @return \Bingo\Model\GameMetaModel The games' metadata, or null if the game does not exist
      */
-    public static function getGame(int $gameId): ?GameMetaModel
+    public static function loadGameFromId(int $gameId): ?GameMetaModel
     {
         $games = self::loadGames($gameId);
+        return $games[0] ?? null;
+    }
+
+    /**
+     * Gets a game based on the unique name used to identify the game.
+     *
+     * @param string $gameName The unique name used to identify the game
+     *
+     * @return \Bingo\Model\GameMetaModel The games' metadata, or null if the game does not exist
+     */
+    public static function loadGameFromName(string $gameName): ?GameMetaModel
+    {
+        $games = self::loadGames(null, $gameName);
         return $games[0] ?? null;
     }
 
