@@ -2,7 +2,7 @@
         <div id="connection-status">Status: <span>Connecting...</span></div>
         <div id="cards">
 <?php foreach ($cards as $card): ?>
-            <div class="card" data-game-name="<?php echo $card['gameName']; ?>">
+            <div class="card" data-game-id="<?php echo $card['gameId']; ?>" data-game-name="<?php echo $card['gameName']; ?>">
                 <h2 class="game-name"><?php echo $card['gameName']; ?></h2>
                 <table class="grid">
                     <tr>

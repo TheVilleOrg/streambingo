@@ -61,6 +61,7 @@ class PlayPage extends Page
 
             $data['cards'][] = [
                 'cardId'     => $card->getId(),
+                'gameId'     => $card->getGameId(),
                 'gameName'   => \htmlspecialchars($card->getGameName()),
                 'grid'       => $grid,
                 'marked'     => $card->getMarked(),
@@ -86,14 +87,15 @@ class PlayPage extends Page
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'toggleCell':
-                $gameName = \filter_input(INPUT_POST, 'gameName');
+                $gameId = \filter_input(INPUT_POST, 'gameId', FILTER_VALIDATE_INT);
                 $cell = \filter_input(INPUT_POST, 'cell', FILTER_VALIDATE_INT);
-                $data['marked'] = GameController::toggleCell($user->getId(), $gameName, $cell);
+                $data['marked'] = GameController::toggleCell($user->getId(), $gameId, $cell);
                 break;
             case 'fetchCard':
-                $gameName = \filter_input(INPUT_POST, 'gameName');
-                $card = GameController::getCard($user->getId(), $gameName);
+                $gameId = \filter_input(INPUT_POST, 'gameId', FILTER_VALIDATE_INT);
+                $card = GameController::getCard($user->getId(), $gameId);
                 $data['cardId'] = $card->getId();
+                $data['gameName'] = $card->getGameName();
                 $data['grid'] = $card->getGrid();
                 $data['grid'][12] = 'Free';
                 break;

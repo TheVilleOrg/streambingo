@@ -75,8 +75,9 @@ jQuery.noConflict();
           action: 'createGame',
           autoCall: $('#auto-call').prop('checked') ? $('#auto-call-interval').val() : 0
         };
-        $.post(window.location, postData, function() {
-          socket.emit('resetgame');
+        $.post(window.location, postData, function(data) {
+          socket.emit('resetgame', gameVars.gameId);
+          gameVars.gameId = data.gameId;
         }, 'json');
       }
     });

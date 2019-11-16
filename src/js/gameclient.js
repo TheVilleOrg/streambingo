@@ -28,8 +28,8 @@ jQuery.noConflict();
       $('#connection-status span').text('Disconnected');
     });
 
-    socket.on('gameover', function(gameName, winner) {
-      var card = $('.card[data-game-name=' + gameName + ']');
+    socket.on('gameover', function(gameId, winner) {
+      var card = $('.card[data-game-id=' + gameId + ']');
       var gameOver = gameOverModal.clone();
 
       if (winner) {
@@ -40,25 +40,26 @@ jQuery.noConflict();
       card.append(gameOver);
     });
 
-    socket.on('newcard', function(gameName) {
+    socket.on('newcard', function(gameId) {
       var postData = {
         json: true,
         action: 'fetchCard',
-        gameName: gameName
+        gameId: gameId
       };
       $.post(window.location, postData, function(data) {
         var card = blankCard.clone();
-        card.attr('data-game-name', gameName);
-        card.find('.game-name').text(gameName);
+        card.attr('data-game-id', gameId);
+        card.attr('data-game-name', data.gameName);
+        card.find('.game-name').text(data.gameName);
 
         for (var i = 0; i < data.grid.length; i++) {
           card.find('.marker[data-cell=' + i + ']').text(data.grid[i]);
         }
 
         $('#cards').prepend(card);
-      }, 'json');
 
-      socket.emit('joingame', gameName);
+        socket.emit('joingame', data.gameName);
+      }, 'json');
     });
 
     $(document).on('click', '.card .marker', function() {
@@ -71,7 +72,7 @@ jQuery.noConflict();
       var postData = {
         json: true,
         action: 'toggleCell',
-        gameName: cell.parents('.card').data('game-name'),
+        gameId: cell.parents('.card').data('game-id'),
         cell: index
       };
       $.post(window.location, postData, function(data) {

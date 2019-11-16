@@ -94,9 +94,9 @@
               io.to(data.name).emit('numbercalled', letter, number);
             });
 
-            socket.on('resetgame', () => {
-              io.to(data.name).emit('gameover', data.name);
-              io.to(data.name).emit('resetgame', data.name);
+            socket.on('resetgame', (gameId) => {
+              io.to(data.name).emit('gameover', gameId);
+              io.to(data.name).emit('resetgame');
             });
 
             socket.on('disconnect', () => {
@@ -148,10 +148,11 @@
     exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, (err, stdout) => {
       try {
         const data = JSON.parse(stdout);
-        io.to(`user${user['user-id']}`).emit('newcard', channel.substr(1));
+        io.to(`user${user['user-id']}`).emit('newcard', data.gameId);
         client.say(channel, `@${user['display-name']} see your BINGO card at ${data.url}`);
       } catch (e) {
         console.error(e);
+        console.error(stdout);
       }
     });
   }
@@ -163,7 +164,7 @@
         const data = JSON.parse(stdout);
         if (data.result) {
           client.say(channel, `Congratulations @${user['display-name']}!`);
-          io.to(gameName).emit('gameover', gameName, user['display-name']);
+          io.to(gameName).emit('gameover', data.gameId, user['display-name']);
         } else if(data.result === null) {
           client.say(channel, `@${user['display-name']}, you do not have a BINGO card.`);
         } else {

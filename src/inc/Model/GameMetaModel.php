@@ -128,7 +128,7 @@ class GameMetaModel extends Model
     {
         $game = $userId = $gameName = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
 
-        $stmt = self::db()->prepare('SELECT g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameName = g.gameName) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id WHERE g.id = ?;');
+        $stmt = self::db()->prepare('SELECT g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameId = g.id) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id WHERE g.id = ?;');
         $stmt->bind_param('i', $gameId);
         $stmt->execute();
         $stmt->bind_result($userId, $gameName, $ended, $winner, $winnerName, $created, $updated, $numCards);

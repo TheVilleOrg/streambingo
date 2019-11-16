@@ -171,15 +171,15 @@ class GameController
      * Gets a card for a game.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      *
      * @return \Bingo\Model\CardModel The card
      *
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function getCard(int $userId, string $gameName): CardModel
+    public static function getCard(int $userId, int $gameId): CardModel
     {
-        $card = CardModel::loadCard($userId, $gameName);
+        $card = CardModel::loadCard($userId, $gameId);
         if (!$card)
         {
             throw new NotFoundException('Card not found');
@@ -195,22 +195,27 @@ class GameController
      * @param string $userName The user name of the user creating the card
      * @param string $gameName The name of the game with which to associate the card
      *
+     * @return int The unique identifier of the game
+     *
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function createCard(int $twitchId, string $userName, string $gameName): void
+    public static function createCard(int $twitchId, string $userName, string $gameName): int
     {
-        if (!GameModel::gameExists($gameName))
+        $game = GameModel::loadGameFromName($gameName);
+        if (!$game)
         {
             throw new NotFoundException('Attempted to create card for unknown game');
         }
 
         $userId = UserController::getIdFromTwitchUser($userName, $twitchId);
 
-        if (!CardModel::cardExists($userId, $gameName))
+        if (!CardModel::cardExists($userId, $game->getId()))
         {
-            $card = CardModel::createCard($userId, $gameName);
+            $card = CardModel::createCard($userId, $game->getId());
             $card->save();
         }
+
+        return $game->getId();
     }
 
     /**
@@ -226,18 +231,18 @@ class GameController
     }
 
     /**
-     * Marks a call on a card.
+     * Marks a cell on a card.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      * @param int $cell The index of the cell
      *
      * @throws \Bingo\Exception\BadRequestException
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function toggleCell(int $userId, string $gameName, int $cell): bool
+    public static function toggleCell(int $userId, int $gameId, int $cell): bool
     {
-        $card = CardModel::loadCard($userId, $gameName);
+        $card = CardModel::loadCard($userId, $gameId);
         if (!$card)
         {
             throw new NotFoundException('Attemped to mark unknown card');
@@ -274,9 +279,9 @@ class GameController
      * @param int $twitchId The Twitch identifier associated with the user that owns the card
      * @param string $gameName The unique name identifying the game associated with the card
      *
-     * @return bool|null True if the card meets the win conditions, false otherwise, null if the game does not exist
+     * @return array|null Array containing the result and the unique game identifier, null if the game does not exist
      */
-    public static function submitCard(int $twitchId, string $gameName): ?bool
+    public static function submitCard(int $twitchId, string $gameName): ?array
     {
         $user = UserModel::loadUserFromTwitchId($twitchId);
         if (!$user)
@@ -284,13 +289,17 @@ class GameController
             return null;
         }
 
-        $card = CardModel::loadCard($user->getId(), $gameName);
-        if (!$card)
+        $game = GameModel::loadGameFromName($gameName);
+        if (!$game)
         {
             return null;
         }
 
-        $game = GameModel::loadGameFromName($gameName);
+        $card = CardModel::loadCard($user->getId(), $game->getId());
+        if (!$card)
+        {
+            return null;
+        }
 
         $result = $card->checkCard($game->getCalled());
 
@@ -298,7 +307,10 @@ class GameController
             self::endGame($gameName, $card->getId(), $user->getName());
         }
 
-        return $result;
+        return [
+            'result' => $result,
+            'gameId' => $game->getId(),
+        ];
     }
 
     /**

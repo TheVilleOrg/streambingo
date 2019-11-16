@@ -11,8 +11,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `cards` (
   `id` int(11) NOT NULL,
+  `gameId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
-  `gameName` varchar(32) NOT NULL,
   `grid` text NOT NULL,
   `marked` text NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -47,8 +47,8 @@ CREATE TABLE `users` (
 
 ALTER TABLE `cards`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `userId_2` (`userId`,`gameName`),
-  ADD KEY `gameName` (`gameName`),
+  ADD UNIQUE KEY `gameId_2` (`gameId`,`userId`),
+  ADD KEY `gameId` (`gameId`),
   ADD KEY `userId` (`userId`);
 
 ALTER TABLE `games`
@@ -75,8 +75,8 @@ ALTER TABLE `users`
 
 
 ALTER TABLE `cards`
-  ADD CONSTRAINT `cards_ibfk_1` FOREIGN KEY (`gameName`) REFERENCES `games` (`gameName`) ON DELETE CASCADE,
-  ADD CONSTRAINT `cards_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `cards_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `cards_ibfk_2` FOREIGN KEY (`gameId`) REFERENCES `games` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `games`
   ADD CONSTRAINT `games_ibfk_2` FOREIGN KEY (`winner`) REFERENCES `cards` (`id`) ON DELETE SET NULL,

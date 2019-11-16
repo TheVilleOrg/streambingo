@@ -30,18 +30,18 @@ class CardModel extends Model
     ];
 
     /**
+     * The unique identifier of the game associated with this card
+     *
+     * @var int
+     */
+    protected $gameId;
+
+    /**
      * The unique identifier associated with the user that owns this card
      *
      * @var int
      */
     protected $userId;
-
-    /**
-     * The name of the game associated with this card
-     *
-     * @var string
-     */
-    protected $gameName;
 
     /**
      * The list of numbers assigned to this card's grid
@@ -71,6 +71,13 @@ class CardModel extends Model
     protected $updated;
 
     /**
+     * The name of the game associated with this card
+     *
+     * @var string
+     */
+    protected $gameName;
+
+    /**
      * True if the game associated with this card has ended, false otherwise
      *
      * @var bool
@@ -86,25 +93,25 @@ class CardModel extends Model
 
     /**
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      */
-    protected function __construct(int $userId, string $gameName)
+    protected function __construct(int $userId, int $gameId)
     {
         $this->userId = $userId;
-        $this->gameName = $gameName;
+        $this->gameId = $gameId;
     }
 
     /**
      * Loads a card from the database.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      *
      * @return \Bingo\Model\CardModel|null The card, or null if the card does not exist
      */
-    public static function loadCard(int $userId, string $gameName): ?CardModel
+    public static function loadCard(int $userId, int $gameId): ?CardModel
     {
-        $cards = self::loadCards($userId, $gameName);
+        $cards = self::loadCards($userId, $gameId);
         return $cards[0] ?? null;
     }
 
@@ -124,14 +131,14 @@ class CardModel extends Model
      * Checks whether a card exists.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      *
      * @return bool True if the card exists, false otherwise
      */
-    public static function cardExists(int $userId, string $gameName): bool
+    public static function cardExists(int $userId, int $gameId): bool
     {
-        $stmt = self::db()->prepare('SELECT 1 FROM cards WHERE userId = ? AND gameName = ?;');
-        $stmt->bind_param('is', $userId, $gameName);
+        $stmt = self::db()->prepare('SELECT 1 FROM cards WHERE userId = ? AND gameId = ?;');
+        $stmt->bind_param('ii', $userId, $gameId);
         $stmt->execute();
         $result = $stmt->fetch() === true;
         $stmt->close();
@@ -143,13 +150,13 @@ class CardModel extends Model
      * Creates a new card.
      *
      * @param int $userId The unique identifier associated with the user that owns the card
-     * @param string $gameName The unique name identifying the game associated with the card
+     * @param int $gameId The unique identifier of the game associated with the card
      *
      * @return \Bingo\Model\CardModel The card
      */
-    public static function createCard(int $userId, string $gameName): CardModel
+    public static function createCard(int $userId, int $gameId): CardModel
     {
-        $card = new self($userId, $gameName);
+        $card = new self($userId, $gameId);
 
         $grid = \array_chunk(\array_keys(\array_fill(1, 75, true)), 15);
         foreach ($grid as $column)
@@ -171,12 +178,12 @@ class CardModel extends Model
     public function save(): bool
     {
         $userId = $this->getUserId();
-        $gameName = $this->getGameName();
+        $gameId = $this->getGameId();
         $grid = \implode(',', $this->getGrid());
         $marked = \implode(',', $this->getMarked());
 
-        $stmt = self::db()->prepare('INSERT INTO cards (userId, gameName, grid, marked) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE grid = ?, marked = ?, updated = CURRENT_TIMESTAMP;');
-        $stmt->bind_param('isssss', $userId, $gameName, $grid, $marked, $grid, $marked);
+        $stmt = self::db()->prepare('INSERT INTO cards (userId, gameId, grid, marked) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE grid = ?, marked = ?, updated = CURRENT_TIMESTAMP;');
+        $stmt->bind_param('iissss', $userId, $gameId, $grid, $marked, $grid, $marked);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -196,19 +203,19 @@ class CardModel extends Model
     }
 
     /**
+     * @return int The unique identifier of the game associated with this card
+     */
+    public function getGameId(): int
+    {
+        return $this->gameId;
+    }
+
+    /**
      * @return int The unique identifier associated with the user that owns this card
      */
     public function getUserId(): int
     {
         return $this->userId;
-    }
-
-    /**
-     * @return string The name of the game associated with this card
-     */
-    public function getGameName(): string
-    {
-        return $this->gameName;
     }
 
     /**
@@ -260,6 +267,14 @@ class CardModel extends Model
     public function getUpdated(): int
     {
         return $this->updated;
+    }
+
+    /**
+     * @return string The name of the game associated with this card
+     */
+    public function getGameName(): string
+    {
+        return $this->gameName;
     }
 
     /**
@@ -347,20 +362,20 @@ class CardModel extends Model
      * Gets cards from the database.
      *
      * @param int $userId The unique identifier associated with the user that owns the cards
-     * @param string|null $gameName The unique name identifying the game associated with the card, or null for all games
+     * @param int|null $gameId The unique identifier of the game associated with the card, or null for all games
      *
      * @return \Bingo\Model\CardModel[] The cards
      */
-    protected static function loadCards(int $userId, string $gameName = null): array
+    protected static function loadCards(int $userId, int $gameId = null): array
     {
         $cards = [];
 
-        $card = $cardId = $gameName = $grid = $marked = $created = $updated = $gameEnded = $gameWinner = null;
+        $card = $cardId = $grid = $marked = $created = $updated = $gameName = $gameEnded = $gameWinner = null;
 
-        $sql = 'SELECT c.id, c.gameName, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameName = g.gameName WHERE c.userId = ? ';
+        $sql = 'SELECT c.id, c.gameId, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.gameName, g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameId = g.id WHERE c.userId = ? ';
         if ($gameName)
         {
-            $sql .= 'AND c.gameName = ? ';
+            $sql .= 'AND c.gameId = ? ';
         }
 
         $sql .= 'ORDER BY c.created DESC;';
@@ -368,7 +383,7 @@ class CardModel extends Model
         $stmt = self::db()->prepare($sql);
         if ($gameName)
         {
-            $stmt->bind_param('is', $userId, $gameName);
+            $stmt->bind_param('ii', $userId, $gameId);
         }
         else
         {
@@ -376,18 +391,19 @@ class CardModel extends Model
         }
 
         $stmt->execute();
-        $stmt->bind_result($cardId, $gameName, $grid, $marked, $created, $updated, $gameEnded, $gameWinner);
+        $stmt->bind_result($cardId, $gameId, $grid, $marked, $created, $updated, $gameName, $gameEnded, $gameWinner);
         while ($stmt->fetch())
         {
             $grid = \array_map('intval', \explode(',', $grid));
             $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
 
-            $card = new self($userId, $gameName);
+            $card = new self($userId, $gameId);
             $card->id = $cardId;
             $card->grid = $grid;
             $card->marked = \array_fill_keys($marked, true);
             $card->created = $created;
             $card->updated = $updated;
+            $card->gameName = $gameName;
             $card->gameEnded = (bool) $gameEnded;
             $card->gameWinner = $gameWinner;
 
