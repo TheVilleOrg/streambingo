@@ -43,6 +43,9 @@
   client.connect()
   .then(() => {
     console.log('connected to Twitch');
+    http.listen(config.port, config.host, () => {
+      console.log(`listening on ${config.host}:${config.port}`);
+    });
   }).catch((err) => {
     console.error(err);
   });
@@ -76,10 +79,6 @@
         joinGame(channel, userstate);
       }
     }
-  });
-
-  http.listen(config.port, config.host, () => {
-    console.log(`listening on ${config.host}:${config.port}`);
   });
 
   io.on('connect', (socket) => {
