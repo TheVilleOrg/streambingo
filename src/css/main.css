@@ -213,6 +213,26 @@ h2 {
     padding: 8px;
 }
 
+#call-number, #create-game {
+    border-radius: 8px;
+    border: 2px solid;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 8px 14px;
+}
+
+#call-number:disabled, #create-game:disabled {
+    color: #ccc;
+}
+
+#call-number {
+    color: #4c4;
+}
+
+#create-game {
+    color: #800;
+}
+
 .game-over-wrapper {
     background: rgba(0, 0, 0, .6);
     height: 100%;
