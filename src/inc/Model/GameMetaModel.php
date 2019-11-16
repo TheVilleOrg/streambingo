@@ -92,29 +92,7 @@ class GameMetaModel extends Model
      */
     public static function getGames(): array
     {
-        $games = [];
-
-        $gameId = $userId = $gameName = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
-
-        $stmt = self::db()->prepare('SELECT g.id, g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameName = g.gameName) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id ORDER BY g.created ASC;');
-        $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $ended, $winner, $winnerName, $created, $updated, $numCards);
-        while ($stmt->fetch())
-        {
-            $game = new self($gameId, $userId, $gameName);
-            $game->ended = (bool) $ended;
-            $game->winner = $winner;
-            $game->winnerName = $winnerName;
-            $game->created = $created;
-            $game->updated = $updated;
-            $game->numCards = $numCards;
-
-            $games[] = $game;
-        }
-
-        $stmt->close();
-
-        return $games;
+        return self::loadGames(null, null, true);
     }
 
     /**
@@ -126,26 +104,8 @@ class GameMetaModel extends Model
      */
     public static function getGame(int $gameId): ?GameMetaModel
     {
-        $game = $userId = $gameName = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
-
-        $stmt = self::db()->prepare('SELECT g.userId, g.gameName, g.ended, g.winner, u.name, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), (SELECT COUNT(1) FROM cards WHERE gameId = g.id) FROM games g LEFT JOIN cards c ON g.winner = c.id LEFT JOIN users u ON c.userId = u.id WHERE g.id = ?;');
-        $stmt->bind_param('i', $gameId);
-        $stmt->execute();
-        $stmt->bind_result($userId, $gameName, $ended, $winner, $winnerName, $created, $updated, $numCards);
-        if ($stmt->fetch())
-        {
-            $game = new self($gameId, $userId, $gameName);
-            $game->ended = (bool) $ended;
-            $game->winner = $winner;
-            $game->winnerName = $winnerName;
-            $game->created = $created;
-            $game->updated = $updated;
-            $game->numCards = $numCards;
-        }
-
-        $stmt->close();
-
-        return $game;
+        $games = self::loadGames($gameId);
+        return $games[0] ?? null;
     }
 
     /**
@@ -210,5 +170,68 @@ class GameMetaModel extends Model
     public function getNumCards(): int
     {
         return $this->numCards;
+    }
+
+    /**
+     * Loads games from the database.
+     *
+     * @param int $gameId The unique identifier associated with the game
+     * @param string $gameName The unique name identifying the game
+     * @param bool $active True to only load active games, false to load all games
+     *
+     * @return \Bingo\Model\GameMetaModel[] An array of games' metadata
+     */
+    protected static function loadGames(int $gameId = null, string $gameName = null, bool $active = false): array
+    {
+        $games = [];
+
+        $userId = $ended = $winner = $winnerName = $created = $updated = $numCards = null;
+
+        $sql = 'SELECT id, userId, gameName, ended, winner, winnerName, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated), (SELECT COUNT(1) FROM cards WHERE gameId = games.id) FROM games ';
+        if ($gameId)
+        {
+            $sql .= 'WHERE id = ? ';
+        }
+        elseif ($gameName)
+        {
+            $sql .= 'WHERE gameName = ? ';
+        }
+
+        if ($active)
+        {
+            $sql .= ($gameId || $gameName) ? 'AND ' : 'WHERE ';
+            $sql .= 'updated > NOW() - INTERVAL 5 MINUTE ';
+        }
+
+        $sql .= 'ORDER BY created ASC;';
+
+        $stmt = self::db()->prepare($sql);
+        if ($gameId)
+        {
+            $stmt->bind_param('i', $gameId);
+        }
+        elseif ($gameName)
+        {
+            $stmt->bind_param('s', $gameName);
+        }
+
+        $stmt->execute();
+        $stmt->bind_result($gameId, $userId, $gameName, $ended, $winner, $winnerName, $created, $ended, $numCards);
+        while ($stmt->fetch())
+        {
+            $game = new self($gameId, $userId, $gameName);
+            $game->ended = (bool) $ended;
+            $game->winner = $winner;
+            $game->winnerName = $winnerName;
+            $game->created = $created;
+            $game->updated = $updated;
+            $game->numCards = $numCards;
+
+            $games[] = $game;
+        }
+
+        $stmt->close();
+
+        return $games;
     }
 }
