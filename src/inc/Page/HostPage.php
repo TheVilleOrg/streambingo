@@ -37,16 +37,11 @@ class HostPage extends Page
         else
         {
             $user = UserController::getCurrentUser();
-            if (!$user)
+            if (!$user || !$user->getHost())
             {
-                $this->showTemplate('auth');
+                $this->showTemplate('host/beta');
 
                 return;
-            }
-
-            if (!$user->getHost())
-            {
-                throw new UnauthorizedException('Your account is not authorized to host games.');
             }
 
             $game = GameController::getGame($user->getId(), $user->getName());
