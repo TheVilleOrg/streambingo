@@ -29,6 +29,7 @@ jQuery.noConflict();
     });
 
     socket.on('gameover', function(gameId, winner) {
+      console.log('game #' + gameId + ' ended');
       var card = $('.card[data-game-id=' + gameId + ']');
       var gameOver = gameOverModal.clone();
 
@@ -41,6 +42,7 @@ jQuery.noConflict();
     });
 
     socket.on('newcard', function(gameId) {
+      console.log('received new card for game #' + gameId);
       var postData = {
         json: true,
         action: 'fetchCard',

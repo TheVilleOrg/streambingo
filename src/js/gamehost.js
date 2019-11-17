@@ -33,6 +33,7 @@ jQuery.noConflict();
     });
 
     socket.on('numbercalled', function(letter, number) {
+      console.log('called ' + letter + number);
       $('.latest').removeClass('latest');
       $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
       $('#last-number').text(letter + number);
@@ -48,6 +49,7 @@ jQuery.noConflict();
     });
 
     socket.on('gameover', function(gameName, winner) {
+      console.log('game ended');
       if (winner) {
         console.log('congrats ' + winner + '!');
         $('.game-winner').text(winner);
@@ -57,6 +59,7 @@ jQuery.noConflict();
     });
 
     socket.on('resetgame', function() {
+      console.log('reset game');
       $('#board td').removeClass('marked');
       $('#last-number').text('--');
       $('#game-winner').text('--');

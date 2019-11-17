@@ -71,7 +71,7 @@
 
       chatTimes[userstate['user-id']] = now;
 
-      console.log(channel, message);
+      console.log(`[${channel}] ${userstate['username']} ${message}`);
 
       if (message === 'bingo' || message === '!bingo') {
         callBingo(channel, userstate);
@@ -94,7 +94,7 @@
               if (channels.indexOf(data.name) === -1) {
                 client.part(data.name)
                 .then(() => {
-                  console.log(`parted #${data.name}`);
+                  console.log(`parted Twitch channel #${data.name}`);
                 })
                 .catch((err) => {
                   console.warn(err);
@@ -105,7 +105,7 @@
             if (channels.indexOf(data.name) === -1) {
               client.join(data.name)
               .then(() => {
-                console.log(`joined #${data.name}`);
+                console.log(`joined Twitch channel #${data.name}`);
               })
               .catch((err) => {
                 console.warn(err);
@@ -179,18 +179,25 @@
   function resetGame(gameName, gameId) {
     io.to(gameName).emit('gameover', gameId);
     io.to(gameName).emit('resetgame');
+
+    console.log(`created new game ${gameName}`);
   }
 
   function callNumber(gameName, letter, number) {
     io.to(gameName).emit('numbercalled', letter, number);
+
+    console.log(`called ${letter}${number} for game ${gameName}`);
   }
 
   function joinGame(channel, user) {
-    exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, (err, stdout) => {
+    const gameName = channel.substr(1);
+    exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['username']} ${gameName}`, (err, stdout) => {
       try {
         const data = JSON.parse(stdout);
         io.to(`user${user['user-id']}`).emit('newcard', data.gameId);
         client.say(channel, `@${user['display-name']} see your BINGO card at ${data.url}`);
+
+        console.log(`player ${user['username']} joined game ${gameName}`);
       } catch (e) {
         console.error(e);
         console.error(stdout);
@@ -206,6 +213,8 @@
         if (data.result) {
           client.say(channel, `Congratulations @${user['display-name']}!`);
           io.to(gameName).emit('gameover', data.gameId, user['display-name']);
+
+          console.log(`player ${user['name']} won game ${gameName}`);
         } else if(data.result === null) {
           client.say(channel, `@${user['display-name']}, you do not have a BINGO card.`);
         } else {
