@@ -215,7 +215,7 @@
         const data = JSON.parse(stdout);
         if (data.result) {
           client.say(channel, `Congratulations @${user['display-name']}!`);
-          io.to(gameName).emit('gameover', data.gameId, user['display-name']);
+          io.to(gameName).emit('gameover', data.gameId, user['username']);
 
           console.log(`player ${user['username']} won game ${gameName}`);
         } else if(data.result === null) {
