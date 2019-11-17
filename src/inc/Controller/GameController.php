@@ -230,9 +230,11 @@ class GameController
         {
             $card = CardModel::createCard($userId, $game->getId());
             $card->save();
+
+            return $game->getId();
         }
 
-        return $game->getId();
+        return 0;
     }
 
     /**

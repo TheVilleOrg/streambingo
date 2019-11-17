@@ -194,10 +194,13 @@
     exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['username']} ${gameName}`, (err, stdout) => {
       try {
         const data = JSON.parse(stdout);
-        io.to(`user${user['user-id']}`).emit('newcard', data.gameId);
-        client.say(channel, `@${user['display-name']} see your BINGO card at ${data.url}`);
+        if (data.gameId) {
+          io.to(`user${user['user-id']}`).emit('newcard', data.gameId);
 
-        console.log(`player ${user['username']} joined game ${gameName}`);
+          console.log(`player ${user['username']} joined game ${gameName}`);
+        }
+
+        client.say(channel, `@${user['display-name']} see your BINGO card at ${data.url}`);
       } catch (e) {
         console.error(e);
         console.error(stdout);
