@@ -217,7 +217,7 @@
           client.say(channel, `Congratulations @${user['display-name']}!`);
           io.to(gameName).emit('gameover', data.gameId, user['display-name']);
 
-          console.log(`player ${user['name']} won game ${gameName}`);
+          console.log(`player ${user['username']} won game ${gameName}`);
         } else if(data.result === null) {
           client.say(channel, `@${user['display-name']}, you do not have a BINGO card.`);
         } else {
