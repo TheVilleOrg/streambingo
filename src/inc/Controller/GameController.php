@@ -7,6 +7,7 @@ namespace Bingo\Controller;
 use Bingo\Config;
 use Bingo\Exception\BadRequestException;
 use Bingo\Exception\GameException;
+use Bingo\Exception\InternalErrorException;
 use Bingo\Exception\NotFoundException;
 use Bingo\Exception\UnauthorizedException;
 use Bingo\Model\CardModel;
@@ -88,16 +89,27 @@ class GameController
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name to identify the game
      * @param int $autoCall The auto call interval in seconds, or 0 to disable
-     *
-     * @return \Bingo\Model\GameModel The game
      */
-    public static function createGame(int $userId, string $gameName, int $autoCall): GameModel
+    public static function createGame(int $userId, string $gameName, int $autoCall): void
     {
-        GameModel::deleteGame($gameName);
+        $oldGameId = null;
+
+        $game = GameMetaModel::loadGameFromName($gameName);
+        if ($game)
+        {
+            $oldGameId = $game->getId();
+            GameModel::deleteGame($gameName);
+        }
+
         $game = GameModel::createGame($userId, $gameName);
         $game->setAutoCall($autoCall)->save();
 
-        return $game;
+        $request = [
+            'action'   => 'resetGame',
+            'gameName' => $gameName,
+            'gameId'   => $oldGameId,
+        ];
+        self::serverRequest($request);
     }
 
     /**
@@ -125,12 +137,10 @@ class GameController
      *
      * @param string $gameName The unique name identifying the game
      *
-     * @return int The number that was called
-     *
      * @throws \Bingo\Exception\BadRequestException
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function callNumber(string $gameName): int
+    public static function callNumber(string $gameName): void
     {
         $game = GameModel::loadGameFromName($gameName);
         if (!$game)
@@ -153,7 +163,14 @@ class GameController
 
         $game->save();
 
-        return $number;
+        $request = [
+            'action'   => 'callNumber',
+            'gameName' => $gameName,
+            'gameId'   => $game->getId(),
+            'letter'   => self::getLetter($number),
+            'number'   => $number,
+        ];
+        self::serverRequest($request);
     }
 
     /**
@@ -348,5 +365,32 @@ class GameController
         }
 
         return '';
+    }
+
+    /**
+     * Make an HTTP POST request to the Node server.
+     *
+     * @param array $data The POST variables to send
+     */
+    protected static function serverRequest(array $data = []): void
+    {
+        $ch = \curl_init(Config::SERVER_URI);
+        \curl_setopt($ch, CURLOPT_POST, true);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: ' . Config::SERVER_SECRET,
+            'Content-Type: application/json',
+        ]);
+        \curl_setopt($ch, CURLOPT_POSTFIELDS, \json_encode($data));
+
+        \curl_exec($ch);
+        $responseCode = \curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        \curl_close($ch);
+
+        if ($responseCode !== 200)
+        {
+            throw new InternalErrorException('Request to the Node server failed');
+        }
     }
 }

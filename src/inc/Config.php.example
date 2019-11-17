@@ -40,6 +40,16 @@ class Config
     const DBNAME = 'bingo';
 
     /**
+     * The URI for the Node server
+     */
+    const SERVER_URI = 'http://localhost:3000/';
+
+    /**
+     * The secret for authenticating requests to the Node server
+     */
+    const SERVER_SECRET = '';
+
+    /**
      * The Twitch application ID
      */
     const TWITCH_APP_ID = '';

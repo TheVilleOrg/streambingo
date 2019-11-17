@@ -84,7 +84,6 @@ class HostPage extends Page
             'scripts'  => [
                 'gamehost',
             ],
-            'gameId'     => $game->getId(),
             'gameName'   => \htmlspecialchars($game->getGameName()),
             'gameToken'  => $user->getGameToken(),
             'gameUrl'    => Config::BASE_URL . Config::BASE_PATH . 'play/' . $game->getGameName(),
@@ -117,12 +116,10 @@ class HostPage extends Page
         {
             case 'createGame':
                 $autoCall = \filter_input(INPUT_POST, 'autoCall', FILTER_VALIDATE_INT);
-                $game = GameController::createGame($user->getId(), $user->getName(), $autoCall);
-                $data['gameId'] = $game->getId();
+                GameController::createGame($user->getId(), $user->getName(), $autoCall);
                 break;
             case 'callNumber':
-                $data['number'] = GameController::callNumber($user->getName());
-                $data['letter'] = GameController::getLetter($data['number']);
+                GameController::callNumber($user->getName());
                 break;
             case 'getStats':
                 $data['cardCount'] = $this->getCardCount(GameController::getGameMetaData($game));

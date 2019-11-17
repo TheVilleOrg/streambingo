@@ -75,10 +75,7 @@ jQuery.noConflict();
           action: 'createGame',
           autoCall: $('#auto-call').prop('checked') ? $('#auto-call-interval').val() : 0
         };
-        $.post(window.location, postData, function(data) {
-          socket.emit('resetgame', gameVars.gameId);
-          gameVars.gameId = data.gameId;
-        }, 'json');
+        $.post(window.location, postData);
       }
     });
 
@@ -126,8 +123,7 @@ jQuery.noConflict();
         json: true,
         action: 'callNumber'
       };
-      $.post(window.location, postData, function(data) {
-        socket.emit('callnumber', data.letter, data.number);
+      $.post(window.location, postData, function() {
         $('#create-game').prop('disabled', false);
         setTimeout(function() {
           $('#call-number').prop('disabled', false);

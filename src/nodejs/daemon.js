@@ -21,9 +21,9 @@
         options.ca = fs.readFileSync(config.ssl.cafile);
       }
 
-      return require('https').createServer(options);
+      return require('https').createServer(options, httpHandler);
     } else {
-      return require('http').Server();
+      return require('http').Server(httpHandler);
     }
   }();
 
@@ -89,15 +89,6 @@
           if (data.name) {
             socket.join(data.name);
 
-            socket.on('callnumber', (letter, number) => {
-              io.to(data.name).emit('numbercalled', letter, number);
-            });
-
-            socket.on('resetgame', (gameId) => {
-              io.to(data.name).emit('gameover', gameId);
-              io.to(data.name).emit('resetgame');
-            });
-
             socket.on('disconnect', () => {
               channels.splice(channels.indexOf(data.name), 1);
               if (channels.indexOf(data.name) === -1) {
@@ -142,6 +133,57 @@
       socket.join(gameName);
     });
   });
+
+  function httpHandler(req, res) {
+    if (req.headers['authorization'] !== config.secret) {
+      res.writeHead(401).end();
+      return;
+    }
+
+    if (req.method === 'POST') {
+      let body = [];
+      req.on('error', (err) => {
+        console.error(err);
+        res.writeHead(500).end();
+      }).on('data', (chunk) => {
+        body.push(chunk);
+      }).on('end', () => {
+        body = Buffer.concat(body).toString();
+        try {
+          const data = JSON.parse(body);
+          switch (data.action) {
+            case 'resetGame':
+              resetGame(data.gameName, data.gameId);
+              break;
+            case 'callNumber':
+              callNumber(data.gameName, data.letter, data.number);
+              break;
+            default:
+              res.writeHead(400).end();
+              return;
+          }
+
+          res.writeHead(200).end();
+        } catch (e) {
+          console.warn(e);
+          res.writeHead(400).end();
+        }
+      });
+
+      return;
+    }
+
+    res.writeHead(200).end();
+  }
+
+  function resetGame(gameName, gameId) {
+    io.to(gameName).emit('gameover', gameId);
+    io.to(gameName).emit('resetgame');
+  }
+
+  function callNumber(gameName, letter, number) {
+    io.to(gameName).emit('numbercalled', letter, number);
+  }
 
   function joinGame(channel, user) {
     exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['name']} ${channel.substr(1)}`, (err, stdout) => {
