@@ -62,7 +62,8 @@ noscript {
 }
 
 #user {
-	float: right;
+    float: right;
+    margin-top: 5px;
 	padding: 10px;
 }
 
