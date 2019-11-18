@@ -5,6 +5,8 @@ jQuery.noConflict();
   $(function() {
     var gameVars = JSON.parse($('#game-vars').text());
 
+    $('body').removeClass('nojs');
+
     var socket = io('//' + window.location.hostname + ':3000');
 
     var bingoBall = $('.bingo-ball.template');

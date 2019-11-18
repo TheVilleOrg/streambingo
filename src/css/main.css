@@ -22,6 +22,12 @@ h2 {
     line-height: 1.6em;
 }
 
+noscript {
+    color: #000;
+    display: block;
+    text-align: center;
+}
+
 #nav {
     background: #9146FF;
     color: #fff;
@@ -75,6 +81,10 @@ h2 {
 
 #footer {
 	text-align: center;
+}
+
+.nojs #play, .nojs #host {
+    display: none;
 }
 
 .letter-b {

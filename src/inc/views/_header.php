@@ -13,7 +13,7 @@
 <?php endif; ?>
     <title>Stream BINGO</title>
 </head>
-<body>
+<body class="nojs">
     <div id="nav">
         <a href="<?php echo $app['basePath']; ?>" id="logo">B</a>
         <ul>

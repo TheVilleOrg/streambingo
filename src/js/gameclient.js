@@ -5,6 +5,8 @@ jQuery.noConflict();
   $(function() {
     var gameVars = JSON.parse($('#game-vars').text());
 
+    $('body').removeClass('nojs');
+
     var blankCard = $('.card.template');
     blankCard.removeClass('template').remove();
 
