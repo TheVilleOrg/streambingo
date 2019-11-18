@@ -6,12 +6,18 @@
 			<tr>
 				<th>Game</th>
 				<th width="1%">Players</th>
-			</tr>
+            </tr>
+<?php if (empty($games)): ?>
+            <tr>
+                <td colspan="2">There are no active games.</td>
+            </tr>
+<?php else: ?>
 <?php foreach ($games as $game): ?>
 			<tr>
 				<td><a href="https://www.twitch.tv/<?php echo $game['name']; ?>" target="_blank"><?php echo $game['name']; ?></a></td>
 				<td class="player-count"><?php echo $game['numCards']; ?></td>
 			</tr>
 <?php endforeach; ?>
+<?php endif; ?>
 		</table>
 <?php require __DIR__ . '/../_footer.php'; ?>

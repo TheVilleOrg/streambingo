@@ -115,6 +115,10 @@ a.twitch-login:hover {
     background: #7313ff;
 }
 
+.hidden {
+    display: none;
+}
+
 #game-list {
     background: #eee;
     font-family: 'Courier New', Courier, monospace;

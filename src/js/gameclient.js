@@ -58,6 +58,7 @@ jQuery.noConflict();
           card.find('.marker[data-cell=' + i + ']').text(data.grid[i]);
         }
 
+        $('#empty-list').addClass('hidden');
         $('#cards').prepend(card);
 
         socket.emit('joingame', data.gameName);
@@ -88,6 +89,9 @@ jQuery.noConflict();
 
     $(document).on('click', '.game-over-buttons .cancel', function() {
       $(this).parents('.card').remove();
+      if (!$('.card').length) {
+        $('#empty-list').removeClass('hidden');
+      }
     });
   });
 })(jQuery);

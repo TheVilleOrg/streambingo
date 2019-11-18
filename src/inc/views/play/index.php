@@ -1,6 +1,7 @@
 <?php require __DIR__ . '/../_header.php'; ?>
         <div id="connection-status">Status: <span>Connecting...</span></div>
         <div id="cards">
+            <p id="empty-list"<?php if (!empty($cards)): ?> class="hidden"<?php endif; ?>>You have no BINGO cards.</p>
 <?php foreach ($cards as $card): ?>
             <div class="card" data-game-id="<?php echo $card['gameId']; ?>" data-game-name="<?php echo $card['gameName']; ?>">
                 <h2 class="game-name"><?php echo $card['gameName']; ?></h2>
