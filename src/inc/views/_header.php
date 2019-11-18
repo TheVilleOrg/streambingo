@@ -25,7 +25,7 @@
 <?php if ($app['user']['loggedIn']): ?>
             Welcome, <strong><?php echo $app['user']['name']; ?></strong>
 <?php else: ?>
-            <a href="<?php echo $app['authUrl']; ?>">Login with Twitch</a>
+            <a href="<?php echo $app['authUrl']; ?>" class="twitch-login">Login with Twitch</a>
 <?php endif; ?>
         </span>
     </div>

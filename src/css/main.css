@@ -26,8 +26,7 @@ h2 {
     background: #9146FF;
     color: #fff;
 	font-size: 1.3em;
-	height: 40px;
-	line-height: 20px;
+    height: 52px;
 }
 
 #nav a {
@@ -36,9 +35,9 @@ h2 {
 }
 
 #nav ul, #nav li {
-	float: left;
+    display: inline-block;
 	list-style: none;
-	margin: 0;
+	margin-top: 4px;
 	padding: 0;
 }
 
@@ -70,7 +69,7 @@ h2 {
 
 #main > p {
     font-size: 1.3em;
-    line-height: 1.7em;
+    margin: 5px 0;
     text-align: center;
 }
 
@@ -96,6 +95,24 @@ h2 {
 
 .letter-o {
 	color: #d4d;
+}
+
+a.twitch-login {
+    background: #9146FF;
+    border-radius: 6px;
+    color: #fff;
+    display: inline-block;
+    font-family: 'roobert', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 13px;
+    position: relative;
+    text-decoration: none;
+    transition: all .3s ease;
+}
+
+a.twitch-login:hover {
+    background: #7313ff;
 }
 
 #game-list {
