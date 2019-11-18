@@ -90,7 +90,7 @@ class GameController
      * @param string $gameName The unique name to identify the game
      * @param int $autoCall The auto call interval in seconds, or 0 to disable
      */
-    public static function createGame(int $userId, string $gameName, int $autoCall): void
+    public static function createGame(int $userId, string $gameName, int $autoCall = 30): void
     {
         $oldGameId = null;
 
