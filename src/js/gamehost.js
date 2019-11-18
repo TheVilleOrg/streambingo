@@ -53,6 +53,7 @@ jQuery.noConflict();
       if (winner) {
         console.log('congrats ' + winner + '!');
         $('.game-winner').text(winner);
+        $('#winner-display').show().find('strong').text(winner);
       }
 
       $('#call-number').prop('disabled', true);
@@ -66,6 +67,7 @@ jQuery.noConflict();
       $('#card-count').text('0 Players');
       $('#call-number').prop('disabled', false);
       $('#create-game').prop('disabled', false);
+      $('#winner-display').hide();
     });
 
     $('#create-game').click(function() {
