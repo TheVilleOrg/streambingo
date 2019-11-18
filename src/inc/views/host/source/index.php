@@ -14,7 +14,7 @@
     <div id="main-container">
         <div id="inner-container">
     		<h1>Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span></h1>
-            <h2><?php echo $gameUrl; ?></h2>
+            <h2>Type <code>!play</code> in chat to get your BINGO card!</h2>
 <?php require __DIR__ . '/../_board.php'; ?>
             <p id="winner-display">Congratulations, <strong></strong>!</p>
             <div class="bingo-ball template">

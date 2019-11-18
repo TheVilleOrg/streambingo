@@ -86,7 +86,6 @@ class HostPage extends Page
             ],
             'gameName'   => \htmlspecialchars($game->getGameName()),
             'gameToken'  => $user->getGameToken(),
-            'gameUrl'    => Config::BASE_URL . Config::BASE_PATH . 'play/' . $game->getGameName(),
             'hostUrl'    => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
             'called'     => $called,
             'lastNumber' => $lastNumber,
