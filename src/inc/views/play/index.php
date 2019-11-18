@@ -1,5 +1,6 @@
 <?php require __DIR__ . '/../_header.php'; ?>
         <noscript>JavaScript must be enabled to use this site.</noscript>
+        <p>Join our <a href="https://discord.io/StreamBingo" target="_blank">Discord server</a> or <a href="https://twitter.com/streambingolive" target="_blank">follow us on Twitter</a> to stay up to date with Stream BINGO news.</p>
         <div id="play">
             <div id="connection-status">Status: <span>Connecting...</span></div>
             <div id="cards">
