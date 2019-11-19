@@ -13,13 +13,8 @@
       const options = {
         key: fs.readFileSync(config.ssl.keyfile),
         cert: fs.readFileSync(config.ssl.cert),
-        requestCert: false,
-        rejectUnauthorized: false
+        ca: fs.readFileSync(config.ssl.cafile)
       };
-
-      if (config.ssl.cafile) {
-        options.ca = fs.readFileSync(config.ssl.cafile);
-      }
 
       return require('https').createServer(options, httpHandler);
     } else {
