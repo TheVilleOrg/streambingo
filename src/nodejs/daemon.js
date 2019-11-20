@@ -83,6 +83,7 @@
           const data = JSON.parse(stdout);
           if (data.name) {
             socket.join(data.name);
+            socket.join(`admin_${data.name}`);
 
             socket.on('disconnect', () => {
               channels.splice(channels.indexOf(data.name), 1);
@@ -153,6 +154,9 @@
             case 'callNumber':
               callNumber(data.gameName, data.letter, data.number);
               break;
+            case 'updateGameSettings':
+              updateGameSettings(data.gameName, data.settings);
+              break;
             default:
               res.writeHead(400).end();
               return;
@@ -173,15 +177,19 @@
 
   function resetGame(gameName, gameId) {
     io.to(gameName).emit('gameover', gameId);
-    io.to(gameName).emit('resetgame');
+    io.to(`admin_${gameName}`).emit('resetgame');
 
     console.log(`created new game ${gameName}`);
   }
 
   function callNumber(gameName, letter, number) {
-    io.to(gameName).emit('numbercalled', letter, number);
+    io.to(`admin_${gameName}`).emit('numbercalled', letter, number);
 
     console.log(`called ${letter}${number} for game ${gameName}`);
+  }
+
+  function updateGameSettings(gameName, settings) {
+    io.to(`admin_${gameName}`).emit('gamesettings', settings);
   }
 
   function joinGame(channel, user) {

@@ -40,13 +40,6 @@ class GameModel extends Model
     protected $called = [];
 
     /**
-     * The auto call interval in seconds
-     *
-     * @var int
-     */
-    protected $autoCall = 30;
-
-    /**
      * Whether the game is in the ended state
      *
      * @var bool
@@ -80,6 +73,27 @@ class GameModel extends Model
      * @var int
      */
     protected $updated;
+
+    /**
+     * The auto call interval in seconds
+     *
+     * @var int
+     */
+    protected $autoCall = 30;
+
+    /**
+     * Whether text-to-speech is enabled
+     *
+     * @var bool
+     */
+    protected $tts = false;
+
+    /**
+     * The name of the text-to-speech voice to use
+     *
+     * @var string
+     */
+    protected $ttsVoice = '';
 
     /**
      * @param int $userId The unique identifier associated with the user that owns the game
@@ -174,13 +188,12 @@ class GameModel extends Model
         $gameName = $this->getGameName();
         $balls = \implode(',', $this->getBalls());
         $called = \implode(',', $this->getCalled());
-        $autoCall = $this->getAutoCall();
         $ended = $this->getEnded();
         $winner = $this->getWinner();
         $winnerName = $this->getWinnerName();
 
-        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, autoCall, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, autoCall = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
-        $stmt->bind_param('isssiiisssiiis', $userId, $gameName, $balls, $called, $autoCall, $ended, $winner, $winnerName, $balls, $called, $autoCall, $ended, $winner, $winnerName);
+        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
+        $stmt->bind_param('isssiisssiis', $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $balls, $called, $ended, $winner, $winnerName);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -193,10 +206,30 @@ class GameModel extends Model
 
             $this->updated = time();
 
-            return true;
+            return $this->saveSettings();
         }
 
         return false;
+    }
+
+    /**
+     * Saves the settings for the game.
+     *
+     * @return bool True if the save was successful, false otherwise
+     */
+    public function saveSettings(): bool
+    {
+        $gameName = $this->getGameName();
+        $autoCall = $this->getAutoCall();
+        $tts = $this->getTts();
+        $ttsVoice = $this->getTtsVoice();
+
+        $stmt = self::db()->prepare('INSERT INTO game_settings (gameName, autoCall, tts, ttsVoice) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE autoCall = ?, tts = ?, ttsVoice = ?;');
+        $stmt->bind_param('siisiis', $gameName, $autoCall, $tts, $ttsVoice, $autoCall, $tts, $ttsVoice);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        return $result;
     }
 
     /**
@@ -229,26 +262,6 @@ class GameModel extends Model
     public function getCalled(): array
     {
         return $this->called;
-    }
-
-    /**
-     * @return int The auto call interval in seconds
-     */
-    public function getAutoCall(): int
-    {
-        return $this->autoCall;
-    }
-
-    /**
-     * @param int $autoCall The auto call interval in seconds
-     *
-     * @return \Bingo\Model\GameModel This object
-     */
-    public function setAutoCall(int $autoCall): GameModel
-    {
-        $this->autoCall = \min(600, \max(20, $autoCall));
-
-        return $this;
     }
 
     /**
@@ -328,6 +341,66 @@ class GameModel extends Model
     }
 
     /**
+     * @return int The auto call interval in seconds
+     */
+    public function getAutoCall(): int
+    {
+        return $this->autoCall;
+    }
+
+    /**
+     * @param int $autoCall The auto call interval in seconds
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setAutoCall(int $autoCall): GameModel
+    {
+        $this->autoCall = \min(600, \max(20, $autoCall));
+
+        return $this;
+    }
+
+    /**
+     * @return bool True if text-to-speech is enabled, false otherwise
+     */
+    public function getTts(): bool
+    {
+        return $this->tts;
+    }
+
+    /**
+     * @param bool $tts True if text-to-speech is enabled, false otherwise
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setTts(bool $tts): GameModel
+    {
+        $this->tts = $tts;
+
+        return $this;
+    }
+
+    /**
+     * @return string The text-to-speech voice to use
+     */
+    public function getTtsVoice(): string
+    {
+        return $this->ttsVoice;
+    }
+
+    /**
+     * @param string $ttsVoice The text-to-speech voice to use
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setTtsVoice(string $ttsVoice): GameModel
+    {
+        $this->ttsVoice = $ttsVoice;
+
+        return $this;
+    }
+
+    /**
      * Removes a number from the list of available numbers and adds it to the list of called numbers.
      *
      * @return int The number that was called
@@ -362,15 +435,15 @@ class GameModel extends Model
      */
     protected static function loadGame(string $ident, bool $useToken): ?GameModel
     {
-        $game = $gameId = $userId = $gameName = $balls = $called = $autoCall = $ended = $winner = $winnerName = $created = $updated = null;
+        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = $autoCall = $tts = $ttsVoice = null;
 
-        $sql = 'SELECT id, userId, gameName, balls, called, autoCall, ended, winner, winnerName, UNIX_TIMESTAMP(created), UNIX_TIMESTAMP(updated) FROM games WHERE ';
-        $sql .= $useToken ? 'userId = (SELECT id FROM users WHERE gameToken = ?);' : 'gameName = ?;';
+        $sql = 'SELECT g.id, g.userId, g.gameName, g.balls, g.called, g.ended, g.winner, g.winnerName, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), s.autoCall, s.tts, s.ttsVoice FROM games g LEFT JOIN game_settings s ON g.gameName = s.gameName WHERE ';
+        $sql .= $useToken ? 'g.userId = (SELECT id FROM users WHERE gameToken = ?);' : 'g.gameName = ?;';
 
         $stmt = self::db()->prepare($sql);
         $stmt->bind_param('s', $ident);
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $autoCall, $ended, $winner, $winnerName, $created, $updated);
+        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated, $autoCall, $tts, $ttsVoice);
         if ($stmt->fetch())
         {
             $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
@@ -380,12 +453,14 @@ class GameModel extends Model
             $game->id = $gameId;
             $game->balls = $balls;
             $game->called = $called;
-            $game->autoCall = $autoCall;
             $game->ended = (bool) $ended;
             $game->winner = $winner;
             $game->winnerName = $winnerName;
             $game->created = $created;
             $game->updated = $updated;
+            $game->autoCall = $autoCall ?? 30;
+            $game->tts = (bool) $tts;
+            $game->ttsVoice = $ttsVoice ?? '';
         }
 
         $stmt->close();

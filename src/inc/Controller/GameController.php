@@ -88,9 +88,8 @@ class GameController
      *
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name to identify the game
-     * @param int $autoCall The auto call interval in seconds, or 0 to disable
      */
-    public static function createGame(int $userId, string $gameName, int $autoCall = 30): void
+    public static function createGame(int $userId, string $gameName): void
     {
         $oldGameId = null;
 
@@ -101,8 +100,7 @@ class GameController
             GameModel::deleteGame($gameName);
         }
 
-        $game = GameModel::createGame($userId, $gameName);
-        $game->setAutoCall($autoCall)->save();
+        GameModel::createGame($userId, $gameName)->save();
 
         $request = [
             'action'   => 'resetGame',
@@ -174,14 +172,23 @@ class GameController
     }
 
     /**
-     * Set the auto call setting for a game.
+     * Update the settings for a game.
      *
      * @param \Bingo\Model\GameModel $game The game
-     * @param int $interval The auto call interval in seconds
+     * @param int $autoCall The auto call interval in seconds
+     * @param bool $tts True to enable text-to-speech, false otherwise
+     * @param string $ttsVoice The name of the text-to-speech voice to use
      */
-    public static function setAutoCall(GameModel $game, int $interval): void
+    public static function updateGameSettings(GameModel $game, int $autoCall, bool $tts, string $ttsVoice): void
     {
-        $game->setAutoCall($interval)->save();
+        $game->setAutoCall($autoCall)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
+
+        $request = [
+            'action'   => 'updateGameSettings',
+            'gameName' => $game->getGameName(),
+            'settings' => \compact('autoCall', 'tts', 'ttsVoice'),
+        ];
+        self::serverRequest($request);
     }
 
     /**

@@ -33,6 +33,8 @@
         <div id="card-count"><?php echo $cardCount; ?></div>
         <script type="application/json" id="game-vars">
             {
-                "gameToken": "<?php echo $gameToken; ?>"
+                "gameToken": "<?php echo $gameToken; ?>",
+                "tts": <?php echo $tts ? 'true' : 'false'; ?>,
+                "ttsVoice": "<?php echo $ttsVoice; ?>"
             }
         </script>

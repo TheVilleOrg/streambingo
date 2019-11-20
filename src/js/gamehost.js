@@ -15,14 +15,11 @@ $(function() {
     }
 
     ttsVoices = window.speechSynthesis.getVoices();
-    var voice = window.localStorage.getItem('tts-voice');
     for (var i = 0; i < ttsVoices.length; i++) {
-      var selected = voice === ttsVoices[i].name ? ' selected' : '';
-      ttsVoiceSelect.append('<option value="' + i + '"' + selected + '>' + ttsVoices[i].name + '</option>');
+      var selected = gameVars.ttsVoice === ttsVoices[i].name ? ' selected' : '';
+      ttsVoiceSelect.append('<option' + selected + '>' + ttsVoices[i].name + '</option>');
     }
   };
-
-  $('#tts').prop('checked', window.localStorage.getItem('tts') === 'true');
 
   var autoCallTimer;
 
@@ -92,19 +89,20 @@ $(function() {
   });
 
   $('#auto-call').change(function() {
-    setAutoCall();
+    updateAutoCall();
   });
 
   $('#auto-call-interval').change(function() {
-    setAutoCall();
+    updateGameSettings();
+    updateAutoCall();
   });
 
   $('#tts').change(function () {
-    window.localStorage.setItem('tts', $(this).prop('checked'));
+    updateGameSettings();
   });
 
   $('#tts-voice').change(function () {
-    window.localStorage.setItem('tts-voice', ttsVoices[$(this).val()].name);
+    updateGameSettings();
   });
 
   $('#source-url').click(function() {
@@ -144,29 +142,30 @@ $(function() {
       setTimeout(function() {
         $('#call-number').prop('disabled', false);
       }, 10000);
-      setAutoCall();
+      updateAutoCall();
     }, 'json');
   }
 
-  function setAutoCall() {
+  function updateAutoCall() {
     if (autoCallTimer) {
       clearInterval(autoCallTimer);
       autoCallTimer = undefined;
     }
 
-    var enabled = $('#auto-call').prop('checked');
-    var interval = $('#auto-call-interval').val();
-
-    if (enabled) {
+    if ($('#auto-call').prop('checked')) {
       autoCallTimer = setInterval(function() {
         callNumber();
-      }, interval * 1000);
+      }, $('#auto-call-interval').val() * 1000);
     }
+  }
 
+  function updateGameSettings() {
     var postData = {
       json: true,
-      action: 'updateAutoCall',
-      interval: interval
+      action: 'updateGameSettings',
+      autoCallInterval: $('#auto-call-interval').val(),
+      tts: $('#tts').prop('checked'),
+      ttsVoice: ttsVoiceSelect.val(),
     };
     $.post(window.location, postData);
   }

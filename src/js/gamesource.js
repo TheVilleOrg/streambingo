@@ -42,11 +42,16 @@ $(function() {
       ball.remove();
     }, 8000);
 
-    if (window.localStorage.getItem('tts') === 'true') {
+    if (gameVars.tts) {
       var tts = new SpeechSynthesisUtterance(letter + ', ' + number);
-      tts.voice = ttsVoices[window.localStorage.getItem('tts-voice')];
+      tts.voice = ttsVoices[gameVars.ttsVoice];
       window.speechSynthesis.speak(tts);
     }
+  });
+
+  socket.on('gamesettings', function (settings) {
+    gameVars.tts = settings.tts;
+    gameVars.ttsVoice = settings.ttsVoice;
   });
 
   socket.on('gameover', function(gameName, winner) {

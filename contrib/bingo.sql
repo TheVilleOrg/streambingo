@@ -25,13 +25,19 @@ CREATE TABLE `games` (
   `gameName` varchar(32) NOT NULL,
   `balls` text NOT NULL,
   `called` text NOT NULL,
-  `autoCall` int(11) NOT NULL DEFAULT 30,
   `ended` tinyint(1) NOT NULL DEFAULT 0,
   `winner` int(11) DEFAULT NULL,
   `winnerName` varchar(32) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `game_settings` (
+  `gameName` varchar(32) NOT NULL,
+  `autoCall` int(11) NOT NULL DEFAULT 30,
+  `tts` tinyint(1) NOT NULL DEFAULT 0,
+  `ttsVoice` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
@@ -56,6 +62,9 @@ ALTER TABLE `games`
   ADD UNIQUE KEY `gameName` (`gameName`),
   ADD KEY `userId` (`userId`),
   ADD KEY `winner` (`winner`);
+
+ALTER TABLE `game_settings`
+  ADD PRIMARY KEY (`gameName`);
 
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),

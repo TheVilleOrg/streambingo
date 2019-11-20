@@ -91,6 +91,8 @@ class HostPage extends Page
             'lastNumber' => $lastNumber,
             'lastLetter' => $lastLetter,
             'autoCall'   => $game->getAutoCall(),
+            'tts'        => $game->getTts(),
+            'ttsVoice'   => $game->getTtsVoice(),
             'cardCount'  => $this->getCardCount($meta),
             'winner'     => $meta->getWinnerName() ?? '--',
         ];
@@ -114,8 +116,7 @@ class HostPage extends Page
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'createGame':
-                $autoCall = \filter_input(INPUT_POST, 'autoCall', FILTER_VALIDATE_INT);
-                GameController::createGame($user->getId(), $user->getName(), $autoCall);
+                GameController::createGame($user->getId(), $user->getName());
                 break;
             case 'callNumber':
                 GameController::callNumber($user->getName());
@@ -123,9 +124,11 @@ class HostPage extends Page
             case 'getStats':
                 $data['cardCount'] = $this->getCardCount(GameController::getGameMetaData($game));
                 break;
-            case 'updateAutoCall':
-                $interval = \filter_input(INPUT_POST, 'interval', FILTER_VALIDATE_INT);
-                GameController::setAutoCall($game, $interval);
+            case 'updateGameSettings':
+                $autoCall = \filter_input(INPUT_POST, 'autoCallInterval', FILTER_VALIDATE_INT);
+                $tts = \filter_input(INPUT_POST, 'tts', FILTER_VALIDATE_BOOLEAN);
+                $ttsVoice = \filter_input(INPUT_POST, 'ttsVoice');
+                GameController::updateGameSettings($game, $autoCall, $tts, $ttsVoice);
                 break;
         }
 

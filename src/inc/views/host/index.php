@@ -13,7 +13,7 @@
                 </div>
                 <div>
                     <h4>Text-To-Speech</h4>
-                    <label><input type="checkbox" id="tts"> Enable Text-To-Speech</label><br>
+                    <label><input type="checkbox" id="tts"<?php if ($tts): ?> checked<?php endif; ?>> Enable Text-To-Speech</label><br>
                     <label for="tts-voice">Voice: </label>
                     <select id="tts-voice"></select>
                 </div>
