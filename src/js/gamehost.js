@@ -51,6 +51,12 @@ $(function() {
     $('#last-number').text(letter + number);
   });
 
+  socket.on('addplayer', function () {
+    gameVars.cardCount++;
+    var count = gameVars.cardCount + ' ' + (gameVars.cardCount === 1 ? ' Player' : ' Players');
+    $('#card-count').text(count);
+  })
+
   socket.on('gameover', function(gameName, winner) {
     console.log('game ended');
     if (winner) {
@@ -122,16 +128,6 @@ $(function() {
     $('#source-url').select();
     document.execCommand('copy');
   });
-
-  setInterval(function() {
-    var postData = {
-      json: true,
-      action: 'getStats'
-    };
-    $.post(window.location, postData, function(data) {
-      $('#card-count').text(data.cardCount);
-    }, 'json');
-  }, 10000);
 
   function callNumber() {
     if (autoCallTimer) {

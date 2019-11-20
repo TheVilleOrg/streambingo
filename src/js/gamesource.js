@@ -54,6 +54,12 @@ $(function() {
     gameVars.ttsVoice = settings.ttsVoice;
   });
 
+  socket.on('addplayer', function () {
+    gameVars.cardCount++;
+    var count = gameVars.cardCount + ' ' + (gameVars.cardCount === 1 ? ' Player' : ' Players');
+    $('#card-count').text(count);
+  })
+
   socket.on('gameover', function(gameName, winner) {
     console.log('game ended');
     if (winner) {
@@ -68,14 +74,4 @@ $(function() {
     $('#card-count').text('0 Players');
     $('#winner-display').hide();
   });
-
-  setInterval(function() {
-    var postData = {
-      json: true,
-      action: 'getStats'
-    };
-    $.post(window.location, postData, function(data) {
-      $('#card-count').text(data.cardCount);
-    }, 'json');
-  }, 10000);
 });

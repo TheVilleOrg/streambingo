@@ -93,7 +93,7 @@ class HostPage extends Page
             'autoCall'   => $game->getAutoCall(),
             'tts'        => $game->getTts(),
             'ttsVoice'   => $game->getTtsVoice(),
-            'cardCount'  => $this->getCardCount($meta),
+            'cardCount'  => $meta->getNumCards(),
             'winner'     => $meta->getWinnerName() ?? '--',
         ];
 
@@ -121,9 +121,6 @@ class HostPage extends Page
             case 'callNumber':
                 GameController::callNumber($user->getName());
                 break;
-            case 'getStats':
-                $data['cardCount'] = $this->getCardCount(GameController::getGameMetaData($game));
-                break;
             case 'updateGameSettings':
                 $autoCall = \filter_input(INPUT_POST, 'autoCallInterval', FILTER_VALIDATE_INT);
                 $tts = \filter_input(INPUT_POST, 'tts', FILTER_VALIDATE_BOOLEAN);
@@ -133,18 +130,5 @@ class HostPage extends Page
         }
 
         echo \json_encode($data);
-    }
-
-    /**
-     * Gets the number of cards in the game as a formatted string.
-     *
-     * @param \Bingo\Model\GameMetaModel $game The metadata for the game
-     *
-     * @return string The number of cards as a formatted string
-     */
-    protected function getCardCount(GameMetaModel $game): string
-    {
-        $count = $game->getNumCards();
-        return $count . ($count === 1 ? ' Player' : ' Players');
     }
 }

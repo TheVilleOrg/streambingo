@@ -199,6 +199,7 @@
         const data = JSON.parse(stdout);
         if (data.gameId) {
           io.to(`user_${user['user-id']}`).emit('newcard', data.gameId);
+          io.to(`admin_${gameName}`).emit('addplayer');
 
           console.log(`player ${user['username']} joined game ${gameName}`);
         }

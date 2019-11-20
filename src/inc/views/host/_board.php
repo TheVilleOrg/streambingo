@@ -30,11 +30,13 @@
 <?php endfor; ?>
 			</tr>
 		</table>
-        <div id="card-count"><?php echo $cardCount; ?></div>
+        <div id="card-count"><?php echo $cardCount; ?> Player<?php if ($cardCount !== 1): ?>s<?php endif; ?></div>
         <script type="application/json" id="game-vars">
             {
                 "gameToken": "<?php echo $gameToken; ?>",
                 "tts": <?php echo $tts ? 'true' : 'false'; ?>,
-                "ttsVoice": "<?php echo $ttsVoice; ?>"
+                "ttsVoice": "<?php echo $ttsVoice; ?>",
+                "cardCount": <?php echo $cardCount; ?>
+
             }
         </script>
