@@ -12,6 +12,17 @@ jQuery.noConflict();
     var bingoBall = $('.bingo-ball.template');
     bingoBall.removeClass('template').remove();
 
+    var ttsVoiceSelect = $('#tts-voice');
+    var ttsVoices;
+    window.speechSynthesis.onvoiceschanged = function () {
+      ttsVoices = window.speechSynthesis.getVoices();
+      for (var i = 0; i < ttsVoices.length; i++) {
+        ttsVoiceSelect.append('<option value="' + i + '">' + ttsVoices[i].name + '</option>');
+      }
+    };
+
+    $('#tts').prop('checked', window.localStorage.getItem('tts') === 'true');
+
     var autoCallTimer;
 
     socket.on('connect', function() {
@@ -48,6 +59,12 @@ jQuery.noConflict();
       setTimeout(function() {
         ball.remove();
       }, 8000);
+
+      if (window.localStorage.getItem('tts') === 'true') {
+        var tts = new SpeechSynthesisUtterance(letter + ', ' + number);
+        tts.voice = ttsVoices[ttsVoiceSelect.val()];
+        window.speechSynthesis.speak(tts);
+      }
     });
 
     socket.on('gameover', function(gameName, winner) {
@@ -96,6 +113,10 @@ jQuery.noConflict();
 
     $('#auto-call-interval').change(function() {
       setAutoCall();
+    });
+
+    $('#tts').change(function () {
+      window.localStorage.setItem('tts', $(this).prop('checked'));
     });
 
     $('#source-url').click(function() {

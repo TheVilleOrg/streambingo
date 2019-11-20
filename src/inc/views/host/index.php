@@ -12,6 +12,12 @@
                     <button id="create-game" disabled>New Game</button>
                 </div>
                 <div>
+                    <h4>Text-To-Speech</h4>
+                    <label><input type="checkbox" id="tts"> Enable Text-To-Speech</label><br>
+                    <label for="tts-voice">Voice: </label>
+                    <select id="tts-voice"></select>
+                </div>
+                <div>
                     <h4>Automatic Call</h4>
                     <label><input type="checkbox" id="auto-call"> Automatically call a number every <input type="number" id="auto-call-interval" min="20" max="600" value="<?php echo $autoCall; ?>"> seconds.</label>
                 </div>
