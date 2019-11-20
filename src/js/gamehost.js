@@ -22,6 +22,7 @@ $(function() {
   };
 
   var autoCallTimer;
+  var autoCallUpdateTimer;
 
   socket.on('connect', function() {
     socket.emit('getgame', gameVars.gameToken, function(gameName, ended) {
@@ -93,8 +94,16 @@ $(function() {
   });
 
   $('#auto-call-interval').change(function() {
-    updateGameSettings();
-    updateAutoCall();
+    if (autoCallUpdateTimer) {
+      clearInterval(autoCallUpdateTimer);
+      autoCallUpdateTimer = undefined;
+    }
+
+    autoCallUpdateTimer = setTimeout(function () {
+      updateGameSettings();
+      updateAutoCall();
+      autoCallUpdateTimer = null;
+    }, 3000);
   });
 
   $('#tts').change(function () {
@@ -155,17 +164,21 @@ $(function() {
     if ($('#auto-call').prop('checked')) {
       autoCallTimer = setInterval(function() {
         callNumber();
-      }, $('#auto-call-interval').val() * 1000);
+      }, gameVars.autoCall * 1000);
     }
   }
 
   function updateGameSettings() {
+    gameVars.autoCall = $('#auto-call-interval').val();
+    gameVars.tts = $('#tts').prop('checked');
+    gameVars.ttsVoice = ttsVoiceSelect.val();
+
     var postData = {
       json: true,
       action: 'updateGameSettings',
-      autoCallInterval: $('#auto-call-interval').val(),
-      tts: $('#tts').prop('checked'),
-      ttsVoice: ttsVoiceSelect.val(),
+      autoCallInterval: gameVars.autoCall,
+      tts: gameVars.tts,
+      ttsVoice: gameVars.ttsVoice
     };
     $.post(window.location, postData);
   }
