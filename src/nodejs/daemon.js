@@ -119,7 +119,7 @@
     });
 
     socket.on('playgame', (userId, gameNames) => {
-      socket.join(`user${userId}`);
+      socket.join(`user_${userId}`);
       gameNames.forEach((gameName) => {
         socket.join(gameName);
       });
@@ -198,7 +198,7 @@
       try {
         const data = JSON.parse(stdout);
         if (data.gameId) {
-          io.to(`user${user['user-id']}`).emit('newcard', data.gameId);
+          io.to(`user_${user['user-id']}`).emit('newcard', data.gameId);
 
           console.log(`player ${user['username']} joined game ${gameName}`);
         }
