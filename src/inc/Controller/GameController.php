@@ -146,7 +146,7 @@ class GameController
             throw new NotFoundException('Attemped to call number for unknown game');
         }
 
-        if (\time() - $game->getUpdated() < 5)
+        if (\time() - $game->getUpdated() < 5 && !empty($game->getCalled()))
         {
             throw new BadRequestException('Attempted to call a number for a game too soon after the previous');
         }
