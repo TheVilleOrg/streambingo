@@ -219,11 +219,11 @@ class GameController
      * @param string $userName The user name of the user creating the card
      * @param string $gameName The name of the game with which to associate the card
      *
-     * @return int The unique identifier of the game
+     * @return mixed[] Data about the card
      *
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function createCard(int $twitchId, string $userName, string $gameName): int
+    public static function createCard(int $twitchId, string $userName, string $gameName): array
     {
         $game = GameMetaModel::loadGameFromName($gameName);
         if (!$game)
@@ -237,11 +237,12 @@ class GameController
         {
             $card = CardModel::createCard($userId, $game->getId());
             $card->save();
-
-            return $game->getId();
         }
 
-        return 0;
+        return [
+            'userId' => $userId,
+            'gameId' => $game->getId(),
+        ];
     }
 
     /**

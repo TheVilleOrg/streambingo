@@ -80,6 +80,24 @@ class UserController
     }
 
     /**
+     * Gets the unique identifier associated with a user based on their secret game token.
+     *
+     * @param string $gameToken The secret game token of the user
+     *
+     * @return int The unique identifier associated with the user, or null if the user does not exist
+     */
+    public static function getIdFromGameToken(string $gameToken): ?int
+    {
+        $user = UserModel::loadUserFromGameToken($gameToken);
+        if (!$user)
+        {
+            return null;
+        }
+
+        return $user->getId();
+    }
+
+    /**
      * Gets an Twitch OAuth2 authorization URL.
      *
      * @param string $returnPath The URL path to which to return the user after authorization

@@ -75,7 +75,7 @@
         </div>
         <script type="application/json" id="game-vars">
             {
-                "twitchId": "<?php echo $twitchId; ?>"
+                "gameToken": "<?php echo $gameToken; ?>"
             }
         </script>
 <?php require __DIR__ . '/../_footer.php'; ?>

@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Bingo;
 
 use Bingo\Controller\GameController;
+use Bingo\Controller\UserController;
 use Bingo\Exception\HttpException;
 use Bingo\Page\Page;
 
@@ -72,8 +73,11 @@ class App
                 $return['ended'] = $game->getEnded();
                 break;
             case 'getcard':
-                $return['gameId'] = GameController::createCard((int) $argv[2], $argv[3], $argv[4]);
+                $return = GameController::createCard((int) $argv[2], $argv[3], $argv[4]);
                 $return['url'] = Config::BASE_URL . Config::BASE_PATH . 'play';
+                break;
+            case 'getuser':
+                $return['userId'] = UserController::getIdFromGameToken($argv[2]);
                 break;
             case 'submitcard':
                 $return = GameController::submitCard((int) $argv[2], $argv[3]);

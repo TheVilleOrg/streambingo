@@ -48,7 +48,7 @@ class PlayPage extends Page
             'scripts'  => [
                 'gameclient',
             ],
-            'twitchId' => $user->getTwitchId(),
+            'gameToken' => $user->getGameToken(),
             'cards'    => [],
         ];
 

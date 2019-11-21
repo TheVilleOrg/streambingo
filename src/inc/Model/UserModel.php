@@ -93,6 +93,18 @@ class UserModel extends Model
     }
 
     /**
+     * Loads a user from the database based on their secret game token.
+     *
+     * @param string $gameToken The secret game token of the user
+     *
+     * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
+     */
+    public static function loadUserFromGameToken(string $gameToken): ?UserModel
+    {
+        return self::loadUser(0, false, $gameToken);
+    }
+
+    /**
      * Creates a new user based on a Twitch access token.
      *
      * @param string $accessToken The Twitch access token for the user
@@ -267,19 +279,40 @@ class UserModel extends Model
      * Loads a user from the database.
      *
      * @param string $ident The unique identifier associated with the game
-     * @param bool $useTwitch True if the unique identifier is a Twitch identifier, false if it is a unique identifier
+     * @param bool $useTwitch True if $ident is a Twitch identifier, false if it is a unique identifier
+     * @param string|null $gameToken The secret game token of the user
      *
      * @return \Bingo\Model\UserModel|null The user, or null if the user does not exist
      */
-    protected static function loadUser(int $ident, bool $useTwitch): ?UserModel
+    protected static function loadUser(int $ident, bool $useTwitch, string $gameToken = null): ?UserModel
     {
-        $user = $userId = $name = $gameToken = $twitchId = $accessToken = $refreshToken = $host = $created = null;
+        $user = $userId = $name = $twitchId = $accessToken = $refreshToken = $host = $created = null;
 
         $sql = 'SELECT id, name, gameToken, twitchId, accessToken, refreshToken, host, UNIX_TIMESTAMP(created) FROM users ';
-        $sql .= $useTwitch ? 'WHERE twitchId = ?;' : 'WHERE id = ?;';
+        if ($useTwitch)
+        {
+            $sql .= 'WHERE twitchId = ?;';
+        }
+        elseif ($gameToken)
+        {
+            $sql .= 'WHERE gameToken = ?;';
+        }
+        else
+        {
+            $sql .= 'WHERE id = ?;';
+        }
+
 
         $stmt = self::db()->prepare($sql);
-        $stmt->bind_param('i', $ident);
+        if ($gameToken && !$useTwitch)
+        {
+            $stmt->bind_param('s', $gameToken);
+        }
+        else
+        {
+            $stmt->bind_param('i', $ident);
+        }
+
         $stmt->execute();
         $stmt->bind_result($userId, $name, $gameToken, $twitchId, $accessToken, $refreshToken, $host, $created);
         if ($stmt->fetch())

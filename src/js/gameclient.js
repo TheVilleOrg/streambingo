@@ -19,8 +19,9 @@ $(function() {
     $('.card').each(function() {
       gameNames.push($(this).data('game-name'));
     });
-    socket.emit('playgame', gameVars.twitchId, gameNames);
-    $('#connection-status span').text('Connected');
+    socket.emit('playgame', gameVars.gameToken, gameNames, function () {
+      $('#connection-status span').text('Connected');
+    });
   });
 
   socket.on('disconnect', function() {

@@ -110,7 +110,9 @@
 
             channels.push(data.name);
 
-            cb(data.name, data.ended);
+            if (typeof cb === 'function') {
+              cb(data.name, data.ended);
+            }
           }
         } catch (e) {
           console.error(e);
@@ -118,15 +120,28 @@
       });
     });
 
-    socket.on('playgame', (userId, gameNames) => {
-      socket.join(`user_${userId}`);
-      gameNames.forEach((gameName) => {
-        socket.join(gameName);
-      });
-    });
+    socket.on('playgame', (token, gameNames, cb) => {
+      exec(`php ${config.phpcli} getuser ${token}`, (err, stdout) => {
+        try {
+          const data = JSON.parse(stdout);
+          if (data.userId) {
+            socket.join(`user_${data.userId}`);
+            gameNames.forEach((gameName) => {
+              socket.join(gameName);
+            });
 
-    socket.on('joingame', (gameName) => {
-      socket.join(gameName);
+            socket.on('joingame', (gameName) => {
+              socket.join(gameName);
+            });
+
+            if (typeof cb === 'function') {
+              cb();
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
     });
   });
 
@@ -198,7 +213,7 @@
       try {
         const data = JSON.parse(stdout);
         if (data.gameId) {
-          io.to(`user_${user['user-id']}`).emit('newcard', data.gameId);
+          io.to(`user_${data.userId}`).emit('newcard', data.gameId);
           io.to(`admin_${gameName}`).emit('addplayer');
 
           console.log(`player ${user['username']} joined game ${gameName}`);
