@@ -10,14 +10,6 @@ $(function() {
   var bingoBall = $('.bingo-ball.template');
   bingoBall.removeClass('template').remove();
 
-  var ttsVoices = {};
-  window.speechSynthesis.onvoiceschanged = function () {
-    var voices = window.speechSynthesis.getVoices();
-    for (var i = 0; i < voices.length; i++) {
-      ttsVoices[voices[i].name] = voices[i];
-    }
-  };
-
   socket.on('connect', function() {
     socket.emit('getgame', gameVars.gameToken, function(gameName) {
       console.log('joined game ' + gameName);
@@ -43,9 +35,7 @@ $(function() {
     }, 8000);
 
     if (gameVars.tts) {
-      var tts = new SpeechSynthesisUtterance(letter + ', ' + number);
-      tts.voice = ttsVoices[gameVars.ttsVoice];
-      window.speechSynthesis.speak(tts);
+      new Audio('../../audio/' + gameVars.ttsVoice + '/' + letter.toLowerCase() + number + '.ogg').play();
     }
   });
 
@@ -62,6 +52,11 @@ $(function() {
 
   socket.on('gameover', function(gameName, winner) {
     console.log('game ended');
+
+    if (gameVars.tts) {
+      new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
+    }
+
     if (winner) {
       console.log('congrats ' + winner + '!');
       $('#winner-display').show().find('strong').text(winner);

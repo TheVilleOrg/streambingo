@@ -42,6 +42,11 @@
       .pipe(gulp.dest('dist/'));
   }
 
+  function audio() {
+    return gulp.src('src/audio/**/*')
+      .pipe(gulp.dest('dist/audio/'));
+  }
+
   function sync() {
     return gulp.src('dist/**/*', {dot: true})
       .pipe(gulp.dest(wwwPath));
@@ -52,11 +57,12 @@
     gulp.watch('src/js/*.js', js);
     gulp.watch('src/**/*.php', php);
     gulp.watch('src/.htaccess', misc);
+    gulp.watch('src/audio/**/*', audio)
     gulp.watch('dist/**/*', {dot: true}, sync);
     cb();
   }
 
   exports.clean = clean;
 
-  exports.default = gulp.series(clean, gulp.parallel(css, js, php, misc), sync, watch);
+  exports.default = gulp.series(clean, gulp.parallel(css, js, php, misc, audio), sync, watch);
 })();

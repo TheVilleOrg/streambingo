@@ -15,7 +15,11 @@
                     <h4>Text-To-Speech</h4>
                     <label><input type="checkbox" id="tts"<?php if ($tts): ?> checked<?php endif; ?>> Enable Text-To-Speech</label><br>
                     <label for="tts-voice">Voice: </label>
-                    <select id="tts-voice"></select>
+                    <select id="tts-voice">
+<?php foreach ($ttsVoices as $k => $v): ?>
+                        <option value="<?php echo $k; ?>"<?php if ($k === $ttsVoice): ?> selected<?php endif; ?>><?php echo $v; ?></option>
+<?php endforeach; ?>
+                    </select>
                 </div>
                 <div>
                     <h4>Automatic Call</h4>

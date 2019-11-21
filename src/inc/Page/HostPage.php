@@ -84,6 +84,12 @@ class HostPage extends Page
             'scripts'  => [
                 'gamehost',
             ],
+            'ttsVoices'  => [
+                'en-GB/f' => 'British English Female',
+                'en-GB/m' => 'British English Male',
+                'en-US/f' => 'US English Female',
+                'en-US/m' => 'US English Male',
+            ],
             'gameName'   => \htmlspecialchars($game->getGameName()),
             'gameToken'  => $user->getGameToken(),
             'hostUrl'    => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),

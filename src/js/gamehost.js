@@ -7,20 +7,6 @@ $(function() {
 
   var socket = io('//' + window.location.hostname + ':3000');
 
-  var ttsVoiceSelect = $('#tts-voice');
-  var ttsVoices;
-  window.speechSynthesis.onvoiceschanged = function () {
-    if (ttsVoices) {
-      return;
-    }
-
-    ttsVoices = window.speechSynthesis.getVoices();
-    for (var i = 0; i < ttsVoices.length; i++) {
-      var selected = gameVars.ttsVoice === ttsVoices[i].name ? ' selected' : '';
-      ttsVoiceSelect.append('<option' + selected + '>' + ttsVoices[i].name + '</option>');
-    }
-  };
-
   var autoCallTimer;
   var autoCallUpdateTimer;
 
@@ -167,7 +153,7 @@ $(function() {
   function updateGameSettings() {
     gameVars.autoCall = $('#auto-call-interval').val();
     gameVars.tts = $('#tts').prop('checked');
-    gameVars.ttsVoice = ttsVoiceSelect.val();
+    gameVars.ttsVoice = $('#tts-voice').val();
 
     var postData = {
       json: true,
