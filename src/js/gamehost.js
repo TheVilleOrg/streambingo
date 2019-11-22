@@ -11,13 +11,13 @@ $(function() {
   var autoCallUpdateTimer;
 
   socket.on('connect', function() {
-    socket.emit('getgame', gameVars.gameToken, function(gameName, ended) {
+    socket.emit('getgame', gameVars.gameToken, function(gameName, ended, winner) {
       console.log('joined game ' + gameName);
       $('#connection-status span').text('Connected');
 
-      if (!ended) {
-        $('#call-number').prop('disabled', false);
-      }
+      gameVars.ended = ended;
+      gameVars.winner = winner;
+      updateGameState();
 
       $('#create-game').prop('disabled', false);
     });
@@ -45,12 +45,10 @@ $(function() {
 
   socket.on('gameover', function(gameName, winner) {
     console.log('game ended');
-    if (winner) {
-      console.log('congrats ' + winner + '!');
-      $('.game-winner').text(winner);
-    }
 
-    $('#call-number').prop('disabled', true);
+    gameVars.ended = true;
+    gameVars.winner = winner;
+    updateGameState();
   });
 
   socket.on('resetgame', function() {
@@ -61,6 +59,9 @@ $(function() {
     $('#card-count').text('0 Players');
     $('#call-number').prop('disabled', false);
     $('#create-game').prop('disabled', false);
+
+    gameVars.ended = false;
+    gameVars.winner = '';
   });
 
   $('#create-game').click(function() {
@@ -70,8 +71,7 @@ $(function() {
 
       var postData = {
         json: true,
-        action: 'createGame',
-        autoCall: $('#auto-call').prop('checked') ? $('#auto-call-interval').val() : 0
+        action: 'createGame'
       };
       $.post(window.location, postData);
     }
@@ -116,6 +116,10 @@ $(function() {
   });
 
   function callNumber() {
+    if ($('#board .marked').length >= 75) {
+      return;
+    }
+
     if (autoCallTimer) {
       clearInterval(autoCallTimer);
       autoCallTimer = undefined;
@@ -131,7 +135,7 @@ $(function() {
     $.post(window.location, postData, function() {
       $('#create-game').prop('disabled', false);
       setTimeout(function() {
-        $('#call-number').prop('disabled', false);
+        updateGameState();
       }, 10000);
       updateAutoCall();
     }, 'json');
@@ -146,22 +150,34 @@ $(function() {
     if ($('#auto-call').prop('checked')) {
       autoCallTimer = setInterval(function() {
         callNumber();
-      }, gameVars.autoCall * 1000);
+      }, $('#auto-call-interval').val() * 1000);
     }
   }
 
   function updateGameSettings() {
-    gameVars.autoCall = $('#auto-call-interval').val();
     gameVars.tts = $('#tts').prop('checked');
     gameVars.ttsVoice = $('#tts-voice').val();
 
     var postData = {
       json: true,
       action: 'updateGameSettings',
-      autoCallInterval: gameVars.autoCall,
+      autoCallInterval: $('#auto-call-interval').val(),
       tts: gameVars.tts,
       ttsVoice: gameVars.ttsVoice
     };
     $.post(window.location, postData);
+  }
+
+  function updateGameState() {
+    if (gameVars.ended) {
+      if (gameVars.winner) {
+        console.log('congrats ' + gameVars.winner + '!');
+        $('.game-winner').text(gameVars.winner);
+      }
+
+      $('#call-number').prop('disabled', true);
+    } else {
+      $('#call-number').prop('disabled', $('#board .marked').length >= 75);
+    }
   }
 });

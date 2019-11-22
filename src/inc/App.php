@@ -71,6 +71,7 @@ class App
                 $game = GameController::getGameFromToken($argv[2]);
                 $return['name'] = $game->getGameName();
                 $return['ended'] = $game->getEnded();
+                $return['winner'] = $game->getWinnerName();
                 break;
             case 'getcard':
                 $return = GameController::createCard((int) $argv[2], $argv[3], $argv[4]);

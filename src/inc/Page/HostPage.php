@@ -100,6 +100,7 @@ class HostPage extends Page
             'tts'        => $game->getTts(),
             'ttsVoice'   => $game->getTtsVoice(),
             'cardCount'  => $meta->getNumCards(),
+            'ended'      => $game->getEnded(),
             'winner'     => $meta->getWinnerName() ?? '--',
         ];
 

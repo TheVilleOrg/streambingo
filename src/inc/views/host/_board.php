@@ -36,7 +36,8 @@
                 "gameToken": "<?php echo $gameToken; ?>",
                 "tts": <?php echo $tts ? 'true' : 'false'; ?>,
                 "ttsVoice": "<?php echo $ttsVoice; ?>",
-                "cardCount": <?php echo $cardCount; ?>
-
+                "cardCount": <?php echo $cardCount; ?>,
+                "ended": <?php echo $ended ? 'true' : 'false'; ?>,
+                "winner": "<?php echo $winner; ?>"
             }
         </script>

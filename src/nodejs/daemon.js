@@ -111,7 +111,7 @@
             channels.push(data.name);
 
             if (typeof cb === 'function') {
-              cb(data.name, data.ended);
+              cb(data.name, data.ended, data.winner);
             }
           }
         } catch (e) {

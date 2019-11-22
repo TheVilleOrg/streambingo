@@ -11,8 +11,11 @@ $(function() {
   bingoBall.removeClass('template').remove();
 
   socket.on('connect', function() {
-    socket.emit('getgame', gameVars.gameToken, function(gameName) {
+    socket.emit('getgame', gameVars.gameToken, function(gameName, ended, winner) {
       console.log('joined game ' + gameName);
+      gameVars.ended = ended;
+      gameVars.winner = winner;
+      updateEndgamePanel();
     });
   });
 
@@ -51,22 +54,35 @@ $(function() {
   })
 
   socket.on('gameover', function(gameName, winner) {
-    console.log('game ended');
-
-    if (gameVars.tts) {
-      new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
-    }
-
-    if (winner) {
-      console.log('congrats ' + winner + '!');
-      $('#winner-display').show().find('strong').text(winner);
-    }
+    gameVars.ended = true;
+    gameVars.winner = winner;
+    updateEndgamePanel();
   });
 
   socket.on('resetgame', function() {
     console.log('reset game');
     $('#board td').removeClass('marked');
     $('#card-count').text('0 Players');
-    $('#winner-display').hide();
+
+    gameVars.ended = false;
+    gameVars.winner = '';
+    updateEndgamePanel();
   });
+
+  function updateEndgamePanel() {
+    if (gameVars.ended) {
+      console.log('game ended');
+
+      if (gameVars.tts) {
+        new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
+      }
+
+      if (gameVars.winner) {
+        console.log('congrats ' + gameVars.winner + '!');
+        $('#winner-display').show().find('strong').text(gameVars.winner);
+      }
+    } else {
+      $('#winner-display').hide();
+    }
+  }
 });
