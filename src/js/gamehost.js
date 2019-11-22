@@ -226,10 +226,14 @@ $(function() {
             autoRestartTimer = undefined;
           }
         }, 1000);
+
+        socket.emit('timer', 'restart', true, autoRestartCountdown);
       }
     } else if (autoRestartTimer) {
       clearInterval(autoRestartTimer);
       autoRestartTimer = undefined;
+
+      socket.emit('timer', 'restart', false);
     }
   }
 
@@ -249,10 +253,14 @@ $(function() {
             autoEndTimer = undefined;
           }
         }, 1000);
+
+        socket.emit('timer', 'end', true, autoEndCountdown);
       }
     } else if (autoEndTimer) {
       clearInterval(autoEndTimer);
       autoEndTimer = undefined;
+
+      socket.emit('timer', 'end', false);
     }
   }
 

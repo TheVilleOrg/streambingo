@@ -29,8 +29,11 @@
 				<td<?php if (\in_array($i, $called)): ?> class="marked<?php if ($i === $lastNumber): ?> latest<?php endif; ?>"<?php endif; ?> data-cell="<?php echo $i; ?>"><?php echo $i; ?></td>
 <?php endfor; ?>
 			</tr>
-		</table>
-        <div id="card-count"><?php echo $cardCount; ?> Player<?php if ($cardCount !== 1): ?>s<?php endif; ?></div>
+        </table>
+        <div id="game-status">
+            <div id="end-countdown" class="hidden">Game Over in <strong></strong></div>
+            <div id="card-count"><?php echo $cardCount; ?> Player<?php if ($cardCount !== 1): ?>s<?php endif; ?></div>
+        </div>
         <script type="application/json" id="game-vars">
             {
                 "gameToken": "<?php echo $gameToken; ?>",

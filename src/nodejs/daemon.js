@@ -85,6 +85,10 @@
             socket.join(data.name);
             socket.join(`admin_${data.name}`);
 
+            socket.on('timer', (name, running, value) => {
+              io.to(`admin_${data.name}`).emit('timer', name, running, value);
+            });
+
             socket.on('disconnect', () => {
               channels.splice(channels.indexOf(data.name), 1);
               if (channels.indexOf(data.name) === -1) {

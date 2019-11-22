@@ -5,6 +5,11 @@ $(function() {
 
   var gameVars = JSON.parse($('#game-vars').text());
 
+  var autoRestartTimer;
+  var autoRestartCountdown;
+  var autoEndTimer;
+  var autoEndCountdown;
+
   var socket = io('//' + window.location.hostname + ':3000');
 
   var bingoBall = $('.bingo-ball.template');
@@ -13,18 +18,23 @@ $(function() {
   socket.on('connect', function() {
     socket.emit('getgame', gameVars.gameToken, function(gameName, ended, winner) {
       console.log('joined game ' + gameName);
+
       gameVars.ended = ended;
       gameVars.winner = winner;
+
       updateEndgamePanel();
     });
   });
 
   socket.on('disconnect', function() {
     console.warn('socket connection lost');
+
+    clearTimers();
   });
 
   socket.on('numbercalled', function(letter, number) {
     console.log('called ' + letter + number);
+
     $('.latest').removeClass('latest');
     $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
 
@@ -69,6 +79,45 @@ $(function() {
     updateEndgamePanel();
   });
 
+  socket.on('timer', function (name, running, value) {
+    if (name === 'end') {
+      if (autoEndTimer) {
+        clearInterval(autoEndTimer);
+        autoEndTimer = undefined;
+      }
+
+      if (running) {
+        autoEndCountdown = value;
+        $('#end-countdown').removeClass('hidden').find('strong').text(formatTime(autoEndCountdown));
+        autoEndTimer = setInterval(function () {
+          autoEndCountdown--;
+          $('#end-countdown strong').text(formatTime(autoEndCountdown));
+          if (!autoEndCountdown) {
+            clearInterval(autoEndTimer);
+            autoEndTimer = undefined;
+            $('#end-countdown').addClass('hidden');
+          }
+        }, 1000);
+      }
+    } else if (name === 'restart') {
+      if (autoRestartTimer) {
+        clearInterval(autoRestartTimer);
+        autoRestartTimer = undefined;
+      }
+
+      if (running) {
+        autoRestartCountdown = value;
+        autoRestartTimer = setInterval(function () {
+          autoRestartCountdown--;
+          if (!autoRestartCountdown) {
+            clearInterval(autoRestartTimer);
+            autoRestartTimer = undefined;
+          }
+        }, 1000);
+      }
+    }
+  });
+
   function updateEndgamePanel() {
     if (gameVars.ended) {
       console.log('game ended');
@@ -84,5 +133,24 @@ $(function() {
     } else {
       $('#winner-display').hide();
     }
+  }
+
+  function clearTimers() {
+    if (autoRestartTimer) {
+      clearInterval(autoRestartTimer);
+      autoRestartTimer = undefined;
+    }
+
+    if (autoEndTimer) {
+      clearInterval(autoEndTimer);
+      autoEndTimer = undefined;
+    }
+  }
+
+  function formatTime(seconds) {
+    var m = Math.floor(seconds / 60);
+    var s = seconds % 60;
+
+    return m + ':' + (s < 10 ? '0' + s : s);
   }
 });

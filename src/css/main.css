@@ -127,7 +127,7 @@ a.twitch-login:hover {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 #game-list {
@@ -226,9 +226,20 @@ a.twitch-login:hover {
     width: 15em;
 }
 
-#card-count {
+#game-status {
     font-size: 2em;
-    text-align: right;
+    height: 1em;
+    position: relative;
+}
+
+#end-countdown {
+    display: inline-block;
+}
+
+#card-count {
+    display: inline-block;
+    position: absolute;
+    right: 0;
 }
 
 .game-name {
