@@ -1,9 +1,9 @@
 'use strict';
 
 $(function() {
-  var gameVars = JSON.parse($('#game-vars').text());
-
   $('body').removeClass('nojs');
+
+  var gameVars = JSON.parse($('#game-vars').text());
 
   var socket = io('//' + window.location.hostname + ':3000');
 

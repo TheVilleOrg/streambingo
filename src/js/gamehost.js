@@ -1,15 +1,9 @@
 'use strict';
 
 $(function() {
-  var gameVars = JSON.parse($('#game-vars').text());
-
   $('body').removeClass('nojs');
 
-  $('#auto-call').prop('checked', window.sessionStorage.getItem('autoCall') === 'true');
-  $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
-  $('#auto-end').prop('checked', window.sessionStorage.getItem('autoEnd') === 'true');
-
-  var socket = io('//' + window.location.hostname + ':3000');
+  var gameVars = JSON.parse($('#game-vars').text());
 
   var connected = false;
 
@@ -21,6 +15,12 @@ $(function() {
   var settingsUpdateTimer;
 
   var uncalledNumbers = 75 - $('#board .marked').length;
+
+  $('#auto-call').prop('checked', window.sessionStorage.getItem('autoCall') === 'true');
+  $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
+  $('#auto-end').prop('checked', window.sessionStorage.getItem('autoEnd') === 'true');
+
+  var socket = io('//' + window.location.hostname + ':3000');
 
   socket.on('connect', function() {
     socket.emit('getgame', gameVars.gameToken, function(gameName, ended, winner) {
