@@ -181,7 +181,7 @@ $(function() {
       $('#create-game').prop('disabled', false);
       setTimeout(function() {
         updateGameState();
-      }, 10000);
+      }, 8000);
       updateAutoCall();
     }, 'json');
   }
