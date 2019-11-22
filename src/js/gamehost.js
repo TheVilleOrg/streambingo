@@ -5,6 +5,10 @@ $(function() {
 
   $('body').removeClass('nojs');
 
+  $('#auto-call').prop('checked', window.sessionStorage.getItem('autoCall') === 'true');
+  $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
+  $('#auto-end').prop('checked', window.sessionStorage.getItem('autoEnd') === 'true');
+
   var socket = io('//' + window.location.hostname + ':3000');
 
   var connected = false;
@@ -110,14 +114,17 @@ $(function() {
 
   $('#auto-call').change(function() {
     updateAutoCall();
+    window.sessionStorage.setItem('autoCall', $(this).prop('checked'));
   });
 
   $('#auto-restart').change(function () {
     updateAutoRestart();
+    window.sessionStorage.setItem('autoRestart', $(this).prop('checked'));
   });
 
   $('#auto-end').change(function () {
     updateAutoEnd();
+    window.sessionStorage.setItem('autoEnd', $(this).prop('checked'));
   });
 
   $('#auto-call-interval, #auto-restart-interval, #auto-end-interval').change(function() {
