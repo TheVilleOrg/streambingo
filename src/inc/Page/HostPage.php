@@ -81,27 +81,29 @@ class HostPage extends Page
         }
 
         $data = [
-            'scripts'  => [
+            'scripts'     => [
                 'gamehost',
             ],
-            'ttsVoices'  => [
+            'ttsVoices'   => [
                 'en-GB/f' => 'British English Female',
                 'en-GB/m' => 'British English Male',
                 'en-US/f' => 'US English Female',
                 'en-US/m' => 'US English Male',
             ],
-            'gameName'   => \htmlspecialchars($game->getGameName()),
-            'gameToken'  => $user->getGameToken(),
-            'hostUrl'    => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
-            'called'     => $called,
-            'lastNumber' => $lastNumber,
-            'lastLetter' => $lastLetter,
-            'autoCall'   => $game->getAutoCall(),
-            'tts'        => $game->getTts(),
-            'ttsVoice'   => $game->getTtsVoice(),
-            'cardCount'  => $meta->getNumCards(),
-            'ended'      => $game->getEnded(),
-            'winner'     => $meta->getWinnerName() ?? '--',
+            'gameName'    => \htmlspecialchars($game->getGameName()),
+            'gameToken'   => $user->getGameToken(),
+            'hostUrl'     => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
+            'called'      => $called,
+            'lastNumber'  => $lastNumber,
+            'lastLetter'  => $lastLetter,
+            'autoCall'    => $game->getAutoCall(),
+            'autoRestart' => $game->getAutoRestart(),
+            'autoEnd'     => $game->getAutoEnd(),
+            'tts'         => $game->getTts(),
+            'ttsVoice'    => $game->getTtsVoice(),
+            'cardCount'   => $meta->getNumCards(),
+            'ended'       => $game->getEnded(),
+            'winner'      => $meta->getWinnerName() ?? '--',
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);
@@ -125,14 +127,19 @@ class HostPage extends Page
             case 'createGame':
                 GameController::createGame($user->getId(), $user->getName());
                 break;
+            case 'endGame':
+                GameController::endGame($game->getGameName());
+                break;
             case 'callNumber':
                 GameController::callNumber($user->getName());
                 break;
             case 'updateGameSettings':
-                $autoCall = \filter_input(INPUT_POST, 'autoCallInterval', FILTER_VALIDATE_INT);
+                $autoCall = \filter_input(INPUT_POST, 'autoCall', FILTER_VALIDATE_INT);
+                $autoRestart = \filter_input(INPUT_POST, 'autoRestart', FILTER_VALIDATE_INT);
+                $autoEnd = \filter_input(INPUT_POST, 'autoEnd', FILTER_VALIDATE_INT);
                 $tts = \filter_input(INPUT_POST, 'tts', FILTER_VALIDATE_BOOLEAN);
                 $ttsVoice = \filter_input(INPUT_POST, 'ttsVoice');
-                GameController::updateGameSettings($game, $autoCall, $tts, $ttsVoice);
+                GameController::updateGameSettings($game, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice);
                 break;
         }
 

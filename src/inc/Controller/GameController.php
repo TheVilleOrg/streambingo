@@ -128,6 +128,14 @@ class GameController
         }
 
         $game->setEnded(true)->setWinner($cardId)->setWinnerName($winnerName)->save();
+
+        $request = [
+            'action'   => 'endGame',
+            'gameName' => $gameName,
+            'gameId'   => $game->getId(),
+            'winner'   => $winnerName,
+        ];
+        self::serverRequest($request);
     }
 
     /**
@@ -176,17 +184,19 @@ class GameController
      *
      * @param \Bingo\Model\GameModel $game The game
      * @param int $autoCall The auto call interval in seconds
+     * @param int $autoRestart The auto restart interval in seconds
+     * @param int $autoEnd The auto end interval in seconds
      * @param bool $tts True to enable text-to-speech, false otherwise
      * @param string $ttsVoice The name of the text-to-speech voice to use
      */
-    public static function updateGameSettings(GameModel $game, int $autoCall, bool $tts, string $ttsVoice): void
+    public static function updateGameSettings(GameModel $game, int $autoCall, int $autoRestart, int $autoEnd, bool $tts, string $ttsVoice): void
     {
-        $game->setAutoCall($autoCall)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
+        $game->setAutoCall($autoCall)->setAutoRestart($autoRestart)->getAutoEnd($autoEnd)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
 
         $request = [
             'action'   => 'updateGameSettings',
             'gameName' => $game->getGameName(),
-            'settings' => \compact('autoCall', 'tts', 'ttsVoice'),
+            'settings' => \compact('autoCall', 'autoRestart', 'autoEnd', 'tts', 'ttsVoice'),
         ];
         self::serverRequest($request);
     }

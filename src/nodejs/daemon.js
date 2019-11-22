@@ -166,6 +166,9 @@
             case 'resetGame':
               resetGame(data.gameName, data.gameId);
               break;
+            case 'endGame':
+              endGame(data.gameName, data.gameId, data.winner);
+              break;
             case 'callNumber':
               callNumber(data.gameName, data.letter, data.number);
               break;
@@ -195,6 +198,10 @@
     io.to(`admin_${gameName}`).emit('resetgame');
 
     console.log(`created new game ${gameName}`);
+  }
+
+  function endGame(gameName, gameId, winner) {
+    io.to(gameName).emit('gameover', gameId, winner);
   }
 
   function callNumber(gameName, letter, number) {
@@ -234,7 +241,6 @@
         const data = JSON.parse(stdout);
         if (data.result) {
           client.say(channel, `Congratulations @${user['display-name']}!`);
-          io.to(gameName).emit('gameover', data.gameId, user['username']);
 
           console.log(`player ${user['username']} won game ${gameName}`);
         } else if(data.result === null) {
