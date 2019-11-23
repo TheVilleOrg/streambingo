@@ -12,19 +12,26 @@
 
   const wwwPath = 'D:/www/bingo/';
 
+  let production = false;
+
+  function setProd(cb) {
+    production = true;
+    cb();
+  }
+
   function clean() {
     return del(['dist/*', wwwPath + '*'], {dot: true, force: true});
   }
 
   function css() {
-    return gulp.src('src/css/*.css', {sourcemaps: true})
+    return gulp.src('src/css/*.css', {sourcemaps: !production})
       .pipe(postcss([autoprefixer(), cssnano()]))
       .pipe(rename({extname: '.min.css'}))
       .pipe(gulp.dest('dist/css/', {sourcemaps: '.'}));
   }
 
   function js() {
-    return gulp.src('src/js/*.js', {sourcemaps: true})
+    return gulp.src('src/js/*.js', {sourcemaps: !production})
       .pipe(eslint())
       .pipe(eslint.format())
       .pipe(uglify())
@@ -63,6 +70,7 @@
   }
 
   exports.clean = clean;
+  exports.prod = gulp.series(setProd, clean, gulp.parallel(css, js, php, misc, audio));
 
   exports.default = gulp.series(clean, gulp.parallel(css, js, php, misc, audio), sync, watch);
 })();
