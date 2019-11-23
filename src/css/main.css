@@ -259,6 +259,11 @@ a.twitch-login:hover {
     padding: 8px;
 }
 
+#game-controls p {
+    font-size: .9em;
+    text-align: left;
+}
+
 #call-number, #create-game {
     border-radius: 8px;
     border: 2px solid;
