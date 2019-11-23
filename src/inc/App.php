@@ -72,7 +72,7 @@ class App
                 $return['name'] = $game->getGameName();
                 $return['settings'] = [
                     'tts'     => $game->getTts(),
-                    'ttVoice' => $game->getTtsVoice(),
+                    'ttsVoice' => $game->getTtsVoice(),
                 ];
                 $return['called'] = $game->getCalled();
                 $return['ended'] = $game->getEnded();
