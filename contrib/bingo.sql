@@ -35,6 +35,8 @@ CREATE TABLE `games` (
 CREATE TABLE `game_settings` (
   `gameName` varchar(32) NOT NULL,
   `autoCall` int(11) NOT NULL DEFAULT 30,
+  `autoRestart` int(11) NOT NULL DEFAULT 60,
+  `autoEnd` int(11) NOT NULL DEFAULT 30,
   `tts` tinyint(1) NOT NULL DEFAULT 0,
   `ttsVoice` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
