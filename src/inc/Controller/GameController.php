@@ -88,8 +88,10 @@ class GameController
      *
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name to identify the game
+     *
+     * @return \Bingo\Model\GameModel The game
      */
-    public static function createGame(int $userId, string $gameName): void
+    public static function createGame(int $userId, string $gameName): GameModel
     {
         $oldGameId = null;
 
@@ -100,7 +102,8 @@ class GameController
             GameModel::deleteGame($gameName);
         }
 
-        GameModel::createGame($userId, $gameName)->save();
+        $game = GameModel::createGame($userId, $gameName);
+        $game->save();
 
         $request = [
             'action'   => 'resetGame',
@@ -108,6 +111,8 @@ class GameController
             'gameId'   => $oldGameId,
         ];
         self::serverRequest($request);
+
+        return $game;
     }
 
     /**
