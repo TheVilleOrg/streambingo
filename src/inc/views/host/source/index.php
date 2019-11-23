@@ -16,7 +16,7 @@
             <h1>Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span></h1>
             <noscript>JavaScript must be enabled to use this site.</noscript>
             <div id="host">
-                <h2>Type <code>!play</code> in chat to get your BINGO card!</h2>
+                <h2>Type <code>!play</code> in chat to get your BINGO card!<br>Type <code>bingo</code> in chat when you have a winning card!</h2>
 <?php require __DIR__ . '/../_board.php'; ?>
             </div>
             <div id="end-game">
