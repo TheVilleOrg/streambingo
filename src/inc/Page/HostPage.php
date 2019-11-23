@@ -70,16 +70,6 @@ class HostPage extends Page
     {
         $meta = GameController::getGameMetaData($game);
 
-        $called = $game->getCalled();
-
-        $lastNumber = '-';
-        $lastLetter = '-';
-        if (!empty($called))
-        {
-            $lastNumber = $called[\count($called) - 1];
-            $lastLetter = GameController::getLetter($lastNumber);
-        }
-
         $data = [
             'scripts'     => [
                 'gamehost',
@@ -93,17 +83,12 @@ class HostPage extends Page
             'gameName'    => \htmlspecialchars($game->getGameName()),
             'gameToken'   => $user->getGameToken(),
             'hostUrl'     => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
-            'called'      => $called,
-            'lastNumber'  => $lastNumber,
-            'lastLetter'  => $lastLetter,
             'autoCall'    => $game->getAutoCall(),
             'autoRestart' => $game->getAutoRestart(),
             'autoEnd'     => $game->getAutoEnd(),
             'tts'         => $game->getTts(),
             'ttsVoice'    => $game->getTtsVoice(),
             'cardCount'   => $meta->getNumCards(),
-            'ended'       => $game->getEnded(),
-            'winner'      => $meta->getWinnerName() ?? '--',
         ];
 
         $this->showTemplate($minimal ? 'host/source' : 'host', $data);

@@ -16,11 +16,24 @@ $(function() {
   bingoBall.removeClass('template').remove();
 
   socket.on('connect', function() {
-    socket.emit('getgame', gameVars.gameToken, function(gameName, ended, winner) {
+    socket.emit('getgame', gameVars.gameToken, function(gameName, settings, called, ended, winner) {
       console.log('joined game ' + gameName);
 
+      gameVars.tts = settings.tts;
+      gameVars.ttsVoice = settings.ttsVoice;
       gameVars.ended = ended;
       gameVars.winner = winner;
+
+      $('#board .marked').removeClass('marked').removeClass('latest');
+      if (called.length) {
+        for (var i = 0; i < called.length; i++) {
+          $('#board td[data-cell=' + called[i] + ']').addClass('marked');
+        }
+
+        var latest = called[called.length - 1];
+        $('#board td[data-cell=' + latest + ']').addClass('latest');
+        $('#last-number').text(getLetter(latest) + latest);
+      }
 
       updateEndgamePanel();
     });
@@ -32,7 +45,8 @@ $(function() {
     clearTimers();
   });
 
-  socket.on('numbercalled', function(letter, number) {
+  socket.on('numbercalled', function(number) {
+    var letter = getLetter(number);
     console.log('called ' + letter + number);
 
     $('.latest').removeClass('latest');
@@ -145,6 +159,19 @@ $(function() {
       clearInterval(autoEndTimer);
       autoEndTimer = undefined;
     }
+  }
+
+  function getLetter(number) {
+    if (number <= 15) {
+      return 'B';
+    } else if (number <= 30) {
+      return 'I';
+    } else if (number <= 45) {
+      return 'N';
+    } else if (number <= 60) {
+      return 'G';
+    }
+    return 'O';
   }
 
   function formatTime(seconds) {

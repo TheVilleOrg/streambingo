@@ -115,7 +115,7 @@
             channels.push(data.name);
 
             if (typeof cb === 'function') {
-              cb(data.name, data.ended, data.winner);
+              cb(data.name, data.settings, data.called, data.ended, data.winner);
             }
           }
         } catch (e) {
@@ -174,7 +174,7 @@
               endGame(data.gameName, data.gameId, data.winner);
               break;
             case 'callNumber':
-              callNumber(data.gameName, data.letter, data.number);
+              callNumber(data.gameName, data.number);
               break;
             case 'updateGameSettings':
               updateGameSettings(data.gameName, data.settings);
@@ -208,10 +208,10 @@
     io.to(gameName).emit('gameover', gameId, winner);
   }
 
-  function callNumber(gameName, letter, number) {
-    io.to(`admin_${gameName}`).emit('numbercalled', letter, number);
+  function callNumber(gameName, number) {
+    io.to(`admin_${gameName}`).emit('numbercalled', number);
 
-    console.log(`called ${letter}${number} for game ${gameName}`);
+    console.log(`called ${number} for game ${gameName}`);
   }
 
   function updateGameSettings(gameName, settings) {

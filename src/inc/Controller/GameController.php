@@ -173,7 +173,6 @@ class GameController
             'action'   => 'callNumber',
             'gameName' => $gameName,
             'gameId'   => $game->getId(),
-            'letter'   => self::getLetter($number),
             'number'   => $number,
         ];
         self::serverRequest($request);
@@ -191,7 +190,7 @@ class GameController
      */
     public static function updateGameSettings(GameModel $game, int $autoCall, int $autoRestart, int $autoEnd, bool $tts, string $ttsVoice): void
     {
-        $game->setAutoCall($autoCall)->setAutoRestart($autoRestart)->getAutoEnd($autoEnd)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
+        $game->setAutoCall($autoCall)->setAutoRestart($autoRestart)->setAutoEnd($autoEnd)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
 
         $request = [
             'action'   => 'updateGameSettings',
@@ -348,43 +347,6 @@ class GameController
             'result' => $result,
             'gameId' => $game->getId(),
         ];
-    }
-
-    /**
-     * Gets the letter associated with a grid number.
-     *
-     * @param int $number The number
-     *
-     * @return string The letter associated with the number
-     */
-    public static function getLetter(int $number): string
-    {
-        if ($number <= 15)
-        {
-            return 'B';
-        }
-
-        if ($number <= 30)
-        {
-            return 'I';
-        }
-
-        if ($number <= 45)
-        {
-            return 'N';
-        }
-
-        if ($number <= 60)
-        {
-            return 'G';
-        }
-
-        if ($number <= 75)
-        {
-            return 'O';
-        }
-
-        return '';
     }
 
     /**

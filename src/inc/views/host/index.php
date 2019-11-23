@@ -4,7 +4,7 @@
             <h2>Channel: <span class="game-name"><?php echo $gameName; ?></span></h2>
             <div id="connection-status">Status: <span>Connecting...</span></div>
 <?php require '_board.php'; ?>
-            <p>Last Number: <span id="last-number"><?php echo $lastLetter; ?><?php echo $lastNumber; ?></span> | Winner: <span class="game-winner"><?php echo $winner; ?></span></p>
+            <p>Last Number: <span id="last-number">--</span> | Winner: <span class="game-winner">--</span></p>
             <div id="game-controls">
                 <div>
                     <h4>Game Controls</h4>
