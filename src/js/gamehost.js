@@ -14,7 +14,7 @@ $(function() {
   var autoEndCountdown;
   var settingsUpdateTimer;
 
-  var uncalledNumbers = 75 - $('#board .marked').length;
+  var uncalledNumbers;
 
   $('#auto-call').prop('checked', window.sessionStorage.getItem('autoCall') === 'true');
   $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
@@ -34,6 +34,8 @@ $(function() {
       gameVars.ttsVoice = settings.ttsVoice;
       gameVars.ended = ended;
       gameVars.winner = winner;
+
+      uncalledNumbers = 75 - called.length;
 
       $('#board .marked').removeClass('marked').removeClass('latest');
       if (called.length) {
