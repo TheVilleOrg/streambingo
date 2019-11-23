@@ -29,19 +29,35 @@ h2 {
     padding: 1em;
 }
 
+#end-game {
+    background: linear-gradient(#eee, #fff);
+    border-radius: 3em;
+    box-shadow: .3em .3em 1em #666;
+    color: #000;
+    display: none;
+    left: 10%;
+    padding: 3em;
+    position: absolute;
+    right: 10%;
+    text-align: center;
+    top: 10%;
+    z-index: 2000;
+}
+
 #winner-display {
     animation: color-rotate 10s infinite;
     background: linear-gradient(-45deg, #f80, #fd0, #4c4, #08c, #d4d);
     background-clip: text;
     color: transparent;
     display: none;
-    font-size: 6em;
+    font-size: 3em;
     font-weight: bold;
-    position: absolute;
-    text-align: center;
-    top: 50%;
-    width: 100%;
-    z-index: 2000;
+}
+
+#restart-countdown {
+    display: none;
+    font-size: 2em;
+    margin-top: 20px;
 }
 
 .bingo-ball {

@@ -18,7 +18,11 @@
             <div id="host">
                 <h2>Type <code>!play</code> in chat to get your BINGO card!</h2>
 <?php require __DIR__ . '/../_board.php'; ?>
+            </div>
+            <div id="end-game">
+                <h2>Game Over</h2>
                 <p id="winner-display">Congratulations, <strong></strong>!</p>
+                <p id="restart-countdown">New game in <strong></strong></p>
             </div>
             <div class="bingo-ball template">
                 <div class="ball-shine"></div>

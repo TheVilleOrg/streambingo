@@ -78,6 +78,10 @@ $(function() {
   })
 
   socket.on('gameover', function(gameName, winner) {
+    if (!gameVars.ended && gameVars.tts) {
+      new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
+    }
+
     gameVars.ended = true;
     gameVars.winner = winner;
     updateEndgamePanel();
@@ -112,6 +116,8 @@ $(function() {
             $('#end-countdown').addClass('hidden');
           }
         }, 1000);
+      } else {
+        $('#end-countdown').addClass('hidden');
       }
     } else if (name === 'restart') {
       if (autoRestartTimer) {
@@ -121,13 +127,18 @@ $(function() {
 
       if (running) {
         autoRestartCountdown = value;
+        $('#restart-countdown').show().find('strong').text(formatTime(autoRestartCountdown));
         autoRestartTimer = setInterval(function () {
           autoRestartCountdown--;
+          $('#restart-countdown strong').text(formatTime(autoRestartCountdown));
           if (!autoRestartCountdown) {
             clearInterval(autoRestartTimer);
             autoRestartTimer = undefined;
+            $('#restart-countdown').hide();
           }
         }, 1000);
+      } else {
+        $('#restart-countdown').hide();
       }
     }
   });
@@ -136,16 +147,14 @@ $(function() {
     if (gameVars.ended) {
       console.log('game ended');
 
-      if (gameVars.tts) {
-        new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
-      }
+      $('#end-game').show();
 
       if (gameVars.winner) {
         console.log('congrats ' + gameVars.winner + '!');
         $('#winner-display').show().find('strong').text(gameVars.winner);
       }
     } else {
-      $('#winner-display').hide();
+      $('#end-game, #winner-display').hide();
     }
   }
 
