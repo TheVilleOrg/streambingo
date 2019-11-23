@@ -371,7 +371,7 @@ class GameModel extends Model
      */
     public function setAutoCall(int $autoCall): GameModel
     {
-        $this->autoCall = \min(600, \max(20, $autoCall));
+        $this->autoCall = \min(600, \max(10, $autoCall));
 
         return $this;
     }

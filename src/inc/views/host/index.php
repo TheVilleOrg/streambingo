@@ -23,7 +23,7 @@
                 </div>
                 <div>
                     <h4>Automation</h4>
-                    <label><input type="checkbox" id="auto-call"> Automatically call a number every <input type="number" id="auto-call-interval" min="20" max="600" value="<?php echo $autoCall; ?>"> seconds.</label><br>
+                    <label><input type="checkbox" id="auto-call"> Automatically call a number every <input type="number" id="auto-call-interval" min="10" max="600" value="<?php echo $autoCall; ?>"> seconds.</label><br>
                     <label><input type="checkbox" id="auto-restart"> Automatically restart the game <input type="number" id="auto-restart-interval" min="30" max="600" value="<?php echo $autoRestart; ?>"> seconds after ending.</label><br>
                     <label><input type="checkbox" id="auto-end"> Automatically end the game <input type="number" id="auto-end-interval" min="30" max="600" value="<?php echo $autoEnd; ?>"> seconds after the last number has been called.</label>
                 </div>
