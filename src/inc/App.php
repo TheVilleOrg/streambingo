@@ -17,7 +17,7 @@ class App
     /**
      * The application version string
      */
-    const APP_VERSION = 'v0.1.1';
+    const APP_VERSION = 'v0.1.2';
 
     /**
      * The client asset version
