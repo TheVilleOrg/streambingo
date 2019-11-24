@@ -237,9 +237,11 @@ $(function() {
         autoRestartTimer = setInterval(function () {
           autoRestartCountdown--;
           if (!autoRestartCountdown) {
-            restartGame();
             clearInterval(autoRestartTimer);
-            autoRestartTimer = undefined;
+            autoRestartTimer = setTimeout(function () {
+              restartGame();
+              autoRestartTimer = undefined;
+            }, 2000);
           }
         }, 1000);
 
@@ -260,13 +262,15 @@ $(function() {
         autoEndTimer = setInterval(function () {
           autoEndCountdown--;
           if (!autoEndCountdown) {
-            var postData = {
-              json: true,
-              action: 'endGame'
-            };
-            $.post(window.location, postData);
             clearInterval(autoEndTimer);
-            autoEndTimer = undefined;
+            autoEndTimer = setTimeout(function () {
+              var postData = {
+                json: true,
+                action: 'endGame'
+              };
+              $.post(window.location, postData);
+              autoEndTimer = undefined;
+            }, 2000);
           }
         }, 1000);
 
