@@ -246,16 +246,20 @@ class GameController
         }
 
         $userId = UserController::getIdFromTwitchUser($userName, $twitchId);
+        $newCard = false;
 
         if (!CardModel::cardExists($userId, $game->getId()))
         {
+            $newCard = true;
+
             $card = CardModel::createCard($userId, $game->getId());
             $card->save();
         }
 
         return [
-            'userId' => $userId,
-            'gameId' => $game->getId(),
+            'newCard' => $newCard,
+            'userId'  => $userId,
+            'gameId'  => $game->getId(),
         ];
     }
 

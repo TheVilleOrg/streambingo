@@ -223,7 +223,7 @@
     exec(`php ${config.phpcli} getcard ${user['user-id']} ${user['username']} ${gameName}`, (err, stdout) => {
       try {
         const data = JSON.parse(stdout);
-        if (data.gameId) {
+        if (data.newCard) {
           io.to(`user_${data.userId}`).emit('newcard', data.gameId);
           io.to(`admin_${gameName}`).emit('addplayer');
 
