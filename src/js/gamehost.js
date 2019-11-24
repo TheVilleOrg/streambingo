@@ -112,6 +112,7 @@ $(function() {
 
     gameVars.ended = false;
     gameVars.winner = '';
+    gameVars.cardCount = 0;
     uncalledNumbers = 75;
 
     clearTimers();

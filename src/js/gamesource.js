@@ -89,11 +89,13 @@ $(function() {
 
   socket.on('resetgame', function() {
     console.log('reset game');
+
     $('#board td').removeClass('marked');
     $('#card-count').text('0 Players');
 
     gameVars.ended = false;
     gameVars.winner = '';
+    gameVars.cardCount = 0;
     updateEndgamePanel();
   });
 

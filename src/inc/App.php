@@ -22,7 +22,7 @@ class App
     /**
      * The client asset version
      */
-    const ASSET_VERSION = 2;
+    const ASSET_VERSION = 3;
 
     /**
      * The requested route
