@@ -30,16 +30,20 @@ $(function() {
   });
 
   socket.on('gameover', function(gameId, winner) {
-    console.log('game #' + gameId + ' ended');
     var card = $('.card[data-game-id=' + gameId + ']');
-    var gameOver = gameOverModal.clone();
 
-    if (winner) {
-      console.log('congrats ' + winner + '!');
-      gameOver.find('p').show().find('.game-winner').text(winner);
+    if (!card.find('.game-over-wrapper').length) {
+      console.log('game #' + gameId + ' ended');
+
+      var gameOver = gameOverModal.clone();
+
+      if (winner) {
+        console.log('congrats ' + winner + '!');
+        gameOver.find('p').show().find('.game-winner').text(winner);
+      }
+
+      card.append(gameOver);
     }
-
-    card.append(gameOver);
   });
 
   socket.on('newcard', function(gameId) {
