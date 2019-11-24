@@ -3,12 +3,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/main.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/main.min.css?v=<?php echo $app['version']['asset']; ?>">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js?v=<?php echo $app['version']['asset']; ?>"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js?v=<?php echo $app['version']['asset']; ?>"></script>
 <?php if (isset($scripts)): ?>
 <?php foreach ($scripts as $name): ?>
-	<script src="<?php echo $app['basePath']; ?>js/<?php echo $name; ?>.min.js"></script>
+	<script src="<?php echo $app['basePath']; ?>js/<?php echo $name; ?>.min.js?v=<?php echo $app['version']['asset']; ?>"></script>
 <?php endforeach; ?>
 <?php endif; ?>
     <title>Stream BINGO</title>

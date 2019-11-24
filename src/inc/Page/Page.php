@@ -65,6 +65,7 @@ abstract class Page
             ],
             'version'  => [
                 'string' => App::APP_VERSION,
+                'asset'  => App::ASSET_VERSION,
             ],
         ];
 

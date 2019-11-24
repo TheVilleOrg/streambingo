@@ -3,11 +3,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/main.min.css">
-	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/source.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
-	<script src="<?php echo $app['basePath']; ?>js/gamesource.min.js"></script>
+	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/main.min.css?v=<?php echo $app['version']['asset']; ?>">
+	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/source.min.css?v=<?php echo $app['version']['asset']; ?>">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js?v=<?php echo $app['version']['asset']; ?>"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js?v=<?php echo $app['version']['asset']; ?>"></script>
+	<script src="<?php echo $app['basePath']; ?>js/gamesource.min.js?v=<?php echo $app['version']['asset']; ?>"></script>
     <title>Stream BINGO</title>
 </head>
 <body class="nojs">

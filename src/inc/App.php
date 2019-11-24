@@ -20,6 +20,11 @@ class App
     const APP_VERSION = 'v0.1.0';
 
     /**
+     * The client asset version
+     */
+    const ASSET_VERSION = 2;
+
+    /**
      * The requested route
      *
      * @var string
