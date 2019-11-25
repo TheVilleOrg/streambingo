@@ -105,7 +105,7 @@ $(function() {
 
     $('#board td').removeClass('marked');
     $('#last-number').text('--');
-    $('#game-winner').text('--');
+    $('.game-winner').text('--');
     $('#card-count').text('0 Players');
     $('#call-number').prop('disabled', false);
     $('#create-game').prop('disabled', false);
