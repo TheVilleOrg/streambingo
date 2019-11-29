@@ -3,6 +3,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo $app['basePath']; ?>apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $app['basePath']; ?>favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $app['basePath']; ?>favicon-16x16.png">
+    <link rel="manifest" href="<?php echo $app['basePath']; ?>site.webmanifest">
+    <link rel="mask-icon" href="<?php echo $app['basePath']; ?>safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
 	<link rel="stylesheet" href="<?php echo $app['basePath']; ?>css/main.min.css?v=<?php echo $app['version']['asset']; ?>">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js?v=<?php echo $app['version']['asset']; ?>"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js?v=<?php echo $app['version']['asset']; ?>"></script>

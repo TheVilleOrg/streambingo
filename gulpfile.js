@@ -54,6 +54,11 @@
       .pipe(gulp.dest('dist/audio/'));
   }
 
+  function assets() {
+    return gulp.src('src/assets/**/*')
+      .pipe(gulp.dest('dist/'));
+  }
+
   function sync() {
     return gulp.src('dist/**/*', {dot: true})
       .pipe(gulp.dest(wwwPath));
@@ -64,13 +69,14 @@
     gulp.watch('src/js/*.js', js);
     gulp.watch('src/**/*.php', php);
     gulp.watch('src/.htaccess', misc);
-    gulp.watch('src/audio/**/*', audio)
+    gulp.watch('src/audio/**/*', audio);
+    gulp.watch('src/assets/**/*', assets);
     gulp.watch('dist/**/*', {dot: true}, sync);
     cb();
   }
 
   exports.clean = clean;
-  exports.prod = gulp.series(setProd, clean, gulp.parallel(css, js, php, misc, audio));
+  exports.prod = gulp.series(setProd, clean, gulp.parallel(css, js, php, misc, audio, assets));
 
-  exports.default = gulp.series(clean, gulp.parallel(css, js, php, misc, audio), sync, watch);
+  exports.default = gulp.series(clean, gulp.parallel(css, js, php, misc, audio, assets), sync, watch);
 })();
