@@ -395,7 +395,7 @@ class CardModel extends Model
         while ($stmt->fetch())
         {
             $grid = \array_map('intval', \explode(',', $grid));
-            $marked = !empty($marked) ? \array_map('intval', \explode(',', $marked)) : [];
+            $marked = $marked !== '' ? \array_map('intval', \explode(',', $marked)) : [];
 
             $card = new self($userId, $gameId);
             $card->id = $cardId;
