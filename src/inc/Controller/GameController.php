@@ -13,6 +13,7 @@ use Bingo\Exception\UnauthorizedException;
 use Bingo\Model\CardModel;
 use Bingo\Model\GameMetaModel;
 use Bingo\Model\GameModel;
+use Bingo\Model\StatRecordModel;
 use Bingo\Model\UserModel;
 
 /**
@@ -350,6 +351,9 @@ class GameController
 
         if ($result) {
             self::endGame($gameName, $card->getId(), $user->getName());
+
+            $count = GameMetaModel::loadGameFromId($game->getId())->getNumCards();
+            StatRecordModel::createRecord($user->getId(), $gameName, $count, $card->getGrid(), $card->getMarked(), $game->getCalled())->save();
         }
 
         return [

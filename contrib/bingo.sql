@@ -17,7 +17,7 @@ CREATE TABLE `cards` (
   `marked` text NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `games` (
   `id` int(11) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `games` (
   `winnerName` varchar(32) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `game_settings` (
   `gameName` varchar(32) NOT NULL,
@@ -39,6 +39,17 @@ CREATE TABLE `game_settings` (
   `autoEnd` int(11) NOT NULL DEFAULT 30,
   `tts` tinyint(1) NOT NULL DEFAULT 0,
   `ttsVoice` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `stats` (
+  `id` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `gameName` varchar(32) NOT NULL,
+  `numPlayers` int(11) NOT NULL,
+  `grid` text NOT NULL,
+  `marked` text NOT NULL,
+  `called` text NOT NULL,
+  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `users` (
@@ -50,7 +61,7 @@ CREATE TABLE `users` (
   `refreshToken` varchar(64) NOT NULL,
   `host` tinyint(1) NOT NULL DEFAULT 0,
   `created` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 ALTER TABLE `cards`
@@ -61,12 +72,17 @@ ALTER TABLE `cards`
 
 ALTER TABLE `games`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `gameName` (`gameName`),
+  ADD UNIQUE KEY `gameName` (`gameName`) USING BTREE,
   ADD KEY `userId` (`userId`),
   ADD KEY `winner` (`winner`);
 
 ALTER TABLE `game_settings`
   ADD PRIMARY KEY (`gameName`);
+
+ALTER TABLE `stats`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `userId` (`userId`),
+  ADD KEY `gameName` (`gameName`);
 
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -81,6 +97,9 @@ ALTER TABLE `cards`
 ALTER TABLE `games`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `stats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
@@ -92,6 +111,9 @@ ALTER TABLE `cards`
 ALTER TABLE `games`
   ADD CONSTRAINT `games_ibfk_2` FOREIGN KEY (`winner`) REFERENCES `cards` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `games_ibfk_3` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `stats`
+  ADD CONSTRAINT `stats_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
