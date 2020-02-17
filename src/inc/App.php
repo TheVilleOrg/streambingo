@@ -17,12 +17,12 @@ class App
     /**
      * The application version string
      */
-    const APP_VERSION = 'v0.1.3';
+    const APP_VERSION = 'v0.2.0';
 
     /**
      * The client asset version
      */
-    const ASSET_VERSION = 4;
+    const ASSET_VERSION = 5;
 
     /**
      * The requested route
