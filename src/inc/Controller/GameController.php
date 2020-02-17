@@ -282,11 +282,14 @@ class GameController
      * @param int $userId The unique identifier associated with the user that owns the card
      * @param int $gameId The unique identifier of the game associated with the card
      * @param int $cell The index of the cell
+     * @param bool $marked True to set the cell status to marked, false otherwise
+     *
+     * @return bool True if the cell status is marked, false otherwise
      *
      * @throws \Bingo\Exception\BadRequestException
      * @throws \Bingo\Exception\NotFoundException
      */
-    public static function toggleCell(int $userId, int $gameId, int $cell): bool
+    public static function markCell(int $userId, int $gameId, int $cell, bool $marked): bool
     {
         $card = CardModel::loadCard($userId, $gameId);
         if (!$card)
@@ -300,13 +303,13 @@ class GameController
         }
 
         try {
-            if ($card->getCellMarked($cell))
+            if ($marked)
             {
-                $card->unmark($cell);
+                $card->mark($cell);
             }
             else
             {
-                $card->mark($cell);
+                $card->unmark($cell);
             }
         }
         catch (GameException $e)

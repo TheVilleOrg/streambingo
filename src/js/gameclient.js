@@ -71,7 +71,14 @@ $(function() {
   });
 
   $(document).on('click', '.card .marker', function() {
-    var cell = $(this);
+    markCell($(this), true);
+  });
+
+  $(document).on('dblclick', '.card .marker', function() {
+    markCell($(this), false);
+  });
+
+  function markCell(cell, marked) {
     var index = cell.data('cell');
     if (index === 12) {
       return;
@@ -79,9 +86,10 @@ $(function() {
 
     var postData = {
       json: true,
-      action: 'toggleCell',
+      action: 'markCell',
       gameId: cell.parents('.card').data('game-id'),
-      cell: index
+      cell: index,
+      marked: marked
     };
     $.post(window.location, postData, function(data) {
       if (data.marked) {
@@ -90,7 +98,7 @@ $(function() {
         cell.removeClass('marked');
       }
     }, 'json');
-  });
+  }
 
   $(document).on('click', '.game-over-buttons .cancel', function() {
     $(this).parents('.card').remove();

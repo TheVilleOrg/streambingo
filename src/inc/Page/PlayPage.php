@@ -86,10 +86,11 @@ class PlayPage extends Page
 
         switch (\filter_input(INPUT_POST, 'action'))
         {
-            case 'toggleCell':
+            case 'markCell':
                 $gameId = \filter_input(INPUT_POST, 'gameId', FILTER_VALIDATE_INT);
                 $cell = \filter_input(INPUT_POST, 'cell', FILTER_VALIDATE_INT);
-                $data['marked'] = GameController::toggleCell($user->getId(), $gameId, $cell);
+                $marked = \filter_input(INPUT_POST, 'marked', FILTER_VALIDATE_BOOLEAN);
+                $data['marked'] = GameController::markCell($user->getId(), $gameId, $cell, $marked);
                 break;
             case 'fetchCard':
                 $gameId = \filter_input(INPUT_POST, 'gameId', FILTER_VALIDATE_INT);
