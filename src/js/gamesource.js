@@ -3,6 +3,8 @@
 $(function() {
   $('body').removeClass('nojs');
 
+  var voices = ['en-GB/f', 'en-GB/m', 'en-US/f', 'en-US/m'];
+
   var gameVars = JSON.parse($('#game-vars').text());
 
   var autoRestartTimer;
@@ -62,7 +64,12 @@ $(function() {
     }, 8000);
 
     if (gameVars.tts) {
-      new Audio('../../audio/' + gameVars.ttsVoice + '/' + letter.toLowerCase() + number + '.ogg').play();
+      var voice = gameVars.ttsVoice;
+      if (voice === 'random') {
+        voice = voices[parseInt(Math.random() * voices.length)];
+      }
+
+      new Audio('../../audio/' + voice + '/' + letter.toLowerCase() + number + '.ogg').play();
     }
   });
 
@@ -79,7 +86,12 @@ $(function() {
 
   socket.on('gameover', function(gameName, winner) {
     if (!gameVars.ended && gameVars.tts) {
-      new Audio('../../audio/' + gameVars.ttsVoice + '/gameover.ogg').play();
+      var voice = gameVars.ttsVoice;
+      if (voice === 'random') {
+        voice = voices[parseInt(Math.random() * voices.length)];
+      }
+
+      new Audio('../../audio/' + voice + '/gameover.ogg').play();
     }
 
     gameVars.ended = true;

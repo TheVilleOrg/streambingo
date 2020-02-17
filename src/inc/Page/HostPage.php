@@ -75,6 +75,7 @@ class HostPage extends Page
                 'gamehost',
             ],
             'ttsVoices'   => [
+                'random'  => 'Random',
                 'en-GB/f' => 'British English Female',
                 'en-GB/m' => 'British English Male',
                 'en-US/f' => 'US English Female',
