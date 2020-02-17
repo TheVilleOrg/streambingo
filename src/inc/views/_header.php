@@ -27,6 +27,7 @@
             <li><a href="<?php echo $app['basePath']; ?>">Home</a></li>
             <li><a href="<?php echo $app['basePath']; ?>play">Play</a></li>
             <li><a href="<?php echo $app['basePath']; ?>host">Host</a></li>
+            <li><a href="<?php echo $app['basePath']; ?>leaderboard">Leaderboard</a></li>
             <li><a href="https://discord.io/StreamBingo" target="_blank">Discord</a></li>
             <li><a href="https://twitter.com/streambingolive" target="_blank">Twitter</a></li>
         </ul>
