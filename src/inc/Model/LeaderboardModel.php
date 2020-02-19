@@ -4,6 +4,8 @@ declare (strict_types = 1);
 
 namespace Bingo\Model;
 
+use Bingo\Config;
+
 /**
  * Represents a leaderboard entry of a Bingo player.
  */
@@ -109,10 +111,10 @@ class LeaderboardModel extends Model
 
         $userId = $userName = $score = null;
 
-        $sql = 'SELECT s.userId, u.name, COUNT(1) AS score FROM stats s LEFT JOIN users u ON s.userId = u.id';
+        $sql = 'SELECT s.userId, u.name, COUNT(1) AS score FROM stats s LEFT JOIN users u ON s.userId = u.id WHERE s.numPlayers >= ' . (int) Config::LEADERBOARD_MIN_PLAYERS;
         if ($gameName)
         {
-            $sql .= ' WHERE s.gameName = ?';
+            $sql .= ' AND s.gameName = ?';
         }
 
         $sql .= ' GROUP BY s.userId ORDER BY score DESC;';

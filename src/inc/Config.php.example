@@ -58,4 +58,9 @@ class Config
      * The Twitch application secret
      */
     const TWITCH_APP_SECRET = '';
+
+    /**
+     * The minimum number of players required in a game for the winner to be counted in the leaderboards
+     */
+    const LEADERBOARD_MIN_PLAYERS = 3;
 }
