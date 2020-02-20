@@ -35,9 +35,9 @@ class UserModel extends Model
     /**
      * The Twitch access token for this user
      *
-     * @var string
+     * @var string|null
      */
-    protected $accessToken = '';
+    protected $accessToken = null;
 
     /**
      * The Twitch refresh token for this user

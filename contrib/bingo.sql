@@ -57,8 +57,8 @@ CREATE TABLE `users` (
   `name` varchar(32) NOT NULL,
   `gameToken` varchar(64) NOT NULL,
   `twitchId` int(11) DEFAULT NULL,
-  `accessToken` varchar(64) NOT NULL,
-  `refreshToken` varchar(64) NOT NULL,
+  `accessToken` varchar(64) DEFAULT NULL,
+  `refreshToken` varchar(64) DEFAULT NULL,
   `host` tinyint(1) NOT NULL DEFAULT 0,
   `created` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
