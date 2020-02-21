@@ -73,8 +73,9 @@ abstract class Page
         if ($userModel)
         {
             $app['user'] = [
-                'loggedIn' => true,
-                'name'     => \htmlspecialchars($userModel->getName()),
+                'loggedIn'  => true,
+                'name'      => \htmlspecialchars($userModel->getName()),
+                'logoutUrl' => Config::BASE_PATH . 'auth/logout?return_url=' . \urlencode(Config::BASE_PATH . App::getRoute()),
             ];
         }
 

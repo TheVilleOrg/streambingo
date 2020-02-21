@@ -33,7 +33,7 @@
         </ul>
         <span id="user">
 <?php if ($app['user']['loggedIn']): ?>
-            Welcome, <strong><?php echo $app['user']['name']; ?></strong>
+            Welcome, <strong><?php echo $app['user']['name']; ?></strong> | <a href="<?php echo $app['user']['logoutUrl']; ?>">Logout</a>
 <?php else: ?>
             <a href="<?php echo $app['authUrl']; ?>" class="twitch-login">Login with Twitch</a>
 <?php endif; ?>

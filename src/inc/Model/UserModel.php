@@ -246,12 +246,12 @@ class UserModel extends Model
     /**
      * Sets the Twitch OAuth2 tokens for this user.
      *
-     * @param string $accessToken The Twitch access token for this user
+     * @param string|null $accessToken The Twitch access token for this user
      * @param string|null $refreshToken The Twitch refresh token for this user, or null if one is not provided
      *
      * @return \Bingo\Model\UserModel This object
      */
-    public function setTokens(string $accessToken, string $refreshToken = null): UserModel
+    public function setTokens(string $accessToken = null, string $refreshToken = null): UserModel
     {
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;

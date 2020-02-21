@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace Bingo\Page;
 
+use Bingo\Config;
 use Bingo\Controller\UserController;
 use Bingo\Exception\BadRequestException;
 use Bingo\Exception\InternalErrorException;
@@ -21,6 +22,17 @@ class AuthPage extends Page
      */
     public function run(array $params): void
     {
+        if ($params[0] ?? null === 'logout')
+        {
+            UserController::logoutUser();
+
+            $url = \filter_input(INPUT_GET, 'return_url', FILTER_SANITIZE_URL);
+            $url = empty($url) ? Config::BASE_PATH : $url;
+
+            \header('Location: ' . $url);
+            return;
+        }
+
         if (!\filter_has_var(INPUT_GET, 'code'))
         {
             throw new BadRequestException('No `code` parameter present.');

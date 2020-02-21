@@ -168,6 +168,23 @@ class UserController
     }
 
     /**
+     * Removes the tokens and cookies for the current user.
+     */
+    public function logoutUser(): void
+    {
+        $user = self::getCurrentUser();
+        if ($user)
+        {
+            $user->setTokens()->save();
+        }
+
+        \setcookie('uid', '', 0, Config::BASE_PATH);
+        \setcookie('access_token', '', 0, Config::BASE_PATH);
+
+        unset($_SESSION['user_id']);
+    }
+
+    /**
      * Validates an access token with the Twitch server.
      *
      * @param \Bingo\Model\UserModel $user The user to validate
