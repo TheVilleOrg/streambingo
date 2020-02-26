@@ -168,6 +168,10 @@ $(function() {
     updateGameSettings();
   });
 
+  $('#background').change(function () {
+    updateGameSettings();
+  });
+
   $('#source-url').click(function() {
     $(this).select();
   });
@@ -296,7 +300,8 @@ $(function() {
       autoRestart: $('#auto-restart-interval').val(),
       autoEnd: $('#auto-end-interval').val(),
       tts: gameVars.tts,
-      ttsVoice: gameVars.ttsVoice
+      ttsVoice: gameVars.ttsVoice,
+      background: $('#background').val()
     };
     $.post(window.location, postData);
   }

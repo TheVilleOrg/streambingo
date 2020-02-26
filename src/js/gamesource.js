@@ -26,6 +26,8 @@ $(function() {
       gameVars.ended = ended;
       gameVars.winner = winner;
 
+      $('#main-container').prop('class', settings.background);
+
       $('#board .marked').removeClass('marked').removeClass('latest');
       if (called.length) {
         for (var i = 0; i < called.length; i++) {
@@ -76,6 +78,8 @@ $(function() {
   socket.on('gamesettings', function (settings) {
     gameVars.tts = settings.tts;
     gameVars.ttsVoice = settings.ttsVoice;
+
+    $('#main-container').prop('class', settings.background);
   });
 
   socket.on('addplayer', function () {

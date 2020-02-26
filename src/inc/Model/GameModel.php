@@ -110,6 +110,13 @@ class GameModel extends Model
     protected $ttsVoice = '';
 
     /**
+     * The background of the browser source
+     *
+     * @var string
+     */
+    protected $background = 'cycle';
+
+    /**
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name identifying the game
      */
@@ -239,9 +246,10 @@ class GameModel extends Model
         $autoEnd = $this->getAutoEnd();
         $tts = $this->getTts();
         $ttsVoice = $this->getTtsVoice();
+        $background = $this->getBackground();
 
-        $stmt = self::db()->prepare('INSERT INTO game_settings (gameName, autoCall, autoRestart, autoEnd, tts, ttsVoice) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE autoCall = ?, autoRestart = ?, autoEnd = ?, tts = ?, ttsVoice = ?;');
-        $stmt->bind_param('siiiisiiiis', $gameName, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice);
+        $stmt = self::db()->prepare('INSERT INTO game_settings (gameName, autoCall, autoRestart, autoEnd, tts, ttsVoice, background) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE autoCall = ?, autoRestart = ?, autoEnd = ?, tts = ?, ttsVoice = ?, background = ?;');
+        $stmt->bind_param('siiiissiiiiss', $gameName, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -457,6 +465,26 @@ class GameModel extends Model
     }
 
     /**
+     * @return string The background of the browser source
+     */
+    public function getBackground(): string
+    {
+        return $this->background;
+    }
+
+    /**
+     * @param string $background The background of the browser source
+     *
+     * @return \Bingo\Model\GameModel This object
+     */
+    public function setBackground(string $background): GameModel
+    {
+        $this->background = $background;
+
+        return $this;
+    }
+
+    /**
      * Removes a number from the list of available numbers and adds it to the list of called numbers.
      *
      * @return int The number that was called
@@ -491,15 +519,15 @@ class GameModel extends Model
      */
     protected static function loadGame(string $ident, bool $useToken): ?GameModel
     {
-        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = $autoCall = $autoRestart = $autoEnd = $tts = $ttsVoice = null;
+        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = $autoCall = $autoRestart = $autoEnd = $tts = $ttsVoice = $background = null;
 
-        $sql = 'SELECT g.id, g.userId, g.gameName, g.balls, g.called, g.ended, g.winner, g.winnerName, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), s.autoCall, s.autoRestart, s.autoEnd, s.tts, s.ttsVoice FROM games g LEFT JOIN game_settings s ON g.gameName = s.gameName WHERE ';
+        $sql = 'SELECT g.id, g.userId, g.gameName, g.balls, g.called, g.ended, g.winner, g.winnerName, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), s.autoCall, s.autoRestart, s.autoEnd, s.tts, s.ttsVoice, s.background FROM games g LEFT JOIN game_settings s ON g.gameName = s.gameName WHERE ';
         $sql .= $useToken ? 'g.userId = (SELECT id FROM users WHERE gameToken = ?);' : 'g.gameName = ?;';
 
         $stmt = self::db()->prepare($sql);
         $stmt->bind_param('s', $ident);
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice);
+        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background);
         if ($stmt->fetch())
         {
             $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
@@ -519,6 +547,7 @@ class GameModel extends Model
             $game->autoEnd = $autoEnd ?? 60;
             $game->tts = (bool) $tts;
             $game->ttsVoice = $ttsVoice ?? '';
+            $game->background = $background;
         }
 
         $stmt->close();

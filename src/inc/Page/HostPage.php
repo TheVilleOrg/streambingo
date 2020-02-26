@@ -81,6 +81,10 @@ class HostPage extends Page
                 'en-US/f' => 'US English Female',
                 'en-US/m' => 'US English Male',
             ],
+            'backgrounds' => [
+                'none'  => 'No Background',
+                'cycle' => 'Color Cycle',
+            ],
             'gameName'    => \htmlspecialchars($game->getGameName()),
             'gameToken'   => $user->getGameToken(),
             'hostUrl'     => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
@@ -89,6 +93,7 @@ class HostPage extends Page
             'autoEnd'     => $game->getAutoEnd(),
             'tts'         => $game->getTts(),
             'ttsVoice'    => $game->getTtsVoice(),
+            'background'  => $game->getBackground(),
             'cardCount'   => $meta->getNumCards(),
         ];
 
@@ -125,7 +130,8 @@ class HostPage extends Page
                 $autoEnd = \filter_input(INPUT_POST, 'autoEnd', FILTER_VALIDATE_INT);
                 $tts = \filter_input(INPUT_POST, 'tts', FILTER_VALIDATE_BOOLEAN);
                 $ttsVoice = \filter_input(INPUT_POST, 'ttsVoice');
-                GameController::updateGameSettings($game, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice);
+                $background = \filter_input(INPUT_POST, 'background');
+                GameController::updateGameSettings($game, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background);
                 break;
         }
 

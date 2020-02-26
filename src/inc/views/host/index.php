@@ -33,6 +33,15 @@
                     <button id="copy-source-url">Copy</button>
                     <p>Use this for your browser source URL in your streaming software.</p>
                 </div>
+                <div>
+                    <h4>Browser Source Background</h4>
+                    <label for="background">Background: </label>
+                    <select id="background">
+<?php foreach ($backgrounds as $k => $v): ?>
+                        <option value="<?php echo $k; ?>"<?php if ($k === $background): ?> selected<?php endif; ?>><?php echo $v; ?></option>
+<?php endforeach; ?>
+                    </select>
+                </div>
             </div>
         </div>
 <?php require __DIR__ . '/../_footer.php'; ?>

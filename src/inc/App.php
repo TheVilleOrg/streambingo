@@ -22,7 +22,7 @@ class App
     /**
      * The client asset version
      */
-    const ASSET_VERSION = 5;
+    const ASSET_VERSION = 6;
 
     /**
      * The requested route
@@ -76,8 +76,9 @@ class App
                 $game = GameController::getGameFromToken($argv[2]);
                 $return['name'] = $game->getGameName();
                 $return['settings'] = [
-                    'tts'     => $game->getTts(),
-                    'ttsVoice' => $game->getTtsVoice(),
+                    'tts'        => $game->getTts(),
+                    'ttsVoice'   => $game->getTtsVoice(),
+                    'background' => $game->getBackground(),
                 ];
                 $return['called'] = $game->getCalled();
                 $return['ended'] = $game->getEnded();

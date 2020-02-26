@@ -193,15 +193,16 @@ class GameController
      * @param int $autoEnd The auto end interval in seconds
      * @param bool $tts True to enable text-to-speech, false otherwise
      * @param string $ttsVoice The name of the text-to-speech voice to use
+     * @param string $background The background of the browser source
      */
-    public static function updateGameSettings(GameModel $game, int $autoCall, int $autoRestart, int $autoEnd, bool $tts, string $ttsVoice): void
+    public static function updateGameSettings(GameModel $game, int $autoCall, int $autoRestart, int $autoEnd, bool $tts, string $ttsVoice, string $background): void
     {
-        $game->setAutoCall($autoCall)->setAutoRestart($autoRestart)->setAutoEnd($autoEnd)->setTts($tts)->setTtsVoice($ttsVoice)->saveSettings();
+        $game->setAutoCall($autoCall)->setAutoRestart($autoRestart)->setAutoEnd($autoEnd)->setTts($tts)->setTtsVoice($ttsVoice)->setBackground($background)->saveSettings();
 
         $request = [
             'action'   => 'updateGameSettings',
             'gameName' => $game->getGameName(),
-            'settings' => \compact('autoCall', 'autoRestart', 'autoEnd', 'tts', 'ttsVoice'),
+            'settings' => \compact('autoCall', 'autoRestart', 'autoEnd', 'tts', 'ttsVoice', 'background'),
         ];
         self::serverRequest($request);
     }

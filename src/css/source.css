@@ -20,7 +20,7 @@ h2 {
     margin: .4em 0 .5em;
 }
 
-#main-container {
+#main-container.cycle {
     animation: background-fade 60s infinite;
 }
 

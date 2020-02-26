@@ -38,7 +38,8 @@ CREATE TABLE `game_settings` (
   `autoRestart` int(11) NOT NULL DEFAULT 60,
   `autoEnd` int(11) NOT NULL DEFAULT 30,
   `tts` tinyint(1) NOT NULL DEFAULT 0,
-  `ttsVoice` text NOT NULL
+  `ttsVoice` text NOT NULL,
+  `background` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `stats` (
