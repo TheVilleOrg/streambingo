@@ -11,6 +11,11 @@ use Bingo\Exception\GameException;
  */
 class GameModel extends Model
 {
+    const GAME_TYPE_FREE_LINE = 0;
+    const GAME_TYPE_LINE = 1;
+    const GAME_TYPE_FREE_FILL = 2;
+    const GAME_TYPE_FILL = 3;
+
     /**
      * The unique identifier associated with the user that owns this game
      *
@@ -24,6 +29,13 @@ class GameModel extends Model
      * @var string
      */
     protected $gameName;
+
+    /**
+     * The type of game
+     *
+     * @var int
+     */
+    protected $gameType = 0;
 
     /**
      * The list of numbers available to be called
@@ -119,11 +131,13 @@ class GameModel extends Model
     /**
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name identifying the game
+     * @param int $gameType The type of game
      */
-    protected function __construct(int $userId, string $gameName)
+    protected function __construct(int $userId, string $gameName, int $gameType)
     {
         $this->userId = $userId;
         $this->gameName = $gameName;
+        $this->gameType = \min(3, \max(0, $gameType));
     }
 
     /**
@@ -155,12 +169,13 @@ class GameModel extends Model
      *
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name identifying the game
+     * @param int $gameType The type of game
      *
      * @return \Bingo\Model\GameModel The game
      */
-    public static function createGame(int $userId, string $gameName): GameModel
+    public static function createGame(int $userId, string $gameName, int $gameType = 0): GameModel
     {
-        $game = new self($userId, $gameName);
+        $game = new self($userId, $gameName, $gameType);
 
         $game->balls = \array_keys(\array_fill(1, 75, true));
         \shuffle($game->balls);
@@ -207,14 +222,15 @@ class GameModel extends Model
     {
         $userId = $this->getUserId();
         $gameName = $this->getGameName();
+        $gameType = $this->getGameType();
         $balls = \implode(',', $this->getBalls());
         $called = \implode(',', $this->getCalled());
         $ended = $this->getEnded();
         $winner = $this->getWinner();
         $winnerName = $this->getWinnerName();
 
-        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, balls, called, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE balls = ?, called = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
-        $stmt->bind_param('isssiisssiis', $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $balls, $called, $ended, $winner, $winnerName);
+        $stmt = self::db()->prepare('INSERT INTO games (userId, gameName, gameType, balls, called, ended, winner, winnerName) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE gameType = ?, balls = ?, called = ?, ended = ?, winner = ?, winnerName = ?, updated = CURRENT_TIMESTAMP;');
+        $stmt->bind_param('isissiisissiis', $userId, $gameName, $gameType, $balls, $called, $ended, $winner, $winnerName, $gameType, $balls, $called, $ended, $winner, $winnerName);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -362,6 +378,14 @@ class GameModel extends Model
     public function getUpdated(): int
     {
         return $this->updated;
+    }
+
+    /**
+     * @return int The type of game
+     */
+    public function getGameType(): int
+    {
+        return $this->gameType;
     }
 
     /**
@@ -519,21 +543,21 @@ class GameModel extends Model
      */
     protected static function loadGame(string $ident, bool $useToken): ?GameModel
     {
-        $game = $gameId = $userId = $gameName = $balls = $called = $ended = $winner = $winnerName = $created = $updated = $autoCall = $autoRestart = $autoEnd = $tts = $ttsVoice = $background = null;
+        $game = $gameId = $userId = $gameName = $gameType = $balls = $called = $ended = $winner = $winnerName = $created = $updated = $autoCall = $autoRestart = $autoEnd = $tts = $ttsVoice = $background = null;
 
-        $sql = 'SELECT g.id, g.userId, g.gameName, g.balls, g.called, g.ended, g.winner, g.winnerName, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), s.autoCall, s.autoRestart, s.autoEnd, s.tts, s.ttsVoice, s.background FROM games g LEFT JOIN game_settings s ON g.gameName = s.gameName WHERE ';
+        $sql = 'SELECT g.id, g.userId, g.gameName, g.gameType, g.balls, g.called, g.ended, g.winner, g.winnerName, UNIX_TIMESTAMP(g.created), UNIX_TIMESTAMP(g.updated), s.autoCall, s.autoRestart, s.autoEnd, s.tts, s.ttsVoice, s.background FROM games g LEFT JOIN game_settings s ON g.gameName = s.gameName WHERE ';
         $sql .= $useToken ? 'g.userId = (SELECT id FROM users WHERE gameToken = ?);' : 'g.gameName = ?;';
 
         $stmt = self::db()->prepare($sql);
         $stmt->bind_param('s', $ident);
         $stmt->execute();
-        $stmt->bind_result($gameId, $userId, $gameName, $balls, $called, $ended, $winner, $winnerName, $created, $updated, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background);
+        $stmt->bind_result($gameId, $userId, $gameName, $gameType, $balls, $called, $ended, $winner, $winnerName, $created, $updated, $autoCall, $autoRestart, $autoEnd, $tts, $ttsVoice, $background);
         if ($stmt->fetch())
         {
             $balls = !empty($balls) ? \array_map('intval', \explode(',', $balls)) : [];
             $called = !empty($called) ? \array_map('intval', \explode(',', $called)) : [];
 
-            $game = new self($userId, $gameName);
+            $game = new self($userId, $gameName, $gameType);
             $game->id = $gameId;
             $game->balls = $balls;
             $game->called = $called;
@@ -547,7 +571,7 @@ class GameModel extends Model
             $game->autoEnd = $autoEnd ?? 60;
             $game->tts = (bool) $tts;
             $game->ttsVoice = $ttsVoice ?? '';
-            $game->background = $background;
+            $game->background = $background ?? 'cycle';
         }
 
         $stmt->close();

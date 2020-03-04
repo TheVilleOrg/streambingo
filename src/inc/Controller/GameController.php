@@ -41,7 +41,7 @@ class GameController
      */
     public static function getGame(int $userId, string $gameName): GameModel
     {
-        return GameModel::loadGameFromName($gameName) ?? self::createGame($userId, $gameName);
+        return GameModel::loadGameFromName($gameName) ?? self::createGame($userId, $gameName, GameModel::GAME_TYPE_FREE_LINE);
     }
 
     /**
@@ -89,10 +89,11 @@ class GameController
      *
      * @param int $userId The unique identifier associated with the user that owns the game
      * @param string $gameName The unique name to identify the game
+     * @param int $gameType The type of game
      *
      * @return \Bingo\Model\GameModel The game
      */
-    public static function createGame(int $userId, string $gameName): GameModel
+    public static function createGame(int $userId, string $gameName, int $gameType): GameModel
     {
         $oldGameId = null;
 
@@ -103,7 +104,7 @@ class GameController
             GameModel::deleteGame($gameName);
         }
 
-        $game = GameModel::createGame($userId, $gameName);
+        $game = GameModel::createGame($userId, $gameName, $gameType);
         $game->save();
 
         $request = [
@@ -301,6 +302,16 @@ class GameController
         if ($card->getGameEnded())
         {
             throw new BadRequestException('Attempted to mark a card for a game that has ended');
+        }
+
+        if ($card->getCellMarked($cell) === $marked)
+        {
+            return $marked;
+        }
+
+        if ($cell === 12 && ($card->getGameType() === GameModel::GAME_TYPE_FREE_LINE || $card->getGameType() === GameModel::GAME_TYPE_FREE_FILL))
+        {
+            return true;
         }
 
         try {

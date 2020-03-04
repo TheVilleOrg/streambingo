@@ -44,4 +44,19 @@
                 </div>
             </div>
         </div>
+        <div id="create-game-wrapper" class="hidden">
+            <div id="create-game-options">
+                <h2>Create Game</h2>
+                <p>Select the type of game to create.</p>
+                <label>
+                    <select id="create-game-type">
+<?php foreach ($gameTypes as $k => $v): ?>
+                        <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+<?php endforeach; ?>
+                    </select>
+                </label>
+                <button id="create-game-confirm">Create</button>
+                <button id="create-game-cancel">Cancel</button>
+            </div>
+        </div>
 <?php require __DIR__ . '/../_footer.php'; ?>

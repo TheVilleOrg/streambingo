@@ -23,6 +23,7 @@ CREATE TABLE `games` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `gameName` varchar(32) NOT NULL,
+  `gameType` int(11) NOT NULL DEFAULT 0,
   `balls` text NOT NULL,
   `called` text NOT NULL,
   `ended` tinyint(1) NOT NULL DEFAULT 0,

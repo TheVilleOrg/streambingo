@@ -60,7 +60,11 @@ $(function() {
       card.find('.game-name').text(data.gameName);
 
       for (var i = 0; i < data.grid.length; i++) {
-        card.find('.marker[data-cell=' + i + ']').text(data.grid[i]);
+        var cell = card.find('.marker[data-cell=' + i + ']');
+        cell.text(data.grid[i]);
+        if (data.freeSpace && i === 12) {
+          cell.addClass('free');
+        }
       }
 
       $('#empty-list').addClass('hidden');
@@ -80,10 +84,6 @@ $(function() {
 
   function markCell(cell, marked) {
     var index = cell.data('cell');
-    if (index === 12) {
-      return;
-    }
-
     var postData = {
       json: true,
       action: 'markCell',

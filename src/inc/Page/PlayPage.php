@@ -6,6 +6,7 @@ namespace Bingo\Page;
 
 use Bingo\Controller\UserController;
 use Bingo\Controller\GameController;
+use Bingo\Model\GameModel;
 use Bingo\Model\UserModel;
 
 /**
@@ -56,18 +57,23 @@ class PlayPage extends Page
 
         foreach ($cards as $card)
         {
-            $grid = $card->getGrid();
-            $grid[12] = 'Free';
-
-            $data['cards'][] = [
+            $card = [
                 'cardId'     => $card->getId(),
                 'gameId'     => $card->getGameId(),
                 'gameName'   => \htmlspecialchars($card->getGameName()),
-                'grid'       => $grid,
+                'grid'       => $card->getGrid(),
                 'marked'     => $card->getMarked(),
+                'freeSpace'  => $card->getGameType() === GameModel::GAME_TYPE_FREE_LINE || $card->getGameType() === GameModel::GAME_TYPE_FREE_FILL,
                 'gameEnded'  => $card->getGameEnded(),
                 'gameWinner' => $card->getGameWinner(),
             ];
+
+            if ($card['freeSpace'])
+            {
+                $card['grid'][12] = 'Free';
+            }
+
+            $data['cards'][] = $card;
         }
 
         $this->showTemplate('play', $data);
@@ -98,7 +104,13 @@ class PlayPage extends Page
                 $data['cardId'] = $card->getId();
                 $data['gameName'] = $card->getGameName();
                 $data['grid'] = $card->getGrid();
-                $data['grid'][12] = 'Free';
+                $data['freeSpace'] = $card->getGameType() === GameModel::GAME_TYPE_FREE_LINE || $card->getGameType() === GameModel::GAME_TYPE_FREE_FILL;
+
+                if ($data['freeSpace'])
+                {
+                    $data['grid'][12] = 'Free';
+                }
+
                 break;
         }
 

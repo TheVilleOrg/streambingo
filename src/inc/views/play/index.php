@@ -22,7 +22,7 @@
                         <tr>
 <?php for ($j = 0; $j <= 20; $j += 5): ?>
                             <td>
-                                <div class="marker<?php if ($i + $j === 12): ?> free<?php endif; ?><?php if (\in_array($i + $j, $card['marked'])): ?> marked<?php endif; ?>" data-cell="<?php echo $i + $j; ?>"><?php echo $card['grid'][$i + $j]; ?></div>
+                                <div class="marker<?php if ($card['freeSpace'] && $i + $j === 12): ?> free<?php endif; ?><?php if (\in_array($i + $j, $card['marked'])): ?> marked<?php endif; ?>" data-cell="<?php echo $i + $j; ?>"><?php echo $card['grid'][$i + $j]; ?></div>
                             </td>
 <?php endfor; ?>
                         </tr>
@@ -59,7 +59,7 @@
                 <tr>
 <?php for ($j = 0; $j <= 20; $j += 5): ?>
                     <td>
-                        <div class="marker<?php if ($i + $j === 12): ?> free<?php endif; ?>" data-cell="<?php echo $i + $j; ?>"></div>
+                        <div class="marker" data-cell="<?php echo $i + $j; ?>"></div>
                     </td>
 <?php endfor; ?>
                 </tr>

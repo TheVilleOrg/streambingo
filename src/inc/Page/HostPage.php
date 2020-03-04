@@ -85,6 +85,12 @@ class HostPage extends Page
                 'none'  => 'No Background',
                 'cycle' => 'Color Cycle',
             ],
+            'gameTypes' => [
+                'Connect 5 (with free space)',
+                'Connect 5',
+                'Fill (with free space)',
+                'Fill',
+            ],
             'gameName'    => \htmlspecialchars($game->getGameName()),
             'gameToken'   => $user->getGameToken(),
             'hostUrl'     => Config::BASE_URL . Config::BASE_PATH . 'host/source/' . $user->getGameToken(),
@@ -116,7 +122,8 @@ class HostPage extends Page
         switch (\filter_input(INPUT_POST, 'action'))
         {
             case 'createGame':
-                GameController::createGame($user->getId(), $user->getName());
+                $gameType = \filter_input(INPUT_POST, 'gameType', FILTER_VALIDATE_INT);
+                GameController::createGame($user->getId(), $user->getName(), $gameType);
                 break;
             case 'endGame':
                 GameController::endGame($game->getGameName());

@@ -120,9 +120,17 @@ $(function() {
   });
 
   $('#create-game').click(function() {
-    if (window.confirm('Create a new game?')) {
-      restartGame();
-    }
+    $('#create-game-wrapper').removeClass('hidden');
+    $('#create-game-cancel').removeClass('hidden');
+  });
+
+  $('#create-game-confirm').click(function() {
+    restartGame();
+    $('#create-game-wrapper').addClass('hidden');
+  });
+
+  $('#create-game-cancel').click(function() {
+    $('#create-game-wrapper').addClass('hidden');
   });
 
   $('#call-number').click(function() {
@@ -217,7 +225,8 @@ $(function() {
 
     var postData = {
       json: true,
-      action: 'createGame'
+      action: 'createGame',
+      gameType: $('#create-game-type').val()
     };
     $.post(window.location, postData);
   }

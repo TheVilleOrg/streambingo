@@ -15,16 +15,16 @@ class CardModel extends Model
      * The list of winning patterns a card can have.
      */
     const WINPATTERNS = [
-        [0, 6, 18, 24],
-        [20, 16, 8, 4],
+        [0, 6, 12, 18, 24],
+        [20, 16, 12, 8, 4],
         [0, 5, 10, 15, 20],
         [1, 6, 11, 16, 21],
-        [2, 7, 17, 22],
+        [2, 7, 12, 17, 22],
         [3, 8, 13, 18, 23],
         [4, 9, 14, 19, 24],
         [0, 1, 2, 3, 4],
         [5, 6, 7, 8, 9],
-        [10, 11, 13, 14],
+        [10, 11, 12, 13, 14],
         [15, 16, 17, 18, 19],
         [20, 21, 22, 23, 24],
     ];
@@ -69,6 +69,13 @@ class CardModel extends Model
      * @var int
      */
     protected $updated;
+
+    /**
+     * The type of game this card is associated with
+     *
+     * @var int
+     */
+    protected $gameType;
 
     /**
      * The name of the game associated with this card
@@ -166,7 +173,6 @@ class CardModel extends Model
             $card->grid = \array_merge($card->grid, $column);
         }
 
-        $card->grid[12] = null;
         $card->created = $card->updated = time();
 
         return $card;
@@ -245,7 +251,7 @@ class CardModel extends Model
      */
     public function getCellMarked(int $i): bool
     {
-        if ($i < 0 || $i >= \count($this->grid) || $i === 12)
+        if ($i < 0 || $i >= \count($this->grid))
         {
             throw new GameException('Attempted to get the status of an invalid cell');
         }
@@ -267,6 +273,14 @@ class CardModel extends Model
     public function getUpdated(): int
     {
         return $this->updated;
+    }
+
+    /**
+     * @return int The type of game this card is associated with
+     */
+    public function getGameType(): int
+    {
+        return $this->gameType;
     }
 
     /**
@@ -304,7 +318,7 @@ class CardModel extends Model
      */
     public function mark(int $i): CardModel
     {
-        if ($i < 0 || $i >= \count($this->grid) || $i === 12)
+        if ($i < 0 || $i >= \count($this->grid))
         {
             throw new GameException('Attempted to mark an invalid cell');
         }
@@ -325,7 +339,7 @@ class CardModel extends Model
      */
     public function unmark(int $i): CardModel
     {
-        if ($i < 0 || $i >= \count($this->grid) || $i === 12)
+        if ($i < 0 || $i >= \count($this->grid))
         {
             throw new GameException('Attempted to unmark an invalid cell');
         }
@@ -346,13 +360,30 @@ class CardModel extends Model
     {
         $called = \array_intersect($this->grid, $called);
         $marked = \array_intersect(\array_keys($this->marked), \array_keys($called));
-        foreach (self::WINPATTERNS as $pattern)
+
+        if ($this->gameType === GameModel::GAME_TYPE_FREE_LINE || $this->gameType === GameModel::GAME_TYPE_FREE_FILL)
         {
-            $intersect = \array_intersect($pattern, $marked);
-            if (\count($intersect) === \count($pattern))
-            {
-                return true;
-            }
+            $marked[] = 12;
+            $marked = \array_unique($marked);
+        }
+
+        switch ($this->gameType)
+        {
+            case GameModel::GAME_TYPE_FREE_LINE:
+            case GameModel::GAME_TYPE_LINE:
+                foreach (self::WINPATTERNS as $pattern)
+                {
+                    $intersect = \array_intersect($pattern, $marked);
+                    if (\count($intersect) === \count($pattern))
+                    {
+                        return true;
+                    }
+                }
+
+                break;
+            case GameModel::GAME_TYPE_FREE_FILL:
+            case GameModel::GAME_TYPE_FILL:
+                return \count($marked) === 25;
         }
 
         return false;
@@ -370,9 +401,9 @@ class CardModel extends Model
     {
         $cards = [];
 
-        $card = $cardId = $grid = $marked = $created = $updated = $gameName = $gameEnded = $gameWinner = null;
+        $card = $cardId = $grid = $marked = $created = $updated = $gameType = $gameName = $gameEnded = $gameWinner = null;
 
-        $sql = 'SELECT c.id, c.gameId, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.gameName, g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameId = g.id WHERE c.userId = ? ';
+        $sql = 'SELECT c.id, c.gameId, c.grid, c.marked, UNIX_TIMESTAMP(c.created), UNIX_TIMESTAMP(c.updated), g.gameType, g.gameName, g.ended, g.winnerName FROM cards c LEFT JOIN games g ON c.gameId = g.id WHERE c.userId = ? ';
         if ($gameName)
         {
             $sql .= 'AND c.gameId = ? ';
@@ -391,7 +422,7 @@ class CardModel extends Model
         }
 
         $stmt->execute();
-        $stmt->bind_result($cardId, $gameId, $grid, $marked, $created, $updated, $gameName, $gameEnded, $gameWinner);
+        $stmt->bind_result($cardId, $gameId, $grid, $marked, $created, $updated, $gameType, $gameName, $gameEnded, $gameWinner);
         while ($stmt->fetch())
         {
             $grid = \array_map('intval', \explode(',', $grid));
@@ -403,6 +434,7 @@ class CardModel extends Model
             $card->marked = \array_fill_keys($marked, true);
             $card->created = $created;
             $card->updated = $updated;
+            $card->gameType = $gameType;
             $card->gameName = $gameName;
             $card->gameEnded = (bool) $gameEnded;
             $card->gameWinner = $gameWinner;
