@@ -1,12 +1,12 @@
 {
   "name": "bingod",
-  "version": "1.0.0",
+  "version": "0.2.3",
   "description": "The Stream BINGO backend daemon.",
   "homepage": "https://streambingo.live",
   "main": "daemon.js",
   "repository": "github:stevotvr//streambingo.git",
   "author": "Steve Guidetti",
-  "license": "UNLICENSED",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "dependencies": {
     "socket.io": "^2.3.0",

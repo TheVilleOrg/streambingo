@@ -1,3 +1,15 @@
+<?php
+
+/**
+ * This file is part of StreamBingo.
+ *
+ * @copyright (c) 2020, Steve Guidetti, https://github.com/stevotvr
+ * @license GNU General Public License, version 3 (GPL-3.0)
+ *
+ * For full license information, see the LICENSE file included with the source.
+ */
+
+?>
 <?php require __DIR__ . '/../../_header.php'; ?>
         <h2>Closed Beta</h2>
         <p>Hosting games is currently closed to the public. Only authorized accounts are able to use this feature at this time.</p>

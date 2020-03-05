@@ -1,3 +1,15 @@
+<?php
+
+/**
+ * This file is part of StreamBingo.
+ *
+ * @copyright (c) 2020, Steve Guidetti, https://github.com/stevotvr
+ * @license GNU General Public License, version 3 (GPL-3.0)
+ *
+ * For full license information, see the LICENSE file included with the source.
+ */
+
+?>
 <?php require __DIR__ . '/../_header.php'; ?>
 		<h2>Welcome to Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span></h2>
         <p>Stream <span class="letter-b">B</span><span class="letter-i">I</span><span class="letter-n">N</span><span class="letter-g">G</span><span class="letter-o">O</span> is a game made for live streaming. It is currently in beta so there may be bugs.</p>
