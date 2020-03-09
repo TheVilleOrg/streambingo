@@ -21,6 +21,8 @@ $(function() {
   var autoEndTimer;
   var autoEndCountdown;
 
+  var calledNumbers = [];
+
   var socket = io('//' + window.location.hostname + ':3000');
 
   var bingoBall = $('.bingo-ball.template');
@@ -35,16 +37,23 @@ $(function() {
       gameVars.ended = ended;
       gameVars.winner = winner;
 
+      calledNumbers = called;
+
       $('#main-container').prop('class', settings.background);
 
       $('#board .marked').removeClass('marked').removeClass('latest');
       if (called.length) {
         for (var i = 0; i < called.length; i++) {
-          $('#board td[data-cell=' + called[i] + ']').addClass('marked');
+          var cell = $('#board td[data-cell=' + called[i] + ']');
+          cell.addClass('marked');
+
+          if (called.length - i <= 5) {
+            cell.addClass('recent');
+          }
         }
 
         var latest = called[called.length - 1];
-        $('#board td[data-cell=' + latest + ']').addClass('latest');
+        $('#board td[data-cell=' + latest + ']').removeClass('recent').addClass('latest');
         $('#last-number').text(getLetter(latest) + latest);
       }
 
@@ -62,8 +71,14 @@ $(function() {
     var letter = getLetter(number);
     console.log('called ' + letter + number);
 
-    $('.latest').removeClass('latest');
+    calledNumbers.push(number);
+
+    $('.latest').removeClass('latest').addClass('recent');
     $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
+
+    if (calledNumbers.length >= 5) {
+      $('#board td[data-cell=' + calledNumbers[calledNumbers.length - 6] + ']').removeClass('recent');
+    }
 
     var ball = bingoBall.clone();
     ball.addClass(letter.toLowerCase());
@@ -121,6 +136,7 @@ $(function() {
     gameVars.ended = false;
     gameVars.winner = '';
     gameVars.cardCount = 0;
+    calledNumbers = [];
     updateEndgamePanel();
   });
 

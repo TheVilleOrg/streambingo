@@ -187,6 +187,10 @@ a.twitch-login:hover {
     color: #fff;
 }
 
+#board td.marked.recent {
+    background: #faa;
+}
+
 #cards {
     text-align: center;
 }

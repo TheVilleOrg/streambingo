@@ -23,7 +23,7 @@ $(function() {
   var autoEndCountdown;
   var settingsUpdateTimer;
 
-  var uncalledNumbers;
+  var calledNumbers = [];
 
   $('#auto-call').prop('checked', window.sessionStorage.getItem('autoCall') === 'true');
   $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
@@ -47,16 +47,21 @@ $(function() {
       gameVars.ended = ended;
       gameVars.winner = winner;
 
-      uncalledNumbers = 75 - called.length;
+      calledNumbers = called;
 
       $('#board .marked').removeClass('marked').removeClass('latest');
       if (called.length) {
         for (var i = 0; i < called.length; i++) {
-          $('#board td[data-cell=' + called[i] + ']').addClass('marked');
+          var cell = $('#board td[data-cell=' + called[i] + ']');
+          cell.addClass('marked');
+
+          if (called.length - i <= 5) {
+            cell.addClass('recent');
+          }
         }
 
         var latest = called[called.length - 1];
-        $('#board td[data-cell=' + latest + ']').addClass('latest');
+        $('#board td[data-cell=' + latest + ']').removeClass('recent').addClass('latest');
         $('#last-number').text(getLetter(latest) + latest);
       }
 
@@ -85,11 +90,15 @@ $(function() {
     var letter = getLetter(number);
     console.log('called ' + letter + number);
 
-    uncalledNumbers--;
+    calledNumbers.push(number);
 
-    $('.latest').removeClass('latest');
+    $('.latest').removeClass('latest').addClass('recent');
     $('#board td[data-cell=' + number + ']').addClass('marked').addClass('latest');
     $('#last-number').text(letter + number);
+
+    if (calledNumbers.length >= 5) {
+      $('#board td[data-cell=' + calledNumbers[calledNumbers.length - 6] + ']').removeClass('recent');
+    }
 
     updateAutoEnd();
   });
@@ -125,7 +134,7 @@ $(function() {
     gameVars.ended = false;
     gameVars.winner = '';
     gameVars.cardCount = 0;
-    uncalledNumbers = 75;
+    calledNumbers = [];
 
     clearTimers();
     updateAutoCall();
@@ -206,7 +215,7 @@ $(function() {
   });
 
   function callNumber() {
-    if (!connected || gameVars.ended || !uncalledNumbers) {
+    if (!connected || gameVars.ended || calledNumbers.length === 75) {
       return;
     }
 
@@ -287,7 +296,7 @@ $(function() {
 
   function updateAutoEnd() {
     if ($('#auto-end').prop('checked')) {
-      if (!uncalledNumbers && !autoEndTimer) {
+      if (calledNumbers.length === 75 && !autoEndTimer) {
         autoEndCountdown = $('#auto-end-interval').val();
         autoEndTimer = setInterval(function () {
           autoEndCountdown--;
@@ -340,7 +349,7 @@ $(function() {
 
       $('#call-number').prop('disabled', true);
     } else {
-      $('#call-number').prop('disabled', !uncalledNumbers);
+      $('#call-number').prop('disabled', calledNumbers === 75);
     }
   }
 
