@@ -29,6 +29,9 @@ $(function() {
   $('#auto-restart').prop('checked', window.sessionStorage.getItem('autoRestart') === 'true');
   $('#auto-end').prop('checked', window.sessionStorage.getItem('autoEnd') === 'true');
 
+  var gameType = window.sessionStorage.getItem('gameType');
+  $('#create-game-type').val(gameType ? gameType : 0);
+
   var socket = io('//' + window.location.hostname + ':3000');
 
   socket.on('connect', function() {
@@ -131,6 +134,10 @@ $(function() {
   $('#create-game').click(function() {
     $('#create-game-wrapper').removeClass('hidden');
     $('#create-game-cancel').removeClass('hidden');
+  });
+
+  $('#create-game-type').change(function() {
+    window.sessionStorage.setItem('gameType', $(this).val());
   });
 
   $('#create-game-confirm').click(function() {
