@@ -13,8 +13,7 @@
 <?php require __DIR__ . '/../_header.php'; ?>
         <noscript>JavaScript must be enabled to use this site.</noscript>
         <p>Join our <a href="https://discord.io/StreamBingo" target="_blank">Discord server</a> or <a href="https://twitter.com/streambingolive" target="_blank">follow us on Twitter</a> to stay up to date with Stream BINGO news.</p>
-        <p>Click a number to mark the cell. Double-click to unmark the cell.</p>
-        <p>Mark numbers as they are called on the stream. Type <code>bingo</code> in the stream chat when you connect 5 marked cells in a line.</p>
+        <p>Mark numbers as they are called on the stream. Click a number to mark the cell. Double-click to unmark the cell.</p>
         <div id="play">
             <div id="connection-status">Status: <span>Connecting...</span></div>
             <div id="cards">
@@ -22,6 +21,11 @@
 <?php foreach ($cards as $card): ?>
                 <div class="card" data-game-id="<?php echo $card['gameId']; ?>" data-game-name="<?php echo $card['gameName']; ?>">
                     <h2 class="game-name"><?php echo $card['gameName']; ?></h2>
+<?php if ($card['gameType'] < 2): ?>
+                    <p>Fill 5 adjacent squares in a line.</p>
+<?php else: ?>
+                    <p>Fill all squares.</p>
+<?php endif; ?>
                     <table class="grid">
                         <tr>
                             <th class="letter-b">B</th>
@@ -59,6 +63,8 @@
         </div>
         <div class="card template">
             <h2 class="game-name"></h2>
+            <p class="connect hidden">Fill 5 adjacent squares in a line.</p>
+            <p class="fill hidden">Fill all squares.</p>
             <table class="grid">
                 <tr>
                     <th class="letter-b">B</th>

@@ -73,6 +73,7 @@ class PlayPage extends Page
                 'grid'       => $card->getGrid(),
                 'marked'     => $card->getMarked(),
                 'freeSpace'  => $card->getGameType() === GameModel::GAME_TYPE_FREE_LINE || $card->getGameType() === GameModel::GAME_TYPE_FREE_FILL,
+                'gameType'   => $card->getGameType(),
                 'gameEnded'  => $card->getGameEnded(),
                 'gameWinner' => $card->getGameWinner(),
             ];
@@ -114,6 +115,7 @@ class PlayPage extends Page
                 $data['gameName'] = $card->getGameName();
                 $data['grid'] = $card->getGrid();
                 $data['freeSpace'] = $card->getGameType() === GameModel::GAME_TYPE_FREE_LINE || $card->getGameType() === GameModel::GAME_TYPE_FREE_FILL;
+                $data['gameType'] = $card->getGameType();
 
                 if ($data['freeSpace'])
                 {

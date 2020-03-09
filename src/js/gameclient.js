@@ -68,6 +68,12 @@ $(function() {
       card.attr('data-game-name', data.gameName);
       card.find('.game-name').text(data.gameName);
 
+      if (data.gameType < 2) {
+        card.find('.connect').removeClass('hidden');
+      } else {
+        card.find('.fill').removeClass('hidden');
+      }
+
       for (var i = 0; i < data.grid.length; i++) {
         var cell = card.find('.marker[data-cell=' + i + ']');
         cell.text(data.grid[i]);
